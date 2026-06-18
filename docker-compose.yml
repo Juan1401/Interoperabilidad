@@ -1,0 +1,56 @@
+# docker-compose.yml (Produccion - Interoperabilidad HL7)
+# Arquitectura dual:
+#   - Acceso directo por puerto: api:8003 / frontend:4203 (host → contenedor)
+#   - Acceso limpio por dominio: raziel.fciclubnoel.com → Nginx:80 → contenedor
+
+services:
+  # ─── Backend (API Laravel) ───────────────────
+  api:
+    container_name: hl7restapi
+    build:
+      context: ./Hl7RestAPI
+      dockerfile: Dockerfile
+    ports:
+      - "8003:80"   # Acceso directo: raziel-api.fciclubnoel.com:8003
+    volumes:
+      - ./Hl7RestAPI/.env:/var/www/html/.env
+      - hl7_prod_storage:/var/www/html/storage  # Delega a Docker la persistencia y permisos del storage
+    networks:
+      - hl7_network
+    restart: unless-stopped
+
+  # ─── Frontend (Angular compilado con Nginx) ───
+  frontend:
+    container_name: hl7frontend
+    build:
+      context: ./HL7Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4203:80"   # Acceso directo: raziel.fciclubnoel.com:4203
+    networks:
+      - hl7_network
+    restart: unless-stopped
+
+  # ─── Proxy Inverso Nginx (acceso limpio por dominio) ─
+  nginx:
+    container_name: hl7nginx
+    image: nginx:alpine
+    ports:
+      - "8080:80"    # Acceso limpio PROD: raziel.fciclubnoel.com:8080 (en servidor Linux usar 80:80)
+    volumes:
+      - ./nginx/nginx-prod.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - hl7_network
+    restart: unless-stopped
+
+# ─── Red interna compartida ───────────────────
+networks:
+  hl7_network:
+    driver: bridge
+
+# ─── Volúmenes Nombrados ──────────────────────
+volumes:
+  hl7_prod_storage:

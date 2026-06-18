@@ -1,0 +1,61 @@
+# docker-compose.dev.yml (Desarrollo - Interoperabilidad HL7)
+# Arquitectura dual:
+#   - Acceso directo por puerto: api:8002 / frontend:4202 (host → contenedor)
+#   - Acceso limpio por dominio: raziel-dev.fciclubnoel.com → Nginx:80 → contenedor
+
+services:
+  # ─── Backend (API Laravel) para Desarrollo ───
+  api:
+    container_name: hl7restapi_dev
+    build:
+      context: ./Hl7RestAPI
+      dockerfile: Dockerfile
+    env_file:
+      - ./Hl7RestAPI/.env
+    ports:
+      - "8002:80"   # Acceso directo: raziel-dev-api.fciclubnoel.com:8002
+    volumes:
+      - ./Hl7RestAPI:/var/www/html
+    networks:
+      - hl7_network_dev
+    restart: unless-stopped
+
+  # ─── Frontend (Angular en modo ng serve) ─────
+  frontend:
+    container_name: hl7frontend_dev
+    image: node:20-bookworm
+    working_dir: /app
+    ports:
+      - "4202:4200"  # Acceso directo: raziel-dev.fciclubnoel.com:4202
+    volumes:
+      - ./HL7Frontend:/app
+      - hl7_dev_node_modules:/app/node_modules    # Aisla node_modules en un volumen nombrado para mejor rendimiento
+    entrypoint: /app/entrypoint.sh
+    command: node --max-old-space-size=4096 node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --poll=2000
+    networks:
+      - hl7_network_dev
+    restart: unless-stopped
+
+  # ─── Proxy Inverso Nginx (acceso limpio por dominio) ─
+  nginx:
+    container_name: hl7nginx_dev
+    image: nginx:alpine
+    ports:
+      - "8080:80"    # Acceso limpio DEV: raziel-dev.fciclubnoel.com:8080 (puerto 80 ocupado por IIS en Windows)
+    volumes:
+      - ./nginx/nginx-dev.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - hl7_network_dev
+    restart: unless-stopped
+
+# ─── Red interna compartida ───────────────────
+networks:
+  hl7_network_dev:
+    driver: bridge
+
+# ─── Volúmenes Nombrados ──────────────────────
+volumes:
+  hl7_dev_node_modules:

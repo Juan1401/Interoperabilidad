@@ -1,0 +1,47 @@
+info:
+  name: Rda Hospitalizacion
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/rda/hospitalizacion"
+  body:
+    type: multipart-form
+    data:
+      - name: ingreso
+        type: text
+        value: "2135356"
+        contentType: getRdaHospitalizacion
+        disabled: true
+      - name: usuario_id
+        type: text
+        value: "2"
+      - name: ingreso
+        type: text
+        value: "2305544"
+        contentType: getRdaHospitalizacion
+      - name: ingreso
+        type: text
+        value: "2305991"
+        contentType: getRdaUrgencias
+        disabled: true
+      - name: ingreso
+        type: text
+        value: "2306062"
+        contentType: getRdaConsulta
+        disabled: true
+      - name: ingreso
+        type: text
+        value: "2302099"
+        contentType: hospi
+        disabled: true
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,30 @@
+{
+    "resourceType": "CodeSystem",
+    "id": "ColombianOrganizationIdentifiers",
+    "language": "es",
+    "url": "https://fhir.minsalud.gov.co/rda/CodeSystem/ColombianOrganizationIdentifiers",
+    "version": "0.7.1",
+    "name": "ColombianOrganizationIdentifiers",
+    "title": "CodeSystem: Colombian Organization Identifiers",
+    "status": "active",
+    "experimental": false,
+    "date": "2024-11-19",
+    "publisher": "Ministerio de Salud y Protección Social de Colombia",
+    "caseSensitive": true,
+    "content": "complete",
+    "count": 3,
+    "concept": [
+        {
+            "code": "NIT",
+            "display": "Número de Identificación Tributaria"
+        },
+        {
+            "code": "CodigoPrestador",
+            "display": "Código de habilitación de prestador de servicios de salud"
+        },
+        {
+            "code": "EAPB",
+            "display": "Entidad Administradora de Planes de Beneficios"
+        }
+    ]
+}

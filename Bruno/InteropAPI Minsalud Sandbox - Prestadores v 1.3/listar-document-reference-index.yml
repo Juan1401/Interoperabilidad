@@ -1,0 +1,71 @@
+info:
+  name: listar-document-reference-index
+  type: http
+  seq: 18
+
+http:
+  method: POST
+  url: "{{APIMurl}}/DocumentReference/$document-reference-index-query"
+  headers:
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  body:
+    type: json
+    data: "/*En los parametros:\r
+
+      - Cambiar Tipo de Identificación (CC) y Número de identificación (0000000) del paciente\r
+
+      */\r
+
+      {\r
+
+      \    \"resourceType\": \"Parameters\",\r
+
+      \    \"parameter\": [\r
+
+      \        {\r
+
+      \            \"name\": \"identifier\",\r
+
+      \            \"part\": [\r
+
+      \                {\r
+
+      \                    \"name\": \"type\",\r
+
+      \                    \"valueString\": \"CC\"\r
+
+      \                },\r
+
+      \                {\r
+
+      \                    \"name\": \"value\",\r
+
+      \                    \"valueString\": \"0000000\"\r
+
+      \                }\r
+
+      \            ]\r
+
+      \        },\r
+
+      \        {\r
+
+      \            \"name\": \"humanuser\",\r
+
+      \            \"valueString\": \"CC-123123\"\r
+
+      \        }\r
+
+      \    ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

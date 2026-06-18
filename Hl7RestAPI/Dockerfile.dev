@@ -1,0 +1,37 @@
+# Hl7RestAPI/Dockerfile.dev (VERSIÓN DEFINITIVA)
+
+FROM php:7.2.34-apache
+
+# Argumentos para recibir el UID y GID desde docker-compose
+ARG UID
+ARG GID
+
+# Modificamos el usuario 'www-data' para que use el mismo ID que tu usuario
+RUN usermod -u ${UID} www-data && groupmod -g ${GID} www-data
+
+# Instalación de dependencias del sistema
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i '/buster-updates/d' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    chromium \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install pdo pdo_pgsql zip bcmath
+
+# ⚙️ Variables de entorno para Spatie Browsershot y Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Configuraciones de Apache y Composer
+RUN a2enmod rewrite
+COPY ./docker/apache/vhost.conf /etc/apache2/sites-available/000-default.conf
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Directorio de trabajo
+WORKDIR /var/www/html

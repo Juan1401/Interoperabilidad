@@ -1,0 +1,308 @@
+<!-- ============================================================ -->
+<!-- Panel 1: Buscador                                          -->
+<!-- ============================================================ -->
+<p-panel [toggleable]="true" [dt]="panelTokens" class="mb-3 block">
+
+    <ng-template #header>
+        <div class="resultado-panel-header">
+            <i class="pi pi-id-card resultado-panel-icon"></i>
+            <span class="resultado-panel-title">Consulta Información - Resumen Digital de Atención en Salud</span>
+        </div>
+    </ng-template>
+
+    @if (!usuarioValidoParaConsultar()) {
+    <div class="mb-4 p-3 border-round bg-red-50 border-1 border-red-200 flex align-items-center gap-2">
+        <i class="pi pi-exclamation-triangle text-red-600 font-bold"></i>
+        <span class="text-red-700 text-sm font-semibold">{{ mensajeErrorUsuario() }}</span>
+    </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="buscar()">
+        <div class="consultar-fields">
+            <div class="consultar-field consultar-field--documento">
+                <label for="documento" class="consultar-label">
+                    <i class="pi pi-hashtag"></i> Número de Documento
+                </label>
+                <input pInputText id="documento" formControlName="documento" type="text"
+                    placeholder="Número de documento" class="w-full" autocomplete="off" />
+                <div class="consultar-error">
+                    @if (form.errors?.['documentPairIncomplete'] &&
+                    (form.get('tipoDocumento')?.touched || form.get('documento')?.touched)) {
+                    <small class="p-error block text-xs">Requerido si hay tipo.</small>
+                    }
+                </div>
+            </div>
+
+            <div class="consultar-field consultar-field--tipo">
+                <label for="tipoDocumento" class="consultar-label">
+                    <i class="pi pi-file"></i> Tipo de Documento
+                </label>
+                <p-select id="tipoDocumento" [options]="tiposDocumento()" formControlName="tipoDocumento"
+                    optionLabel="label" optionValue="value" placeholder="Tipo" [filter]="true" filterBy="label"
+                    styleClass="w-full"></p-select>
+                <div class="consultar-error">
+                    @if (form.errors?.['documentPairIncomplete'] &&
+                    (form.get('tipoDocumento')?.touched || form.get('documento')?.touched)) {
+                    <small class="p-error block text-xs">Requerido si hay nro.</small>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="consultar-actions">
+            <p-button label="Consultar Información" type="submit"
+                [disabled]="form.invalid || isFormEmpty() || !usuarioValidoParaConsultar()" icon="pi pi-search"
+                iconPos="left">
+            </p-button>
+            <p-button label="Limpiar" type="button" (onClick)="borrarCasillas()" icon="pi pi-refresh" iconPos="left"
+                [outlined]="true" severity="info">
+            </p-button>
+        </div>
+    </form>
+</p-panel>
+
+<!-- ============================================================ -->
+<!-- Sección de resultados: solo visible tras búsqueda           -->
+<!-- ============================================================ -->
+@if (busquedaRealizada()) {
+
+<!-- Panel 2: Información del Paciente -->
+<p-panel [toggleable]="true" [collapsed]="false" [dt]="panelTokens" class="mb-3 block resultado-panel">
+    <ng-template #header>
+        <div class="resultado-panel-header">
+            <i class="pi pi-user resultado-panel-icon"></i>
+            <span class="resultado-panel-title">Información del Paciente</span>
+        </div>
+    </ng-template>
+
+    @if (isLoadingPaciente()) {
+    <div class="resultado-skeleton">
+        <p-skeleton width="40%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="60%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="50%" height="1rem"></p-skeleton>
+    </div>
+    } @else if ((datosPaciente()?.length ?? 0) > 0) {
+    <ng-container *ngTemplateOutlet="tplPaciente"></ng-container>
+    } @else {
+    <ng-container *ngTemplateOutlet="tplSinDatos; context: { $implicit: 'paciente' }"></ng-container>
+    }
+</p-panel>
+
+<!-- Panel 3: Registros de Vacunación -->
+<p-panel [toggleable]="true" [collapsed]="(datosVacunacion()?.length ?? 0) === 0" [dt]="panelTokens"
+    class="mb-3 block resultado-panel">
+    <ng-template #header>
+        <div class="resultado-panel-header w-full flex align-items-center justify-content-between pr-3">
+            <div class="flex align-items-center">
+                <i class="pi pi-shield resultado-panel-icon"></i>
+                <span class="resultado-panel-title">Registros de Vacunación</span>
+                @if ((datosVacunacion()?.length ?? 0) > 0) {
+                <p-badge [value]="datosVacunacion()?.length" severity="warn" styleClass="ml-2"></p-badge>
+                }
+            </div>
+        </div>
+    </ng-template>
+
+    @if (isLoadingVacunacion()) {
+    <div class="resultado-skeleton">
+        <p-skeleton width="70%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="50%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="60%" height="1rem"></p-skeleton>
+    </div>
+    } @else if ((datosVacunacion()?.length ?? 0) > 0) {
+    <ng-container *ngTemplateOutlet="tplVacunacion"></ng-container>
+    } @else {
+    <ng-container *ngTemplateOutlet="tplSinDatos; context: { $implicit: 'vacunación' }"></ng-container>
+    }
+</p-panel>
+
+<!-- Panel 4: Encuentros Clínicos -->
+<p-panel [toggleable]="true" [collapsed]="(datosEncuentros()?.length ?? 0) === 0" [dt]="panelTokens"
+    class="mb-3 block resultado-panel">
+    <ng-template #header>
+        <div class="resultado-panel-header w-full flex align-items-center justify-content-between pr-3">
+            <div class="flex align-items-center">
+                <i class="pi pi-calendar resultado-panel-icon"></i>
+                <span class="resultado-panel-title">Encuentros Clínicos</span>
+                @if ((datosEncuentros()?.length ?? 0) > 0) {
+                <p-badge [value]="datosEncuentros()?.length" severity="warn" styleClass="ml-2"></p-badge>
+                }
+            </div>
+        </div>
+    </ng-template>
+
+    @if (isLoadingEncuentros()) {
+    <div class="resultado-skeleton">
+        <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="55%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="65%" height="1rem"></p-skeleton>
+    </div>
+    } @else if ((datosEncuentros()?.length ?? 0) > 0) {
+    <ng-container *ngTemplateOutlet="tplEncuentros"></ng-container>
+    } @else {
+    <ng-container *ngTemplateOutlet="tplSinDatos; context: { $implicit: 'encuentros clínicos' }"></ng-container>
+    }
+</p-panel>
+
+<!-- Panel 5: Historial / Antecedentes -->
+<p-panel [toggleable]="true" [collapsed]="(datosAntecedentes()?.length ?? 0) === 0" [dt]="panelTokens"
+    class="mb-3 block resultado-panel">
+    <ng-template #header>
+        <div class="resultado-panel-header w-full flex align-items-center justify-content-between pr-3">
+            <div class="flex align-items-center">
+                <i class="pi pi-history resultado-panel-icon"></i>
+                <span class="resultado-panel-title">Historial de Atenciones en Salud - Antecedentes manifestados por el
+                    paciente</span>
+                @if ((datosAntecedentes()?.length ?? 0) > 0) {
+                <p-badge [value]="datosAntecedentes()?.length" severity="warn" styleClass="ml-2"></p-badge>
+                }
+            </div>
+        </div>
+    </ng-template>
+
+    @if (isLoadingAntecedentes()) {
+    <div class="resultado-skeleton">
+        <p-skeleton width="60%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="75%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="45%" height="1rem"></p-skeleton>
+    </div>
+    } @else if ((datosAntecedentes()?.length ?? 0) > 0) {
+    <ng-container *ngTemplateOutlet="tplAntecedentes"></ng-container>
+    } @else {
+    <ng-container *ngTemplateOutlet="tplSinDatos; context: { $implicit: 'antecedentes' }"></ng-container>
+    }
+</p-panel>
+
+}
+
+<!-- ============================================================ -->
+<!-- Templates reutilizables                                      -->
+<!-- ============================================================ -->
+
+<ng-template #tplSinDatos let-seccion>
+    <div class="resultado-sin-datos">
+        <i class="pi pi-inbox resultado-sin-datos-icon"></i>
+        <p class="resultado-sin-datos-texto">No existen datos de <strong>{{ seccion }}</strong> para mostrar.</p>
+    </div>
+</ng-template>
+
+<ng-template #tplPaciente>
+    <div class="resultado-contenido">
+        <p-table [value]="datosPaciente() || []" [rowHover]="true"
+            styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines" [tableStyle]="{'min-width': '50rem'}">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Paciente</th>
+                    <th>Tipo de Documento</th>
+                    <th>No. de Documento</th>
+                    <th>Fecha de Nacimiento</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-paciente>
+                <tr>
+                    <td class="font-semibold text-color-secondary uppercase">
+                        {{ paciente.name?.[0]?.given?.join(' ') }} {{ paciente.name?.[0]?.family }}
+                    </td>
+                    <td>{{ paciente.identifier?.[0]?.type?.coding?.[1]?.code }} - {{
+                        paciente.identifier?.[0]?.type?.coding?.[1]?.display }}</td>
+                    <td>{{ paciente.identifier?.[0]?.value }}</td>
+                    <td>{{ paciente.birthDate | date:'yyyy-MM-dd' }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+<ng-template #tplVacunacion>
+    <div class="resultado-contenido">
+        <p class="text-color-secondary text-sm">Registros de vacunación pendientes de endpoint.</p>
+    </div>
+</ng-template>
+
+<ng-template #tplEncuentros>
+    <div class="resultado-contenido">
+
+        <!-- Barra de filtro + total -->
+        <div class="flex align-items-center justify-content-between mb-3 gap-3 flex-wrap">
+            <div class="flex align-items-center gap-2">
+                <i class="pi pi-filter text-primary"></i>
+                <span class="font-semibold text-900">Filtrar encuentros:</span>
+                <p-select [options]="opcionesFiltroEncuentros" [ngModel]="filtroEncuentros()"
+                    (ngModelChange)="filtroEncuentros.set($event)" optionLabel="label" optionValue="value"
+                    placeholder="Todos" styleClass="w-14rem">
+                </p-select>
+            </div>
+            <p-badge [value]="'Total: ' + datosEncuentrosFiltrados().length" severity="info"
+                styleClass="text-sm font-bold">
+            </p-badge>
+        </div>
+
+        <!-- Tabla de Encuentros Clínicos -->
+        <p-table [value]="datosEncuentrosFiltrados()" [rowHover]="true"
+            styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines" [tableStyle]="{'min-width': '50rem'}">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem">#</th>
+                    <th>Formato</th>
+                    <th>Región</th>
+                    <th>Autor</th>
+                    <th>Fecha Bundle</th>
+                    <th>Origen</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr (click)="seleccionarEncuentro(item)" style="cursor: pointer;">
+                    <td class="text-center font-semibold">{{ rowIndex + 1 }}</td>
+                    <td>{{ item.resource?.title }}</td>
+                    <td>{{ item.resource?.event?.[0]?.period?.start ? 'SANTIAGO DE CALI' : 'SANTIAGO DE CALI' }}</td>
+                    <td class="uppercase">{{ item.resource?.author?.[0]?.display || 'FUNDACION CLINICA INFANTIL CLUB
+                        NOEL' }}</td>
+                    <td>{{ item.resource?.date }}</td>
+                    <td>
+                        <p-tag value="Encuentros" severity="success" icon="pi pi-calendar"
+                            styleClass="text-xs font-semibold">
+                        </p-tag>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center text-color-secondary p-4">
+                        <i class="pi pi-info-circle mr-2"></i>
+                        Sin encuentros para el filtro seleccionado.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+<ng-template #tplAntecedentes>
+    <div class="resultado-contenido">
+        <p-table [value]="datosAntecedentes() || []" [rowHover]="true"
+            styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines" [tableStyle]="{'min-width': '50rem'}">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem">#</th>
+                    <th>Formato</th>
+                    <th>Región</th>
+                    <th>Autor</th>
+                    <th>Fecha Bundle</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr (click)="seleccionarRda(item)" style="cursor: pointer;">
+                    <td class="text-center font-semibold">{{ rowIndex + 1 }}</td>
+                    <td>{{ item.resource?.title }}</td>
+                    <!-- Dejando fallbacks explícitos simulando resolución de referencias no presentes en un recurso estándar -->
+                    <td>{{ item.resource?.event?.[0]?.period?.start ? 'SANTIAGO DE CALI' : 'SANTIAGO DE CALI' }}</td>
+                    <td class="uppercase">{{ item.resource?.author?.[0]?.display || 'FUNDACION CLINICA INFANTIL CLUB
+                        NOEL' }}</td>
+                    <td>{{ item.resource?.date }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+<!-- Modal de Detalles de RDA -->

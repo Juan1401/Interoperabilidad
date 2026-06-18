@@ -1,0 +1,47 @@
+info:
+  name: RDA_paciente
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/rda/paciente"
+  headers:
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+    - name: Accept
+      value: application/json
+  body:
+    type: multipart-form
+    data:
+      - name: ingreso
+        type: text
+        value: "2323241"
+        contentType: Este es el Pro
+        disabled: true
+      - name: usuario_id
+        type: text
+        value: "2"
+      - name: ingreso
+        type: text
+        value: "2319506"
+        contentType: TEST
+      - name: ingreso
+        type: text
+        value: "2317530"
+        contentType: TEST2
+        disabled: true
+      - name: ingreso
+        type: text
+        value: "2306501"
+        contentType: TEST3
+        disabled: true
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,221 @@
+// ============================================================
+// Estilos: Consultar IHCE - Resumen Digital de Atención
+// ============================================================
+
+// --- Estilos Globales para p-panel con cabecera azul ---
+:host ::ng-deep {
+    .p-panel-header {
+        background: #2563ab !important;
+        border-color: #2563ab !important;
+        border-radius: 8px 8px 0 0;
+        padding: 0.75rem 1.25rem !important;
+        display: flex !important;
+        align-items: center !important;
+
+        // Asegurar que los íconos en el HEADER sean blancos
+        .pi,
+        .p-icon,
+        svg,
+        path {
+            color: #ffffff !important;
+            fill: #ffffff !important;
+            opacity: 1 !important;
+        }
+    }
+
+    .p-panel-title {
+        color: #ffffff !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+    }
+
+    .p-panel-header-action {
+        width: 2.2rem !important;
+        height: 2.2rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        background: transparent !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease-in-out !important;
+        margin-left: 0.5rem !important;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-color: #ffffff !important;
+            transform: scale(1.05);
+        }
+    }
+
+    .p-panel-content {
+        padding: 1.5rem 1.25rem 1rem;
+        border: 1px solid var(--p-content-border-color, #e2e8f0);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+    }
+
+    // Estilo de escala de grises para el hover de las tablas
+    .p-datatable-tbody>tr:hover {
+        background-color: #f2f4f6 !important; // Gris suave profesional
+        transition: background-color 0.2s ease;
+    }
+
+    // Estilo para el encabezado de las tablas (Friendly highlight)
+    .p-datatable-thead>tr>th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+        text-align: center !important;
+    }
+
+    // Centrar contenido de las celdas (filas)
+    .p-datatable-tbody>tr>td {
+        text-align: center !important;
+        vertical-align: middle !important;
+        font-size: 0.9rem;
+    }
+}
+
+// Cabecera personalizada de cada resultado-panel
+.resultado-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.resultado-panel-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+.resultado-panel-icon {
+    font-size: 1.1rem !important;
+    color: #ffffff !important;
+}
+
+// --- Estado: Sin datos ---
+.resultado-sin-datos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    gap: 0.75rem;
+    background: var(--p-surface-ground, #f8fafc);
+    border-radius: 8px;
+
+    .resultado-sin-datos-icon {
+        font-size: 3rem;
+        color: var(--p-text-muted-color, #94a3b8);
+    }
+
+    .resultado-sin-datos-texto {
+        font-size: 0.9rem;
+        color: var(--p-text-muted-color, #64748b);
+        margin: 0;
+
+        strong {
+            color: var(--p-text-color, #1e293b);
+        }
+    }
+}
+
+// --- Estado: Skeleton de carga ---
+.resultado-skeleton {
+    padding: 0.5rem 0;
+}
+
+// --- Contenido de datos ---
+.resultado-contenido {
+    padding: 0.25rem 0;
+}
+
+// ============================================================
+// Estilos del formulario de búsqueda
+// ============================================================
+
+.consultar-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.consultar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    &--documento {
+        flex: 2;
+        min-width: 200px;
+    }
+
+    &--tipo {
+        flex: 1;
+        min-width: 160px;
+    }
+}
+
+.consultar-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--p-text-muted-color, #6b7280);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    i {
+        font-size: 0.75rem;
+    }
+}
+
+.consultar-error {
+    min-height: 1.1rem;
+    font-size: 0.75rem;
+
+    .p-error {
+        color: #dc2626 !important; // Rojo intenso para errores
+        font-weight: 500;
+    }
+}
+
+.consultar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--p-content-border-color, #e2e8f0);
+
+    // Forzar visibilidad de iconos en botones
+    :host ::ng-deep {
+        .p-button-icon {
+            font-size: 1.1rem !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            color: inherit !important;
+            margin-right: 0.5rem;
+        }
+
+        // Estilo específico para el botón de limpiar si es info/outlined
+        .p-button-info.p-button-outlined {
+
+            .p-button-icon,
+            .p-button-label {
+                color: #2563ab !important;
+            }
+        }
+    }
+}
+
+
+// ============================================================
+// Estilos del Modal de Detalles RDA (Movidos a styles.scss para alcance global)
+// ============================================

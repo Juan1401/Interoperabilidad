@@ -1,0 +1,10 @@
+# Forzar a Git a usar LF para todos los archivos de texto
+* text=auto eol=lf
+
+# Excepciones (si tuvieras archivos específicos de Windows)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Asegurar que los scripts de bash SIEMPRE sean LF (crítico para Docker)
+*.sh text eol=lf
+Dockerfile text eol=lf

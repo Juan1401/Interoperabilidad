@@ -1,0 +1,27 @@
+info:
+  name: Auditoria-rda-view
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/consulta-ministerio/audit/rda-view"
+  body:
+    type: json
+    data: |-
+      {
+        "user_id": 2,
+        "patient_document_type": "TI",
+        "patient_document_number": "99050105195",
+        "tipo_rda_id": 2,
+        "rda_id": "Composition-0"
+      }
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

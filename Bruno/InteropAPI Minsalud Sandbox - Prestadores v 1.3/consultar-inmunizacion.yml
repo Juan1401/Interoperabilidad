@@ -1,0 +1,73 @@
+info:
+  name: consultar-inmunizacion
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{APIMurl}}/Immunization/$consultar-inmunizacion"
+  headers:
+    - name: x-functions-key
+      value: "{{APIkey}}"
+      disabled: true
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  params:
+    - name: code
+      value: 0bo-yhf8DVVChFofHfsAoawlSaLZy1HBCG-d9ti6cDevAzFuMtNtfA==
+      type: query
+      disabled: true
+  body:
+    type: json
+    data: "{\r
+
+      \    \"resourceType\": \"Parameters\",\r
+
+      \    \"parameter\": [\r
+
+      \        {\r
+
+      \            \"name\": \"identifier\",\r
+
+      \            \"part\": [\r
+
+      \                {\r
+
+      \                    \"name\": \"type\",\r
+
+      \                    \"valueString\": \"CC\"\r
+
+      \                },\r
+
+      \                {\r
+
+      \                    \"name\": \"value\",\r
+
+      \                    \"valueString\": \"1111111\"\r
+
+      \                }\r
+
+      \            ]\r
+
+      \        },\r
+
+      \        {\r
+
+      \            \"name\": \"humanuser\",\r
+
+      \            \"valueString\": \"CC-123123\"\r
+
+      \        }\r
+
+      \    ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

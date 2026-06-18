@@ -1,0 +1,28 @@
+info:
+  name: Consultar_system_modulos_variables
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/system/variables"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"modulo\": \"BioEstadistica\",\r
+
+      \    \"modulo_tipo\": \"app\",\r
+
+      \    \"variable\": \"IHCE_key_secreta\"\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

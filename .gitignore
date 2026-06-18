@@ -1,0 +1,95 @@
+# Visual Studio Code
+.vscode
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+Hl7RestAPI/migration_error.log
+temp_log.log
+
+# HL7Frontend (Angular)
+HL7Frontend/.angular/cache
+HL7Frontend/.sass-cache/
+HL7Frontend/dist/
+HL7Frontend/tmp/
+HL7Frontend/out-tsc/
+HL7Frontend/bazel-out/
+HL7Frontend/node_modules/
+HL7Frontend/npm-debug.log
+HL7Frontend/yarn-error.log
+HL7Frontend/connect.lock
+HL7Frontend/coverage/
+HL7Frontend/libpeerconnection.log
+HL7Frontend/testem.log
+HL7Frontend/typings/
+HL7Frontend/src/environments/environment.ts
+HL7Frontend/src/environments/environment.prod.ts
+
+# Hl7RestAPI (Laravel)
+Hl7RestAPI/node_modules/
+Hl7RestAPI/public/hot
+Hl7RestAPI/public/storage
+Hl7RestAPI/storage/*.key
+Hl7RestAPI/storage/logs/*.log
+Hl7RestAPI/storage/framework/cache/data/*
+Hl7RestAPI/storage/framework/views/*.php
+Hl7RestAPI/storage/framework/sessions/*
+Hl7RestAPI/storage/framework/testing/*
+Hl7RestAPI/vendor/
+Hl7RestAPI/.env
+Hl7RestAPI/.env.backup
+Hl7RestAPI/.phpunit.result.cache
+Hl7RestAPI/Homestead.json
+Hl7RestAPI/Homestead.yaml
+Hl7RestAPI/npm-debug.log
+Hl7RestAPI/yarn-error.log
+Hl7RestAPI/.vscode/
+Hl7RestAPI/public/upload/
+Hl7RestAPI/public/favicon.ico
+
+# Additional Hl7RestAPI ignores based on analysis
+Hl7RestAPI/test-*.php
+Hl7RestAPI/bootstrap/cache/*
+!Hl7RestAPI/bootstrap/cache/.gitignore
+Hl7RestAPI/html/
+Hl7RestAPI/coverage/
+Hl7RestAPI/database/*.sqlite
+Hl7RestAPI/database/*.sqlite3
+Hl7RestAPI/storage/app/public/*
+!Hl7RestAPI/storage/app/public/.gitignore
+
+# IDEs and Editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Temporary Sakai Setup Files
+sakai.zip
+sakai_src_contents.json
+fix-sakai.js
+sakai-temp/
+sakai-extracted/
+
+# Environments
+.env
+# Cache
+Hl7RestAPI/cache/
+
+# antigravity rules
+.agents/rules/context/rda_urgencias/rda_urgencias_base.json
+
+# ignorar los package-lock.json No se debe ignorar para que se instalen las mismas dependencias
+# Hl7RestAPI/package-lock.json
+# HL7Frontend/package-lock.json

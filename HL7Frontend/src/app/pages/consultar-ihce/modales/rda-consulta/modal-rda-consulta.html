@@ -1,0 +1,829 @@
+<div class="p-3">
+
+    @if (datosEncuentro()) {
+
+    <!-- Banner de Origen -->
+    <div class="rda-origen-banner">
+        <div class="rda-origen-label">
+            <i class="pi pi-info-circle"></i>
+            <span>Origen del documento:</span>
+        </div>
+        <div class="rda-origen-pill">
+            <i class="pi pi-file-check"></i>
+            <span>{{ datosEncuentro()?.resource?.title || 'RDA Consulta Externa' }}</span>
+        </div>
+        <div class="rda-origen-pill" style="background-color: #1a6b3c;">
+            <i class="pi pi-calendar"></i>
+            <span>{{ datosEncuentro()?.resource?.date | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+    </div>
+
+    <!-- ── Encabezado Básico: Referencias JSON ─────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-home"></i>
+            <span>Encuentro Clínico</span>
+            @if (encuentroParsedData()[0]) {
+            <span class="rda-status-badge status-active ml-auto">{{ encuentroParsedData()[0].classDisplay | titlecase
+                }}</span>
+            <span class="rda-status-badge status-active ml-2">{{ encuentroParsedData()[0].status === 'finished' ?
+                'Finalizado' : encuentroParsedData()[0].status }}</span>
+            }
+        </div>
+
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            @if (isLoadingEncuentro()) {
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando encuentro...</div>
+            } @else if (encuentroParsedData().length > 0) {
+            @for (enc of encuentroParsedData(); track enc.id) {
+            <div class="grid mb-3">
+                <!-- Fila 1 -->
+                <div class="col-12 md:col-1">
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-hashtag text-primary mr-2"></i>Nº Encuentro: </strong>&nbsp;<span
+                            class="text-pink-500">{{ enc.id }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-calendar text-primary mr-2"></i>Fecha de Ingreso: </strong>&nbsp;<span>{{
+                            enc.startDate | date:'yyyy-MM-dd' }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-calendar-times text-primary mr-2"></i>Fecha de Egreso:
+                        </strong>&nbsp;<span>{{ enc.endDate | date:'yyyy-MM-dd' }}</span></p>
+                    <p class="mb-1"><strong class="text-gray-800"><i class="pi pi-bolt text-primary mr-2"></i>Causa
+                            Externa / Motivo: </strong>
+                        <span class="inline-block text-white font-bold px-2 py-1 border-round text-xs"
+                            style="background-color: #64748b;">
+                            {{ enc.causaExternaDisplay | uppercase }} [{{ enc.causaExternaCode }}]
+                        </span>
+                    </p>
+                    <p class="mt-3 mb-0 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-building text-primary mr-2"></i>Prestador:</strong>&nbsp;<span>{{
+                            prestadoraParsedData()[0]?.name || '---' }}</span></p>
+                </div>
+                <!-- Fila 2 -->
+                <div class="col-12 md:col-2">
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-server text-primary mr-2"></i>Modalidad:</strong>&nbsp;<span>{{
+                            enc.modalidad }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-sitemap text-primary mr-2"></i>Grupo de Servicio:</strong>&nbsp;<span>{{
+                            enc.grupoServicio }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-star text-primary mr-2"></i>Tipo:</strong>&nbsp;<span>{{ enc.tipoServicio
+                            }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-home text-primary mr-2"></i>Entorno de Atención:</strong>&nbsp;<span>{{
+                            enc.entornoAtencion }}</span></p>
+                </div>
+            </div>
+
+            <p class="mt-4 mb-2"><strong class="text-gray-900">Diagnósticos del Encuentro:</strong></p>
+            <table class="rda-table w-full">
+                <thead>
+                    <tr>
+                        <th style="width: 50px">#</th>
+                        <th>Rol diagnóstico</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (diag of enc.diagnosticos; track diag.role; let i = $index) {
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ diag.role }}</td>
+                        <td><span class="rda-status-badge status-active text-white"
+                                style="background-color: #10b981;">{{ diag.typeDisplay }}</span></td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            }
+            } @else {
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información del encuentro.</div>
+            }
+        </div>
+    </div>
+
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #16a34a;">
+            <i class="pi pi-user"></i>
+            <span>Datos del Paciente</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            @if (isLoadingPaciente()) {
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando paciente...</div>
+            } @else if (pacienteParsedData().length > 0) {
+            @for (pat of pacienteParsedData(); track pat.documentValue) {
+            <div class="grid mb-0">
+                <!-- Fila 1 -->
+                <div class="col-12 md:col-1 lh-2">
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-check-circle text-primary mr-2"></i>Activo: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.active }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-times-circle text-primary mr-2"></i>Fallecido: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.deceased }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-user text-primary mr-2"></i>Nombre: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.fullName | uppercase }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-id-card text-primary mr-2"></i>Documento: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.documentValue }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-file text-primary mr-2"></i>Tipo de documento: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.docType }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-calendar text-primary mr-2"></i>Fecha de Nacimiento: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.birthDate | date:'yyyy-MM-dd' }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-clock text-primary mr-2"></i>Hora de Nacimiento: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.birthTime }}</span></p>
+                    <p class="mb-0 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-chart-bar text-primary mr-2"></i>Edad: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.age !== '---' ? pat.age + ' años' : '---' }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-globe text-primary mr-2"></i>País de Residencia: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.country }}</span></p>
+                </div>
+                <!-- Fila 2 -->
+                <div class="col-12 md:col-2 lh-2">
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-map-marker text-primary mr-2"></i>Municipio de Residencia:
+                        </strong>&nbsp;<span class="text-gray-700">{{ pat.city }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-heart text-primary mr-2"></i>Sexo Biológico (extensión):
+                        </strong>&nbsp;<span class="text-gray-700">{{ pat.biologicalGender }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-venus-mars text-primary mr-2"></i>Identidad de Género: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.genderIdentity }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-flag text-primary mr-2"></i>Nacionalidad: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.nationality }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-map text-primary mr-2"></i>Zona de Residencia: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.residenceZone }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-th-large text-primary mr-2"></i>DIVIPOLA Municipio: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.divipola }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-hashtag text-primary mr-2"></i>Código país: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.countryCode }}</span></p>
+                    <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-users text-primary mr-2"></i>Etnia: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.ethnicity }}</span></p>
+                    <p class="mb-0 flex align-items-center"><strong class="text-gray-900"><i
+                                class="pi pi-info-circle text-primary mr-2"></i>Tipo Discapacidad: </strong>&nbsp;<span
+                            class="text-gray-700">{{ pat.disability }}</span></p>
+                </div>
+            </div>
+            }
+            } @else {
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información del paciente.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Organización Prestadora de Salud ─────────────────────────── -->
+    @if (isLoadingPrestadora()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #6b7280;">
+            <i class="pi pi-building"></i>
+            <span>Organización prestadora de salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando organización...</div>
+        </div>
+    </div>
+    } @else if (prestadoraParsedData().length === 0) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #6b7280;">
+            <i class="pi pi-building"></i>
+            <span>Organización prestadora de salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información de organización prestadora.</div>
+        </div>
+    </div>
+    } @else {
+    @for (prest of prestadoraParsedData(); track prest.nit; let i = $index) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #6b7280;">
+            <i class="pi pi-building"></i>
+            <span>Organización prestadora de salud #{{ i + 1 }}</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="mb-0 lh-2">
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-building text-primary mr-2"></i>Nombre: </strong>&nbsp;<span
+                        class="text-gray-700">{{ prest.name }}</span></p>
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tag text-primary mr-2"></i>NIT: </strong>&nbsp;<span class="text-gray-700">{{
+                        prest.nit }}</span></p>
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-verified text-primary mr-2"></i>Código de habilitación (REPS):
+                    </strong>&nbsp;<span class="text-gray-700">{{ prest.reps }}</span></p>
+                <p class="mb-0 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tags text-primary mr-2"></i>Tipo de organización: </strong>&nbsp;<span
+                        class="text-gray-700">{{ prest.type }}</span></p>
+            </div>
+        </div>
+    </div>
+    }
+    }
+
+    <!-- ── EPS (Entidad Pagadora) ─────────────────────────── -->
+    @if (isLoadingEps()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #06b6d4;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS (Entidad Pagadora)</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando EPS...</div>
+        </div>
+    </div>
+    } @else if (epsParsedData().length === 0) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #06b6d4;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS (Entidad Pagadora)</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información de EPS.</div>
+        </div>
+    </div>
+    } @else {
+    @for (eps of epsParsedData(); track eps.name; let i = $index) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #06b6d4;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS #{{ i + 1 }}</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="mb-0 lh-2">
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-building text-primary mr-2"></i>Nombre: </strong>&nbsp;<span
+                        class="text-gray-700">{{ eps.name }}</span></p>
+                @if (eps.nit !== '---') {
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tag text-primary mr-2"></i>NIT: </strong>&nbsp;<span class="text-gray-700">{{
+                        eps.nit }}</span></p>
+                }
+                @if (eps.reps !== '---') {
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-verified text-primary mr-2"></i>Código de habilitación (REPS):
+                    </strong>&nbsp;<span class="text-gray-700">{{ eps.reps }}</span></p>
+                }
+                @if (eps.type !== '---') {
+                <p class="mb-0 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tags text-primary mr-2"></i>Tipo de organización: </strong>&nbsp;<span
+                        class="text-gray-700">{{ eps.type }}</span></p>
+                }
+            </div>
+        </div>
+    </div>
+    }
+    }
+
+    <!-- ── Profesional de la Salud ─────────────────────────── -->
+    @if (isLoadingProfesional()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando profesional...</div>
+        </div>
+    </div>
+    } @else if (profesionalParsedData().length === 0) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información de profesional de la salud.</div>
+        </div>
+    </div>
+    } @else {
+    @for (prof of profesionalParsedData(); track prof.documentValue) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid mb-4 lh-2 m-0">
+                <div class="col-12 md:col-1">
+                    <p class="mb-3 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-user-plus text-primary mr-2"></i>Nombre completo:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.fullName | uppercase }}</span>
+                    </p>
+                    <p class="mb-3 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-file text-primary mr-2"></i>Tipo de documento:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.docType }}</span>
+                    </p>
+                </div>
+                <div class="col-12 md:col-2">
+                    <p class="mb-0 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-check-circle text-primary mr-2"></i>Estado:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.active }}</span>
+                    </p>
+
+                    <p class="mb-3 md:mb-0 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-id-card text-primary mr-2"></i>Documento:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.documentValue }}</span>
+                    </p>
+                </div>
+            </div>
+            @if (prof.qualifications && prof.qualifications.length > 0) {
+            <div class="border-top-1 surface-border pt-4">
+                <p class="mb-2"><strong class="text-gray-900"><i
+                            class="pi pi-star-fill text-gray-700 mr-2"></i>Cualificaciones Profesionales</strong></p>
+                <table class="rda-table w-full mb-2">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">#</th>
+                            <th>Cualificación</th>
+                            <th>Periodo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (qual of prof.qualifications; track qual.name; let i = $index) {
+                        <tr>
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ qual.name }}</td>
+                            <td>{{ qual.start }} - Actual</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+    </div>
+    }
+    }
+
+    <!-- ── 1. Diagnósticos / Condiciones ───────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header">
+            <i class="pi pi-heart-fill"></i>
+            <span>Historial de Diagnósticos</span>
+            <span class="rda-badge">{{ conditionParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingConditionData()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando diagnósticos...</div>
+        } @else if (conditionParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código CIE-10</th>
+                    <th>Diagnóstico</th>
+                    <th>Estado Clínico</th>
+                    <th>Verificación</th>
+                    <th>Categoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of conditionParsedData(); track item.conditionId) {
+                <tr>
+                    <td><code>{{ item.diagnosisCode }}</code></td>
+                    <td>{{ item.diagnosisDisplay }}</td>
+                    <td><span class="rda-status-badge status-active">{{ item.clinicalStatusDisplay }}</span></td>
+                    <td>{{ item.verificationDisplay }}</td>
+                    <td>{{ item.categoryDisplay }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin diagnósticos registrados.</div>
+        }
+    </div>
+
+    <!-- ── 2. Alergias ─────────────────────────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #7c3aed;">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>Alergias e Intolerancias</span>
+            <span class="rda-badge">{{ allergyParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingAllergyData()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando alergias...</div>
+        } @else if (allergyParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Tipo de Alergia</th>
+                    <th>Descripción</th>
+                    <th>Estado Clínico</th>
+                    <!-- <th>Verificación</th> -->
+                    <th>Fecha de Reg.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of allergyParsedData(); track item.allergyId) {
+                <tr>
+                    <td><code>{{ item.allergyCode }}</code></td>
+                    <td>{{ item.allergyDisplay }}</td>
+                    <td>{{ item.allergyText }}</td>
+                    <td><span class="rda-status-badge status-active">{{ item.clinicalStatusDisplay }}</span></td>
+                    <!-- <td>{{ item.verificationDisplay }}</td> -->
+                    <td>{{ item.lastUpdated !== '---' ? (item.lastUpdated | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin alergias registradas.</div>
+        }
+    </div>
+
+    <!-- ── 3. Medicamentos Solicitados ─────────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #059669;">
+            <i class="pi pi-box"></i>
+            <span>Medicamentos Solicitados</span>
+            <span class="rda-badge">{{ medicamentoParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingMedicamento()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando medicamentos...</div>
+        } @else if (medicamentoParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código (INN/IUM)</th>
+                    <th>Medicamento / Categoría</th>
+                    <th>Dosis / Vía</th>
+                    <th>Frecuencia / Duración</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Fecha de Orden</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of medicamentoParsedData(); track item.id) {
+                <tr>
+                    <td><code class="text-pink-500">{{ item.medicacionCode }}</code></td>
+                    <td>
+                        <div class="font-semibold">{{ item.medicacionDisplay }}</div>
+                        <div class="text-xs text-500">
+                            {{ item.categoriaDisplay !== '---' ? item.categoriaDisplay : '' }}
+                            @if (item.categoriaCode !== '---') { <span class="text-pink-500 ml-1">{{ item.categoriaCode
+                                }}</span> }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="font-medium">
+                            {{ item.cantidadValor !== '---' ? item.cantidadValor + ' ' + item.cantidadUnidad : '---' }}
+                            @if (item.cantidadCode !== '---') { <span class="text-pink-500 text-sm ml-1">{{
+                                item.cantidadCode }}</span> }
+                        </div>
+                        <div class="text-xs text-500">
+                            {{ item.viaDisplay !== '---' ? 'Vía: ' + item.viaDisplay : '' }}
+                            @if (item.viaCode !== '---') { <span class="text-pink-500 ml-1">{{ item.viaCode }}</span> }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="font-medium">{{ item.frecuencia }}</div>
+                        <div class="text-xs text-500">{{ item.duracion !== '---' ? 'Tratamiento: ' + item.duracion : ''
+                            }}</div>
+                    </td>
+                    <td>
+                        {{ item.motivoDisplay }}
+                        @if (item.motivoCode !== '---') { <span class="text-pink-500 text-xs ml-1">{{ item.motivoCode
+                            }}</span> }
+                    </td>
+                    <td><span class="rda-status-badge status-active">{{ item.status }}</span></td>
+                    <td>{{ item.fechaSolicitud !== '---' ? (item.fechaSolicitud | date:'yyyy-MM-dd') : '---' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin medicamentos solicitados.</div>
+        }
+    </div>
+
+    <!-- ── 7. Incapacidad (SIPE) ───────────────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #475569;">
+            <i class="pi pi-file-edit"></i>
+            <span>Datos Incapacidad (SIPE)</span>
+            <span class="rda-badge">{{ incapacidadParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingIncapacidad()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando incapacidades...</div>
+        } @else if (incapacidadParsedData().length > 0) {
+
+        <!-- Banner de Incapacidad -->
+        <div class="rda-origen-banner">
+            <div class="rda-origen-pill">
+                <span>🩹 Incapacidad</span>
+            </div>
+            <div class="rda-origen-pill bg-green-700">
+                <i class="pi pi-calendar"></i>
+                <span>{{ incapacidadParsedData()[0]?.status }}</span>
+            </div>
+        </div>
+
+        <!-- <pre>{{ incapacidadParsedData() | json }}</pre> -->
+
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Concepto</th>
+                    <th>Detalles / Componentes</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of incapacidadParsedData(); track item.id) {
+                <tr>
+                    <td><code class="text-pink-500">{{ item.codigoCode }}</code></td>
+                    <td>
+                        <div class="font-semibold">{{ item.codigoDisplay }}</div>
+                    </td>
+                    <td>
+                        @if (item.componentes && item.componentes.length > 0) {
+                        <div class="flex flex-column gap-2 mt-1 mb-1">
+                            @for (comp of item.componentes; track $index) {
+                            <div class="flex flex-wrap align-items-center gap-2">
+                                <div class="text-xs text-500">
+                                    <span class="font-medium text-700">{{ comp.codigoDisplay }}</span>
+                                    (<span class="text-pink-500">{{ comp.codigoCode }}</span>):
+                                </div>
+                                <span class="border-round-xl px-2 py-1 text-xs font-semibold"
+                                    style="background: #1e3a8a; color: white;">
+                                    {{ comp.valor }}
+                                </span>
+                            </div>
+                            }
+                        </div>
+                        } @else {
+                        {{ item.valorDisplay !== '---' ? item.valorDisplay : item.valorString }}
+                        }
+                    </td>
+                    <td>{{ item.efectivaFecha !== '---' ? (item.efectivaFecha | date:'dd/MM/yyyy') : '---' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin datos de incapacidad registrados.</div>
+        }
+    </div>
+
+    <!-- ── 6. Datos Demográficos Adicionales ───────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0891b2;">
+            <i class="pi pi-user"></i>
+            <span>Datos Demográficos Adicionales</span>
+            <span class="rda-badge">{{ demograficosParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingDemograficos()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando datos demográficos...</div>
+        } @else if (demograficosParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Observación</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of demograficosParsedData(); track item.id) {
+                <tr>
+                    <td><code>{{ item.codigoCode }}</code></td>
+                    <td>{{ item.codigoDisplay }}</td>
+                    <td>{{ item.valorDisplay !== '---' ? item.valorDisplay : item.valorString }}</td>
+                    <td>{{ item.efectivaFecha | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin datos demográficos adicionales.</div>
+        }
+    </div>
+
+    <!-- ── 5. Factores de Riesgo ───────────────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #dc2626;">
+            <i class="pi pi-shield"></i>
+            <span>Factores de Riesgo</span>
+            <span class="rda-badge">{{ riesgoParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingRiesgo()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando factores de riesgo...</div>
+        } @else if (riesgoParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Factor de Riesgo</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Fecha Reg.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of riesgoParsedData(); track item.id) {
+                <tr>
+                    <td><code class="text-pink-500">{{ item.codigoCode }}</code></td>
+                    <td>
+                        <div class="font-semibold">{{ item.codigoDisplay }}</div>
+                    </td>
+                    <td>{{ item.codigoText }}</td>
+                    <td><span class="rda-status-badge status-active">{{ item.status }}</span></td>
+                    <td>{{ item.fechaRegistro !== '---' ? (item.fechaRegistro | date:'dd/MM/yyyy') : '---' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin factores de riesgo registrados.</div>
+        }
+    </div>
+
+    <!-- ── 4. Órdenes / Solicitudes de Servicio ────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #d97706;">
+            <i class="pi pi-list-check"></i>
+            <span>Órdenes y Solicitudes de Servicio</span>
+            <span class="rda-badge">{{ solicitudParsedData().length }}</span>
+        </div>
+
+        @if (isLoadingSolicitud()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando órdenes...</div>
+        } @else if (solicitudParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código CUPS</th>
+                    <th>Servicio / Descripción</th>
+                    <th>Categoría</th>
+                    <th>Finalidad</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of solicitudParsedData(); track item.id) {
+                <tr>
+                    <td>
+                        @if (item.codigoCode !== '---') {
+                        <code class="text-pink-500">{{ item.codigoCode }}</code>
+                        } @else {
+                        <code class="text-pink-500">---</code>
+                        }
+                    </td>
+                    <td><span class="font-semibold">{{ item.codigoDisplay }}</span></td>
+                    <td>
+                        @if (item.categoriaDisplay !== '---') {
+                        {{ item.categoriaDisplay }}
+                        @if (item.categoriaCode !== '---') {
+                        <code class="text-pink-500 ml-1">{{ item.categoriaCode }}</code>
+                        }
+                        } @else {
+                        ---
+                        }
+                    </td>
+                    <td>
+                        @if (item.finalidadDisplay !== '---') {
+                        {{ item.finalidadDisplay }}
+                        @if (item.finalidadCode !== '---') {
+                        <code class="text-pink-500 ml-1">{{ item.finalidadCode }}</code>
+                        }
+                        } @else {
+                        ---
+                        }
+                    </td>
+                    <td><span class="rda-status-badge status-active">{{ item.status }}</span></td>
+                    <td>{{ item.fechaSolicitud !== '---' ? (item.fechaSolicitud | date:'dd/MM/yyyy') : '---' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin órdenes de servicio registradas.</div>
+        }
+    </div>
+
+    <!-- ── 8. Documentos de Soporte ────────────────────────────────────── -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #64748b;">
+            <i class="pi pi-file-pdf"></i>
+            <span>Documentos de Soporte</span>
+            <span class="rda-badge">{{ documentoParsedData().length }}</span>
+        </div>
+        @if (isLoadingDocumento()) {
+        <div class="rda-loading p-3"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando documentos...</div>
+        } @else if (documentoParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Fecha Creación</th>
+                    <th>Tipo</th>
+                    <th>Tipo Contenido</th>
+                    <th>Enlace</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of documentoParsedData(); track item.id) {
+                <tr>
+                    <td>{{ item.fechaCreacion !== '---' ? (item.fechaCreacion | date:'yyyy-MM-dd') : '---' }}</td>
+                    <td class="text-pink-500 font-semibold">{{ item.tipoDisplay }}</td>
+                    <td>{{ item.contentType }}</td>
+                    <td>
+                        @if (item.url !== '---') {
+                        <button type="button" class="p-button p-button-link p-1 text-sm"
+                            (click)="procesarDocumento($event, item.url, item.tipoDisplay)">
+                            <i class="pi pi-external-link mr-1"></i>Ver adjunto
+                        </button>
+                        } @else {
+                        <span class="text-gray-400">Sin URL</span>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty p-3"><i class="pi pi-inbox mr-2"></i>Sin documentos de soporte registrados.</div>
+        }
+
+        <!-- ── Visor PDF seguro ───────────────────────────────────────────── -->
+        @if (isLoadingDocumentoExterno()) {
+        <div class="pdf-visor-loading">
+            <i class="pi pi-spin pi-spinner mr-2"></i>
+            <span>Cargando documento del Ministerio IHCE...</span>
+        </div>
+        }
+        @if (documentoExternoError()) {
+        <div class="pdf-visor-error">
+            <i class="pi pi-exclamation-triangle mr-2"></i>
+            <span>{{ documentoExternoError() }}</span>
+        </div>
+        }
+        @if (pdfBytes()) {
+        <div class="pdf-visor-wrapper" [class.pdf-visor-fullscreen]="isVisorFullscreen()">
+            <div class="pdf-visor-header">
+                <div class="pdf-visor-title">
+                    <i class="pi pi-file-pdf mr-2"></i>
+                    <span>{{ pdfTitulo() }}</span>
+                    <span class="pdf-visor-badge">Solo lectura</span>
+                </div>
+                <div class="pdf-visor-actions">
+                    <button class="pdf-visor-action-btn" (click)="toggleVisorFullscreen()"
+                        [title]="isVisorFullscreen() ? 'Restaurar tamaño' : 'Pantalla completa'" type="button">
+                        <i class="pi" [class.pi-window-maximize]="!isVisorFullscreen()"
+                            [class.pi-window-minimize]="isVisorFullscreen()"></i>
+                    </button>
+                    <button class="pdf-visor-action-btn pdf-visor-close-btn" (click)="cerrarVisorPdf()"
+                        title="Cerrar visor" type="button">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="pdf-visor-container no-print" oncontextmenu="return false;"
+                style="user-select: none; -webkit-user-select: none;">
+                <pdf-viewer [src]="pdfBytes()!" [render-text]="false" [original-size]="false" [fit-to-page]="true"
+                    [show-all]="true" [zoom]="1" [autoresize]="true" (error)="onPdfError($event)"
+                    style="display: block; width: 100%; height: 600px;">
+                </pdf-viewer>
+            </div>
+        </div>
+        }
+        <!-- ── Fin Visor PDF ─────────────────────────────────────────────── -->
+    </div>
+
+    } @else {
+    <div class="rda-empty p-5 text-center">
+        <i class="pi pi-spin pi-spinner text-4xl text-primary mb-3"></i>
+        <p>Cargando datos del encuentro...</p>
+    </div>
+    }
+
+</div>

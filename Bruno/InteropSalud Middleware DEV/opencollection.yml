@@ -1,0 +1,32 @@
+opencollection: 1.0.0
+
+info:
+  name: InteropSalud Middleware DEV
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: base_url
+      value: http://localhost:8002
+    - name: ID_Client_Credentials
+      value: "1"
+    - name: Password_Secret_Cliente_Credentials
+      value: eVL2K2YTu5FdM2d2H4dR7z84ZWF5AG8g1La2FNFA
+    - name: Token
+      value: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiYjNlZmVlZDFkYTliZGE1NTY0ZDRhMjRhODIyMTRmNTk3ZTM0MThlN2MwMWExNzc5YzliMDc2YmEzZmJmM2ZjZTE2ZGQyYWE1YzdkZjFjMDUiLCJpYXQiOjE3NzY4NjgxMjEuNzMwMDQ2LCJuYmYiOjE3NzY4NjgxMjEuNzMwMDQ5LCJleHAiOjE4MDg0MDQxMjEuMzA4MTI5LCJzdWIiOiIiLCJzY29wZXMiOltdfQ.JiaA1NSxlSIkPB4C-EQ5K998m4gfxCUI5deT4h1fIk9G_cQk36EiY-JQJp_AObm4AgqLWnE7X4ELbN7BfH7swAdrUgs2Y6xJa2kMsjwo2ekHeECJToZPE2RdopdtLE_Sk1UC7Qkab6pMDXByFvDGhDwDiRRGFMRTfi88UKuJeb7sd_52t925j14rbNIHndVB_qOjr3ABeZGUes1IxOxCo48ix2A3KzgC6Z_wA4__JqVvlx-MIn3dnIvKimZdWpfm8TiUcqPcgCduFp3AZzyKEGBabDFBwMPVZ4-ZLTTbI8E8hHoQVXRpMiZzmSATr8uuiWpHJpZhHts6kGY4l8BW3RqPsgQTQJngqVMIesm5kXUMOgcN3sXOf1d0I5ry-C7nzKTItKDSUyPnu78MwP96fj8yDmX6XhvoYAfyGde5_aKyignoYGXVXLIwOScg8tnIwhb4tJyEWhQpYG0TdrOKr5dGj2GkVB5m2DNUaAXGVWevTWZ8Ciz1wDQ-JObBNMFaLapjC1o8xMDfvQZMbxv1ixfL2Kq9grq-U--DefQE3ug_2pP6w8lH1T9w6aFYEvcD9z-JModTgAlYTOBjxdEe2qSCawLFJB1jG_shkz0I3P3JLP7rR2ULc1_IYXFqAvt7zng0m2P9CUDKMUikgwiDZGyiKoDod5rsmVdphWHNySo
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

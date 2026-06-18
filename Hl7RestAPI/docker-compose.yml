@@ -1,0 +1,16 @@
+# Hl7RestAPI/docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Servicio de la aplicacion Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html

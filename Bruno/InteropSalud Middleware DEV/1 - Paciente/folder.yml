@@ -1,0 +1,7 @@
+info:
+  name: 1 - Paciente
+  type: folder
+  seq: 2
+
+request:
+  auth: inherit

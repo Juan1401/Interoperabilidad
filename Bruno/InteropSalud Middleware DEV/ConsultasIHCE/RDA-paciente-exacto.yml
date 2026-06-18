@@ -1,0 +1,26 @@
+info:
+  name: RDA-paciente-exacto
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/consulta-ministerio/paciente-exacto"
+  body:
+    type: json
+    data: |-
+      {
+          "tipo_documento":     "RC",
+          "numero_documento":   "1232832630",
+          "tipo_doc_usuario":   "CC",
+          "numero_doc_usuario": "123123"
+      }
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

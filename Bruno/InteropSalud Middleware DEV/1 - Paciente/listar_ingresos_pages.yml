@@ -1,0 +1,40 @@
+info:
+  name: listar_ingresos_pages
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/lista-ingreso?page=2"
+  params:
+    - name: page
+      value: "2"
+      type: query
+  body:
+    type: json
+    data: "{\r
+
+      \  \"fechaInicio\": \"2026-02-05\", \r
+
+      \  \"fechaFin\": \"2026-02-06\",    \r
+
+      \  \"tipoDocumento\": null,       // Opcional, pero te exigirá 'documento' si lo envías\r
+
+      \  \"documento\": null,   // Opcional, pero te exigirá 'tipoDocumento' si lo envías\r
+
+      \  \"estado\": 1,                 // Opcional\r
+
+      \  \"noIngreso\": null,        // Opcional\r
+
+      \  \"atencionMedica\": null          // Opcional (ID del Tipo RDA)\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

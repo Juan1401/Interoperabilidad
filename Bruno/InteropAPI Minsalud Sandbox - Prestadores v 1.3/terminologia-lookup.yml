@@ -1,0 +1,35 @@
+info:
+  name: terminologia-lookup
+  type: http
+  seq: 15
+
+http:
+  method: POST
+  url: "{{APIMurl}}/CodeSystem/$lookup"
+  headers:
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  body:
+    type: json
+    data: "{\r
+
+      \  \"resourceType\": \"Parameters\",\r
+
+      \  \"parameter\": [\r
+
+      \    { \"name\": \"system\", \"valueUri\": \"https://fhir.minsalud.gov.co/rda/CodeSystem/IUM\" },\r
+
+      \    { \"name\": \"code\", \"valueCode\": \"1A1000101000100\" }\r
+
+      \  ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

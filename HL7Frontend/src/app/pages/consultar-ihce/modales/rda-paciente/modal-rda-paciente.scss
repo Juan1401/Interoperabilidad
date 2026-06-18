@@ -1,0 +1,7 @@
+// Los estilos del modal (cabecera y envoltorio) se movieron a src/assets/styles.scss
+// para asegurar alcance global en el DynamicDialog de PrimeNG.
+.p-button-text.p-button-secondary {
+    background: transparent;
+    border-color: transparent;
+    color: #ffffff;
+}

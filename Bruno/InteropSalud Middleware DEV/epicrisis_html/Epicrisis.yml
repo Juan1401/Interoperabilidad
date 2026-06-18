@@ -1,0 +1,19 @@
+info:
+  name: Epicrisis
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://metatron.fciclubnoel.com/desarrollo/jonier.cabrera/SIIS/webservices/Ihce/apiReporteEpicrisis.php?ingreso=2308380
+  params:
+    - name: ingreso
+      value: "2308380"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

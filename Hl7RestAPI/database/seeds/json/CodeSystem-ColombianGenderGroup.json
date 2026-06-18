@@ -1,0 +1,30 @@
+{
+    "resourceType": "CodeSystem",
+    "id": "ColombianGenderGroup",
+    "language": "es",
+    "url": "https://fhir.minsalud.gov.co/rda/CodeSystem/ColombianGenderGroup",
+    "version": "0.7.1",
+    "name": "ColombianGenderGroup",
+    "title": "CodeSystem: Gender Group - Colombia",
+    "status": "active",
+    "experimental": false,
+    "date": "2025-05-21",
+    "publisher": "Ministerio de Salud y Protección Social de Colombia",
+    "caseSensitive": true,
+    "content": "complete",
+    "count": 3,
+    "concept": [
+        {
+            "code": "01",
+            "display": "Hombre"
+        },
+        {
+            "code": "02",
+            "display": "Mujer"
+        },
+        {
+            "code": "03",
+            "display": "Indeterminado o Intersexual"
+        }
+    ]
+}

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------------------------------
+seeder
+---------------------------------------------------------------------------------------------------
+CodeSystem-condition-ver-status.json
+Actúa como Senior Backend Developer. Genera los Seeders para las tablas ihce.hl7_catalogs (padre) e ihce.hl7_catalog_items (hijo) usando la siguiente información: [INSERTAR DATOS]. El código debe usar lógica "upsert" (update-or-create) para garantizar idempotencia y evitar duplicados en el deploy. Asegura la integridad referencial vinculando los items con el ID correspondiente del catálogo. Proporciona el comando de terminal para ejecución individual y su integración en el DatabaseSeeder principal para automatización en el pipeline de CI/CD. Tras generar el código, usa la herramienta MCP para validar la estructura en la base de datos, ejecutar una inserción de prueba y realizar un SELECT de verificación que confirme el registro correcto de los datos. Prioriza el manejo de excepciones y logs de consola para el seguimiento del proceso.
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Migracion y seeder Nueva tabla
+---------------------------------------------------------------------------------------------------
+CodeSystem-condition-ver-status.json
+Actúa como Arquitecto de Software Senior. Basándote en el archivo adjunto, genera una Migración y un Seeder en Laravel dentro del esquema específico ihce. Requerimientos: 1. Migración: Define la estructura de la tabla con tipos de datos óptimos, timestamps y comentarios en las columnas. 2. Seeder: Implementa lógica updateOrCreate para garantizar idempotencia y evitar duplicados. 3. Automatización: Registra automáticamente el nuevo Seeder dentro de DatabaseSeeder.php. 4. Verificación MCP: Antes de finalizar, utiliza MCP para validar la conexión, ejecutar la migración, correr el seeder y realizar un SELECT de control que confirme la integridad de los registros. Proporciona los comandos de terminal necesarios para ejecutar este proceso de forma individual y asegura que el código sea compatible con pipelines de CI/CD. agregados los seeders en el archivo DatabaseSeeder.php
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Consulta para Tabla Eloquent
+---------------------------------------------------------------------------------------------------
+En la siguiente linea @RdaPacienteService.php#L116-119 Actúa como Desarrollador Senior. Analiza el patrón de arquitectura actual del proyecto (Service/Repository/Controller) y, utilizando MCP, consulta la tabla [NOMBRE_TABLA] filtrando por la columna code con el valor [VALOR_BUSCADO]. Almacena el resultado en una variable tipada y utilízala para [ACCIÓN_A_REALIZAR]. Asegura que la implementación siga las convenciones de nomenclatura existentes, maneje casos de registros no encontrados y optimice la consulta para evitar redundancias en la base de datos.
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Crear Codigo apartir consulta sql
+---------------------------------------------------------------------------------------------------
+Actúa como Desarrollador Backend Senior. Analiza el patrón de arquitectura en #L153-156 y genera el código (Query Builder o Eloquent) para ejecutar la siguiente consulta: SELECT * FROM ihce.iso_3166_1 WHERE code_type = 'numeric' AND display ILIKE '%colombia%'. Requerimientos: 1. Almacenar el resultado en una variable. 2. Implementar un manejo de excepciones (try-catch) o un firstOrFail() para registros no encontrados. 3. Usa MCP para verificar la existencia del registro en la DB real. Devuelve solo el código limpio y el comando de validación. 4. Implementa El codigo necesario analizando el flujo de trabajo
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Ejecutar el seeder
+---------------------------------------------------------------------------------------------------
+docker exec -i hl7restapi_dev php artisan tinker --execute="(new IhceCatalogsSeeder())->run();"
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Ejecutar el seeder
+---------------------------------------------------------------------------------------------------
+docker exec hl7restapi_dev php artisan db:seed --class=Hl7MedicationStatementStatusSeeder
+---------------------------------------------------------------------------------------------------

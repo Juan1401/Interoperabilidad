@@ -1,0 +1,20 @@
+info:
+  name: ihce-ultima-respuesta-envio
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/system/ihce-ultima-respuesta-envio"
+  body:
+    type: json
+    data: '{ "ingreso_id": 2302121 }'
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

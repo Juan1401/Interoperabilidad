@@ -1,0 +1,47 @@
+info:
+  name: Auditoria-acceso-link
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/auditoria-acceso-link"
+  params:
+    - name: uuid
+      value: 123e4567-e89b-12d3-a456-426614174000
+      type: query
+      disabled: true
+    - name: usuario_id
+      value: usr_123
+      type: query
+      disabled: true
+    - name: ip
+      value: 127.0.0.1
+      type: query
+      disabled: true
+    - name: estado
+      value: ""
+      type: query
+      disabled: true
+  body:
+    type: json
+    data: "{\r
+
+      \    \"uuid\": \"123e4567-e89b-12d3-a456-426614174000\",\r
+
+      \    \"usuario_id\": \"usr_123\",\r
+
+      \    \"ip\": \"127.0.0.1\",\r
+
+      \    \"estado\": \"Usado\"\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

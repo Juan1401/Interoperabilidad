@@ -1,0 +1,61 @@
+info:
+  name: consultar-organizacion
+  type: http
+  seq: 11
+
+http:
+  method: POST
+  url: "{{APIMurl}}/Organization/$consultar-organizacion"
+  headers:
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  body:
+    type: json
+    data: "/*En los parametros:\r
+
+      - Cambiar TaxIdentifier(NIT) (0000000) ó HealthcareProviderIdentifier(Código de habilitación) (0000000) ó name\r
+
+      */\r
+
+      {\r
+
+      \    \"resourceType\": \"Parameters\",\r
+
+      \    \"parameter\": [\r
+
+      \        {\r
+
+      \            \"name\": \"TaxIdentifier\",\r
+
+      \            \"valueString\": \"0000000\"\r
+
+      \        },\r
+
+      \        {\r
+
+      \            \"name\": \"HealthcareProviderIdentifier\",\r
+
+      \            \"valueString\": \"0000000\"\r
+
+      \        },\r
+
+      \        {\r
+
+      \            \"name\": \"name\",\r
+
+      \            \"valueString\": \"Hospital Central\"\r
+
+      \        }\r
+
+      \    ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

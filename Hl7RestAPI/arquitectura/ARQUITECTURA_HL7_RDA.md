@@ -1,0 +1,312 @@
+# 🏗️ Arquitectura del Sistema HL7 RDA
+
+## 📊 Diagrama de Arquitectura en Capas
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        POSTMAN / CLIENTE                       │
+│                    (Herramienta de Pruebas)                    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ HTTP POST + OAuth2 Token
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      CAPA DE RUTAS (API)                       │
+│                       routes/api.php                           │
+├─────────────────────────────────────────────────────────────────┤
+│  POST /api/hl7/rda/paciente        [middleware: client]        │
+│  POST /api/hl7/rda/consulta        [middleware: client]        │
+│  POST /api/hl7/rda/urgencias       [middleware: client]        │
+│  POST /api/hl7/rda/hospitalizacion [middleware: client]        │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ Autenticación OAuth2
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  MIDDLEWARE DE AUTENTICACIÓN                   │
+│                  (Laravel Passport - OAuth2)                   │
+│                  CheckClientCredentials                        │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ Request Autenticado
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     CAPA DE CONTROLADORES                      │
+│            app/Http/Controllers/Api/Hl7/                       │
+│                      RdaController.php                         │
+├─────────────────────────────────────────────────────────────────┤
+│  - getRdaPaciente()         → Valida request                   │
+│  - getRdaConsulta()         → Maneja errores                   │
+│  - getRdaUrgencias()        → Retorna JSON                     │
+│  - getRdaHospitalizacion()  → Logs de auditoría                │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ Inyección de Dependencias
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  CAPA DE SERVICIOS (LÓGICA)                    │
+│                   app/Services/Hl7/                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │          RdaService (Clase Base Abstracta)             │   │
+│  │  - getIngresoWithRelations()                           │   │
+│  │  - validateIngreso()                                   │   │
+│  │  - abstract getDataForRda()                            │   │
+│  └────────────┬───────────────────────────────────────────┘   │
+│               │ Herencia                                       │
+│               ▼                                                │
+│  ┌──────────────────┬─────────────────┬──────────────────┐   │
+│  │                  │                 │                  │   │
+│  │ RdaPaciente     │ RdaConsulta    │ RdaUrgencias    │   │
+│  │ Service ✅      │ Service 🚧     │ Service 🚧      │   │
+│  │                  │                 │                  │   │
+│  └──────────────────┴─────────────────┴──────────────────┘   │
+│               │                                                │
+│               │ RdaHospitalizacionService 🚧                  │
+│               │                                                │
+└───────────────┼────────────────────────────────────────────────┘
+                │
+                │ Consultas ORM (Eloquent)
+                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      CAPA DE MODELOS (ORM)                     │
+│                      app/Models/                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────────┐      ┌──────────────┐      ┌────────────┐  │
+│  │   Ingreso    │──┬──▶│   Paciente   │──┬──▶│  Persona   │  │
+│  │              │  │   │              │  │   │            │  │
+│  │ - ingreso_id │  │   │ - paciente_id│  │   │ - nombres  │  │
+│  │ - numero     │  │   │ - historia   │  │   │ - documento│  │
+│  │ - fecha      │  │   │              │  │   │ - naci.    │  │
+│  └──────────────┘  │   └──────────────┘  │   └─────┬──────┘  │
+│                    │                     │         │          │
+│        belongsTo   │         belongsTo   │         │ belongsTo│
+│                    │                     │         ▼          │
+│                    │                     │   ┌────────────┐  │
+│                    │                     │   │TipoDocumento│  │
+│                    │                     │   │            │  │
+│                    │                     │   │ - nombre   │  │
+│                    │                     │   │ - codigo   │  │
+│                    │                     │   └────────────┘  │
+│                    │                     │                    │
+│                    └─────────────────────┘                    │
+│                      (Relaciones Eloquent)                    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ SQL Queries
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    BASE DE DATOS PostgreSQL                    │
+│                    SIIS_2026_Enero (ihce)                      │
+├─────────────────────────────────────────────────────────────────┤
+│  Tablas:                                                        │
+│  - public.ingreso                                               │
+│  - public.paciente                                              │
+│  - public.persona                                               │
+│  - public.tipo_documento                                        │
+│  - public.system_usuarios                                       │
+│  - ... (otras tablas SIIS)                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 Flujo de Datos (Request -> Response)
+
+### 1️⃣ Flujo Exitoso de RDA Paciente
+
+```
+┌─────────────┐
+│  POSTMAN    │
+└──────┬──────┘
+       │
+       │ 1. POST /api/hl7/rda/paciente
+       │    Headers: Authorization: Bearer {token}
+       │    Body: {"ingreso": 1}
+       ▼
+┌──────────────────────────────────────┐
+│  MIDDLEWARE: CheckClientCredentials  │
+│  - Valida token OAuth2                │
+│  - Verifica permisos del cliente      │
+└──────┬───────────────────────────────┘
+       │ ✅ Token válido
+       ▼
+┌──────────────────────────────────────┐
+│  RdaController::getRdaPaciente()     │
+│  - Valida parámetro 'ingreso'        │
+│  - Captura excepciones                │
+└──────┬───────────────────────────────┘
+       │
+       │ 2. Inyecta servicio
+       ▼
+┌──────────────────────────────────────┐
+│  RdaPacienteService                  │
+│  ::getDataForRda($ingresoId)         │
+└──────┬───────────────────────────────┘
+       │
+       │ 3. Llama método heredado
+       ▼
+┌──────────────────────────────────────┐
+│  RdaService (Base)                   │
+│  ::getIngresoWithRelations()         │
+└──────┬───────────────────────────────┘
+       │
+       │ 4. Query Eloquent con relaciones
+       ▼
+┌──────────────────────────────────────┐
+│  Modelos Eloquent                    │
+│  Ingreso::with([                     │
+│    'paciente.persona.tipoDocumento'  │
+│  ])->find($id)                       │
+└──────┬───────────────────────────────┘
+       │
+       │ 5. SQL Query ejecutada
+       ▼
+┌──────────────────────────────────────┐
+│  PostgreSQL Database                 │
+│  SELECT con LEFT JOINS               │
+└──────┬───────────────────────────────┘
+       │
+       │ 6. Resultados retornados
+       ▼
+┌──────────────────────────────────────┐
+│  RdaPacienteService                  │
+│  - Valida datos recibidos             │
+│  - Estructura datos para HL7          │
+│  - Retorna array estructurado         │
+└──────┬───────────────────────────────┘
+       │
+       │ 7. Array de datos
+       ▼
+┌──────────────────────────────────────┐
+│  RdaController                       │
+│  - Valida datos con validateRdaData()│
+│  - Construye respuesta JSON           │
+└──────┬───────────────────────────────┘
+       │
+       │ 8. Response JSON
+       ▼
+┌──────────────────────────────────────┐
+│  POSTMAN                             │
+│  {                                   │
+│    "status": 200,                    │
+│    "success": true,                  │
+│    "data": {...}                     │
+│  }                                   │
+└──────────────────────────────────────┘
+```
+
+---
+
+## 🛡️ Beneficios de esta Arquitectura
+
+### ✅ Separación de Responsabilidades
+
+- **Controladores**: Solo manejan HTTP (validación, respuestas)
+- **Servicios**: Contienen la lógica de negocio
+- **Modelos**: Representan las tablas y relaciones
+
+### ✅ Reutilización de Código
+
+- Clase base `RdaService` con métodos comunes
+- Los servicios específicos heredan funcionalidad
+
+### ✅ Facilidad de Pruebas
+
+- Cada capa se puede probar independientemente
+- Inyección de dependencias facilita mocking
+
+### ✅ Escalabilidad
+
+- Agregar nuevos tipos de RDA es simple
+- Solo crear nuevo servicio que herede de `RdaService`
+
+### ✅ Mantenibilidad
+
+- Código organizado y fácil de encontrar
+- Cambios en lógica de negocio no afectan controladores
+
+---
+
+## 📦 Responsabilidades por Capa
+
+### Capa de Rutas (`routes/api.php`)
+- ✅ Definir endpoints disponibles
+- ✅ Asignar middleware de autenticación
+- ✅ Mapear rutas a controladores
+
+### Capa de Controladores (`RdaController`)
+- ✅ Validar requests HTTP
+- ✅ Manejar errores y excepciones
+- ✅ Construir respuestas HTTP JSON
+- ✅ Logs de auditoría
+- ❌ NO contiene lógica de negocio
+
+### Capa de Servicios (`RdaPacienteService`, etc.)
+- ✅ Lógica de negocio
+- ✅ Validaciones complejas
+- ✅ Transformación de datos
+- ✅ Coordinar múltiples modelos
+- ❌ NO maneja HTTP directamente
+
+### Capa de Modelos (`Ingreso`, `Paciente`, etc.)
+- ✅ Representar tablas de BD
+- ✅ Definir relaciones Eloquent
+- ✅ Accessors y Mutators
+- ❌ NO contiene lógica de negocio compleja
+
+### Capa de Base de Datos
+- ✅ Almacenar datos
+- ✅ Garantizar integridad referencial
+- ✅ Optimizaciones (índices, etc.)
+
+---
+
+## 🚀 Extensibilidad Futura
+
+Para agregar un nuevo tipo de RDA (ejemplo: RDA Laboratorio):
+
+1. **Crear Servicio**: `app/Services/Hl7/RdaLaboratorioService.php`
+   ```php
+   class RdaLaboratorioService extends RdaService {
+       public function getDataForRda(int $ingresoId): array {
+           // Implementar lógica
+       }
+   }
+   ```
+
+2. **Agregar método al Controlador**: `RdaController.php`
+   ```php
+   public function getRdaLaboratorio(Request $request) {
+       // Similar a otros métodos
+   }
+   ```
+
+3. **Agregar Ruta**: `routes/api.php`
+   ```php
+   Route::post('/hl7/rda/laboratorio', 
+       [RdaController::class, 'getRdaLaboratorio'])
+       ->middleware('client');
+   ```
+
+---
+
+## 🎯 Convenciones de Código
+
+- **Nombres de clases**: PascalCase (`RdaPacienteService`)
+- **Nombres de métodos**: camelCase (`getDataForRda`)
+- **Nombres de rutas**: kebab-case (`/hl7/rda/paciente`)
+- **Respuestas JSON**: snake_case para keys (`numero_ingreso`)
+- **Logs**: Siempre usar `Log::info()`, `Log::error()`
+- **Excepciones**: Capturar y loguear todas las excepciones
+
+---
+
+Esta arquitectura garantiza:
+- 🎯 Código limpio y mantenible
+- 🚀 Fácil de escalar
+- 🧪 Fácil de probar
+- 📚 Bien documentado
+- 🔒 Seguro con OAuth2

@@ -1,0 +1,1310 @@
+<div class="rda-consulta-wrapper">
+
+    <!-- Banner de Origen -->
+    <div class="rda-origen-banner">
+        <div class="rda-origen-label">
+            <i class="pi pi-info-circle"></i>
+            <span>Origen del documento:</span>
+        </div>
+        <div class="rda-origen-pill">
+            <i class="pi pi-file-check"></i>
+            <span>{{ datosEncuentro()?.resource?.title || 'RDA Urgencias' }}</span>
+        </div>
+        <div class="rda-origen-pill" style="background-color: #1a6b3c;">
+            <i class="pi pi-calendar"></i>
+            <span>{{ datosEncuentro()?.resource?.date | safeDate:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         REFERENCIAS PRINCIPALES (Raíz del Resource)
+    =========================================== -->
+
+    <!-- ROOT: encounter (Encuentro Clínico) -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-home"></i>
+            <span>Encuentro Clínico</span>
+            @if (encuentroParsedData()[0]) {
+            <span class="rda-status-badge status-warning">{{ encuentroParsedData()[0].classDisplay |
+                titlecase
+                }}</span>
+            <span class="rda-status-badge status-active">
+                {{ encuentroParsedData()[0].status === 'finished' ? 'Finalizado' : encuentroParsedData()[0].status }}
+            </span>
+            }
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            @if (isLoadingEncuentro()) {
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando encuentro...</div>
+            } @else if (encuentroParsedData().length > 0) {
+            @for (enc of encuentroParsedData(); track enc.id) {
+            <div class="grid mb-3">
+                <div class="col-12 md:col-1 lh-2">
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-hashtag text-primary mr-2"></i>Nº Encuentro:</strong>&nbsp;<span
+                            class="text-pink-500">{{ enc.id }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-clock text-primary mr-2"></i>Fecha de Ingreso:</strong>&nbsp;<span>{{
+                            enc.startDate
+                            | safeDate:'yyyy-MM-dd' }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-clock text-primary mr-2"></i>Fecha de Egreso:</strong>&nbsp;<span>
+                            {{ enc.endDate | safeDate:'yyyy-MM-dd' }}</span></p>
+                    <p class="mb-1"><strong class="text-gray-800"><i class="pi pi-bolt text-primary mr-2"></i>Causa
+                            Externa / Motivo:</strong>
+                        <span class="inline-block text-white font-bold px-2 py-1 border-round text-xs"
+                            style="background-color: #64748b;">
+                            {{ enc.causaExternaDisplay | uppercase }} [{{ enc.causaExternaCode }}]
+                        </span>
+                    </p>
+                    <p class="mb-1 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-building text-primary mr-2"></i>Prestador EPS:</strong>&nbsp;<span>{{
+                            epsParsedData()[0]?.name || '---' }}</span></p>
+                </div>
+                <div class="col-12 md:col-2 lh-2">
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-server text-primary mr-2"></i>Modalidad:</strong>&nbsp;<span>{{
+                            enc.modalidad }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-sitemap text-primary mr-2"></i>Grupo de Servicio:</strong>&nbsp;<span>{{
+                            enc.grupoServicio }}</span></p>
+                    <p class="mb-2 flex align-items-center"><strong class="text-gray-800"><i
+                                class="pi pi-building text-primary mr-2"></i>Entorno de Atención:</strong>&nbsp;<span>{{
+                            enc.entornoAtencion }}</span></p>
+                </div>
+            </div>
+            @if (enc.diagnosticos && enc.diagnosticos.length > 0) {
+            <p class="mt-2 mb-2"><strong class="text-gray-900">Diagnósticos del Encuentro:</strong></p>
+            <table class="rda-table w-full">
+                <thead>
+                    <tr>
+                        <th style="width: 50px">#</th>
+                        <th>Rol diagnóstico</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (diag of enc.diagnosticos; track diag.role; let i = $index) {
+                    @let typeClass = diag.typeDisplay === 'Confirmado Nuevo' ? 'status-active' :
+                    diag.typeDisplay === 'Impresión Diagnóstica' ? 'status-warning' :
+                    'status-secondary';
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ diag.role }}</td>
+                        <td><span class="rda-status-badge {{typeClass}}">{{ diag.typeDisplay }}</span></td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <br>
+            <p class="mt-2 mb-2"><strong class="text-gray-900">Hospitalización:</strong></p>
+            <div class="grid mt-2 mb-3">
+                <div class="col-12 md:col-1 lh-2">
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-800">
+                            <i class="pi pi-sign-in text-primary mr-2"></i>Vía de Ingreso:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ enc.viaIngreso }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-800">
+                            <i class="pi pi-external-link text-primary mr-2"></i>Condición y Destino de Egreso:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ enc.condicionEgreso }}</span>
+                    </p>
+                </div>
+                <div class="col-12 md:col-2 lh-2">
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-800">
+                            <i class="pi pi-heart text-primary mr-2"></i>Estado al Egreso:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ enc.estadoEgreso }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-800">
+                            <i class="pi pi-building text-primary mr-2"></i>Institución de Destino:
+                        </strong>
+                        &nbsp;
+                        @if (isLoadingDestino()) {
+                        <span class="text-gray-500 italic"><i class="pi pi-spin pi-spinner mr-1"></i>Cargando...</span>
+                        } @else if (destinoParsedData(); as destino) {
+                        <span class="text-pink-500 font-medium">
+                            {{ destino.nit }} - {{ destino.name }}
+                        </span>
+                        } @else {
+                        <span class="text-pink-500 font-medium">{{ enc.destinoEgreso }}</span>
+                        }
+                    </p>
+                </div>
+            </div>
+            }
+            }
+            } @else {
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información del encuentro.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ROOT: subject (Paciente) -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #16a34a;">
+            <i class="pi pi-user"></i>
+            <span>Datos del Paciente</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            @if (isLoadingPaciente()) {
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando paciente...</div>
+            } @else if (pacienteParsedData().length > 0) {
+            @for (pat of pacienteParsedData(); track pat.documentValue) {
+            <div class="grid">
+                <!-- Columna Izquierda -->
+                <div class="col-12 md:col-1 lh-2">
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i
+                                class="pi pi-check-circle text-primary mr-2 text-lg"></i>Activo: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.active }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-heart text-primary mr-2 text-lg"></i>Fallecido:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.deceased }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-user text-primary mr-2 text-lg"></i>Nombre:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.fullName | uppercase }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-id-card text-primary mr-2 text-lg"></i>Documento:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.documentValue }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-file text-primary mr-2 text-lg"></i>Tipo de
+                            documento: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.docType }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-calendar text-primary mr-2 text-lg"></i>Fecha de
+                            Nacimiento: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.birthDate | safeDate:'yyyy-MM-dd' }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-clock text-primary mr-2 text-lg"></i>Hora de
+                            Nacimiento: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.birthTime }}</span>
+                    </p>
+                    <p class="mb-0 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-hourglass text-primary mr-2 text-lg"></i>Edad:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.age !== '---' ? pat.age + ' años' : '---' }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-map-marker text-primary mr-2 text-lg"></i>País de
+                            Residencia: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.country }}</span>
+                    </p>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="col-12 md:col-2 lh-2">
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-map text-primary mr-2 text-lg"></i>Municipio de
+                            Residencia: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.city }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-users text-primary mr-2 text-lg"></i>Sexo
+                            Biológico: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.biologicalGender }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i
+                                class="pi pi-transgender text-primary mr-2 text-lg"></i>Identidad de Género: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.genderIdentity }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-globe text-primary mr-2 text-lg"></i>Nacionalidad:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.nationality }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-compass text-primary mr-2 text-lg"></i>Zona de
+                            Residencia: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.residenceZone }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-code text-primary mr-2 text-lg"></i>DIVIPOLA
+                            Municipio: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.divipola }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-flag text-primary mr-2 text-lg"></i>Código país:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.countryCode }}</span>
+                    </p>
+                    <p class="mb-2 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-tags text-primary mr-2 text-lg"></i>Etnia:
+                        </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.ethnicity }}</span>
+                    </p>
+                    <p class="mb-0 flex align-items-center">
+                        <strong class="text-gray-900"><i class="pi pi-info-circle text-primary mr-2 text-lg"></i>Tipo
+                            Discapacidad: </strong>
+                        &nbsp;<span class="text-gray-700">{{ pat.disability }}</span>
+                    </p>
+                </div>
+            </div>
+            }
+            } @else {
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información del paciente.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ROOT: author (Organización Prestadora) -->
+    @if (isLoadingPrestadora()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #6b7280;">
+            <i class="pi pi-building"></i><span>Organización prestadora de salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando organización...</div>
+        </div>
+    </div>
+    } @else {
+    @for (prest of prestadoraParsedData(); track prest.nit; let i = $index) {
+    <div class="bordes-card-0 mb-3 shadow-1 border-round">
+        <div class="rda-section-header p-3 text-white border-round-top flex align-items-center"
+            style="background: #7c3aed;">
+            <i class="pi pi-building mr-2 text-xl"></i>
+            <span class="font-semibold text-lg">Organización prestadora de salud #{{ i + 1 }}</span>
+        </div>
+
+        <div class="grid m-0 p-4 bg-white border-round-bottom text-sm lh-2">
+
+            <div class="col-12 md:col-1">
+                <p class="mb-3 flex align-items-center">
+                    <strong class="text-gray-900">
+                        <i class="pi pi-building text-primary mr-2 text-lg"></i>Nombre:
+                    </strong>&nbsp;
+                    <span class="text-gray-700">{{ prest.name }}</span>
+                </p>
+
+                <p class="mb-3 md:mb-0 flex align-items-center">
+                    <strong class="text-gray-900">
+                        <i class="pi pi-tag text-primary mr-2 text-lg"></i>NIT:
+                    </strong>&nbsp;
+                    <span class="text-gray-700">{{ prest.nit }}</span>
+                </p>
+            </div>
+
+            <div class="col-12 md:col-2">
+                <p class="mb-3 flex align-items-center">
+                    <strong class="text-gray-900">
+                        <i class="pi pi-verified text-primary mr-2 text-lg"></i>REPS:
+                    </strong>&nbsp;
+                    <span class="text-gray-700">{{ prest.reps }}</span>
+                </p>
+
+                <p class="mb-0 flex align-items-center">
+                    <strong class="text-gray-900">
+                        <i class="pi pi-tags text-primary mr-2 text-lg"></i>Tipo:
+                    </strong>&nbsp;
+                    <span class="text-gray-700">{{ prest.type }}</span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+    }
+    }
+
+    <!-- ── EPS (Entidad Pagadora) ─────────────────────────── -->
+    @if (isLoadingEps()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #4f46e5;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS (Entidad Pagadora)</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando EPS...</div>
+        </div>
+    </div>
+    } @else if (epsParsedData().length === 0) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #06b6d4;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS (Entidad Pagadora)</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información de EPS.</div>
+        </div>
+    </div>
+    } @else {
+    @for (eps of epsParsedData(); track eps.name; let i = $index) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #4f46e5;">
+            <i class="pi pi-id-card"></i>
+            <span>EPS #{{ i + 1 }}</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="mb-0 lh-2">
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-building text-primary mr-2"></i>Nombre: </strong>&nbsp;<span
+                        class="text-gray-700">{{ eps.name }}</span></p>
+                @if (eps.nit !== '---') {
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tag text-primary mr-2"></i>NIT: </strong>&nbsp;<span class="text-gray-700">{{
+                        eps.nit }}</span></p>
+                }
+                @if (eps.reps !== '---') {
+                <p class="mb-3 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-verified text-primary mr-2"></i>Código de habilitación (REPS):
+                    </strong>&nbsp;<span class="text-gray-700">{{ eps.reps }}</span></p>
+                }
+                @if (eps.type !== '---') {
+                <p class="mb-0 flex align-items-center"><strong class="text-gray-900"><i
+                            class="pi pi-tags text-primary mr-2"></i>Tipo de organización: </strong>&nbsp;<span
+                        class="text-gray-700">{{ eps.type }}</span></p>
+                }
+            </div>
+        </div>
+    </div>
+    }
+    }
+
+    <!-- ── Profesional de la Salud ─────────────────────────── -->
+    @if (isLoadingProfesional()) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0d9488;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando profesional...</div>
+        </div>
+    </div>
+    } @else if (profesionalParsedData().length === 0) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #2563eb;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin información de profesional de la salud.</div>
+        </div>
+    </div>
+    } @else {
+    @for (prof of profesionalParsedData(); track prof.documentValue) {
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0d9488;">
+            <i class="pi pi-user-plus"></i>
+            <span>Profesional de la Salud</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid mb-4 lh-2 m-0">
+                <div class="col-12 md:col-1">
+                    <p class="mb-3 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-user-plus text-primary mr-2"></i>Nombre completo:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.fullName | uppercase }}</span>
+                    </p>
+                    <p class="mb-3 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-file text-primary mr-2"></i>Tipo de documento:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.docType }}</span>
+                    </p>
+                </div>
+                <div class="col-12 md:col-2">
+                    <p class="mb-0 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-check-circle text-primary mr-2"></i>Estado:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.active }}</span>
+                    </p>
+
+                    <p class="mb-3 md:mb-0 flex align-items-center">
+                        <strong class="text-gray-900">
+                            <i class="pi pi-id-card text-primary mr-2"></i>Documento:
+                        </strong>&nbsp;
+                        <span class="text-gray-700">{{ prof.documentValue }}</span>
+                    </p>
+                </div>
+            </div>
+            @if (prof.qualifications && prof.qualifications.length > 0) {
+            <div class="border-top-1 surface-border pt-4">
+                <p class="mb-2"><strong class="text-gray-900"><i
+                            class="pi pi-star-fill text-gray-700 mr-2"></i>Cualificaciones Profesionales</strong></p>
+                <table class="rda-table w-full mb-2">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">#</th>
+                            <th>Cualificación</th>
+                            <th>Periodo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (qual of prof.qualifications; track qual.name; let i = $index) {
+                        <tr>
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ qual.name }}</td>
+                            <td>{{ qual.start }} - Actual</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+    </div>
+    }
+    }
+
+    <!-- SECCIÓN [3]: Historial de diagnósticos -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #b91c1c;">
+            <i class="pi pi-heart-fill"></i>
+            <span>Historial de Diagnósticos</span>
+            <span class="rda-badge">{{ conditionParsedData().length }}</span>
+        </div>
+        @if (isLoadingConditionData()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando diagnósticos...</div>
+        } @else if (conditionParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código CIE-10</th>
+                    <th>Diagnóstico</th>
+                    <th>Estado Clínico</th>
+                    <th>Verificación</th>
+                    <th>Categoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of conditionParsedData(); track item.conditionId) {
+                <tr>
+                    <td class="text-pink-500">{{ item.diagnosisCode }}</td>
+                    <td>{{ item.diagnosisDisplay || item.diagnosisText }}</td>
+                    <td>
+                        <span class="rda-status-badge"
+                            [ngClass]="item.clinicalStatusCode === 'active' ? 'status-active' : 'status-inactive'">
+                            {{ item.clinicalStatusDisplay }}
+                        </span>
+                    </td>
+                    <td>{{ item.verificationDisplay }}</td>
+                    <td>{{ item.categoryDisplay }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin diagnósticos registrados.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [4]: Historial de alergias -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #e11d48;">
+            <i class="pi pi-bolt"></i>
+            <span>Historial de Alergias e Intolerancias</span>
+            <span class="rda-badge">{{ allergyParsedData().length }}</span>
+        </div>
+        @if (isLoadingAllergyData()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando alergias...</div>
+        } @else if (allergyParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Estado Clínico</th>
+                    <th>Verificación</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of allergyParsedData(); track item.allergyId) {
+                <tr>
+                    <td class="text-pink-500">{{ item.allergyCode }}</td>
+                    <td>{{ item.allergyDisplay || item.allergyText }}</td>
+                    <td>
+                        <span class="rda-status-badge"
+                            [ngClass]="item.clinicalStatusCode === 'active' ? 'status-active' : 'status-inactive'">
+                            {{ item.clinicalStatusDisplay }}
+                        </span>
+                    </td>
+                    <td>{{ item.verificationDisplay }}</td>
+                    <td>{{ item.lastUpdated | safeDate:'yyyy-MM-dd' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin alergias registradas.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [6.1]: Administración de medicamentos -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0d9488;">
+            <i class="pi pi-syringe"></i>
+            <span>Administración de Medicamentos</span>
+            <span class="rda-badge">{{ adminMedicamentoParsedData().length }}</span>
+        </div>
+        @if (isLoadingAdminMedicamento()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando administración de medicamentos...
+        </div>
+        } @else if (adminMedicamentoParsedData().length > 0) {
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid">
+                @for (item of adminMedicamentoParsedData(); track item.id) {
+                <div class="col-12 md:col-1">
+                    <div
+                        class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                        <div
+                            class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                            <div class="text-xl font-bold text-primary flex align-items-center"
+                                style="word-break: break-word;">
+                                <i class="pi pi-check-square mr-2 text-sm"></i>
+                                <span style="font-size: small;">{{ item.medicacionDisplay | uppercase }}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                    [ngClass]="item.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                    {{ item.status === 'completed' ? '✅ Completado' : '⚠️ ' + (item.status | titlecase)
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 grid m-0 text-sm text-gray-700">
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-hashtag text-primary mr-1"></i>Código
+                                    (INN/IUM):</strong>
+                                <span>{{ item.medicacionCode }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-tags text-primary mr-1"></i>Categoría:</strong>
+                                <span>{{ item.categoriaDisplay }} {{ item.categoriaCode !== '---' ? item.categoriaCode :
+                                    '' }}</span>
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-calendar text-primary mr-1"></i>Fecha
+                                    de Adm.:</strong>
+                                <span>{{ item.fechaAdministracion | safeDate:'yyyy-MM-dd' }}</span>
+                            </div>
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-sort-amount-up-alt text-primary mr-1"></i>Dosis:</strong>
+                                <span>{{ item.dosisValor }} {{ item.dosisUnidad }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-directions text-primary mr-1"></i>Vía
+                                    Adm.:</strong>
+                                <span>{{ item.viaDisplay | uppercase }} {{ item.viaCode !== '---' ? item.viaCode : ''
+                                    }}</span>
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-clock text-primary mr-1"></i>Frecuencia:</strong>
+                                <span>{{ item.frecuencia }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin administraciones registradas.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [6]: Historial de medicamentos -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0891b2;">
+            <i class="pi pi-tablet"></i>
+            <span>Órdenes de Medicamento</span>
+            <span class="rda-badge">{{ medicamentoParsedData().length }}</span>
+        </div>
+        @if (isLoadingMedicamento()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando medicamentos...</div>
+        } @else if (medicamentoParsedData().length > 0) {
+
+        <!-- <pre>{{ medicamentoParsedData() | json }}</pre> -->
+
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid">
+                @for (item of medicamentoParsedData(); track item.id) {
+                <div class="col-12 md:col-1">
+                    <div
+                        class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+
+                        <div
+                            class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+
+                            <div class="text-xl font-bold text-primary flex align-items-center"
+                                style="word-break: break-word;">
+                                <i class="pi pi-box mr-2 text-sm"></i>
+                                <span style="font-size: small;">{{ item.medicacionDisplay | uppercase }}</span>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold surface-200 text-gray-800">
+                                    📋 {{ item.intent === 'order' ? 'Orden' : (item.intent | titlecase) }}
+                                </span>
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                    [ngClass]="item.status === 'active' ? 'bg-green-100 text-green-800' : (item.status === 'completed' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')">
+                                    {{ item.status === 'active' ? '✅ Activa' : (item.status === 'completed' ? '❌
+                                    Completada' : '⚠️ ' + (item.status | titlecase)) }}
+                                </span>
+                                @if (item.reportedBoolean) {
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold bg-blue-100 text-blue-800">
+                                    📣 Reportado
+                                </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="p-4 grid m-0 text-sm text-gray-700">
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-tags text-primary mr-1"></i>Código
+                                    (INN/IUM):</strong>
+                                <span>{{ item.medicacionCode }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-tags text-primary mr-1"></i>Categoría:</strong>
+                                <span>{{ item.categoriaDisplay }} {{ item.categoriaCode !== '---' ? item.categoriaCode :
+                                    '' }}</span>
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-calendar text-primary mr-1"></i>Fecha
+                                    Orden:</strong>
+                                <span>{{ item.fechaSolicitud | safeDate:'yyyy-MM-dd' }}</span>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-info-circle text-primary mr-1"></i>Motivo:</strong>
+                                <span>{{ item.motivoDisplay }} {{ item.motivoCode !== '---' ? item.motivoCode : ''
+                                    }}</span>
+                            </div>
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-sort-amount-up-alt text-primary mr-1"></i>Dosis:</strong>
+                                <span>{{ item.cantidadValor }} {{ item.cantidadUnidad }} {{ item.cantidadCode !== '---'
+                                    ? item.cantidadCode : '' }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-directions text-primary mr-1"></i>Vía:</strong>
+                                <span>{{ item.viaDisplay | uppercase }} {{ item.viaCode !== '---' ? item.viaCode : ''
+                                    }}</span>
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-clock text-primary mr-1"></i>Frecuencia:</strong>
+                                <span>{{ item.frecuencia }}</span>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-hourglass text-primary mr-1"></i>Duración:</strong>
+                                <span>{{ item.duracion }}</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin medicamentos registrados.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [7]: Historial de procedimientos -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #059669;">
+            <i class="pi pi-cog"></i>
+            <span>Historial de Procedimientos</span>
+            <span class="rda-badge">{{ procedimientoParsedData().length }}</span>
+        </div>
+        @if (isLoadingProcedimiento()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando procedimientos...</div>
+        } @else if (procedimientoParsedData().length > 0) {
+
+        <!-- <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid justify-content-start">
+                <div class="col-12 md:col-1">
+                    hollllaaa
+                </div>
+            </div>
+        </div> -->
+
+
+        <div class="p-3 bg-white border-round-bottom text-sm">
+            <div class="grid justify-content-start">
+                @for (item of procedimientoParsedData(); track item.id) {
+                <div class="col-12 md:col-1">
+                    <div
+                        class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                        <div
+                            class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                            <div class="text-xl font-bold text-primary flex align-items-center"
+                                style="word-break: break-word;">
+                                <i class="pi pi-cog mr-2 text-sm"></i>
+                                <span style="font-size: small;">{{ item.codigoDisplay | uppercase }}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold surface-200 text-gray-800">
+                                    🏥 {{ item.categoriaDisplay }}
+                                </span>
+                                <span
+                                    class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                    [ngClass]="item.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                    {{ item.status === 'completed' ? '✅ Completado' : '⚠️ ' + (item.status | titlecase)
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 grid m-0 justify-content-start text-sm text-gray-700">
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-hashtag text-primary mr-1"></i>Código
+                                    CUPS:</strong>
+                                <span>{{ item.codigoCode }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-tags text-primary mr-1"></i>Categoría:</strong>
+                                <span>{{ item.categoriaDisplay }} {{ item.categoriaCode !== '---' ? item.categoriaCode :
+                                    '' }}</span>
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-calendar-plus text-primary mr-1"></i>F. Solicitud:</strong>
+                                <span>{{ item.fechaSolicitud | safeDate:'yyyy-MM-dd' }}</span>
+                            </div>
+                            <div class="col-12 md:col-1">
+                                <strong class="text-gray-900 mr-2"><i class="pi pi-calendar text-primary mr-1"></i>F.
+                                    Realización:</strong>
+                                <span>{{ item.fechaRealizacion | safeDate:'yyyy-MM-dd' }}</span>
+                            </div>
+                            <div class="col-12 md:col-2">
+                                <strong class="text-gray-900 mr-2"><i
+                                        class="pi pi-flag text-primary mr-1"></i>Finalidad:</strong>
+                                <span>{{ item.finalidadDisplay }} {{ item.finalidadCode !== '---' ? item.finalidadCode :
+                                    '' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin procedimientos registrados.</div>
+        }
+    </div>
+
+    <!-- ==========================================
+         REFERENCIAS DEL ARRAY SECTION (Indices 0..10)
+    =========================================== -->
+
+    <!-- SECCIÓN AGRUPADORA: Observaciones -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #475569;">
+            <i class="pi pi-eye"></i>
+            <span>Observaciones</span>
+        </div>
+        <div class="p-3 bg-white border-round-bottom">
+
+            <!-- SECCIÓN [1]: Otros datos demográficos ocupacion -->
+            <div class="bordes-card-0 mb-3">
+                <div class="rda-section-header" style="background: #d946ef;">
+                    <i class="pi pi-users"></i>
+                    <span>Otros datos demográficos</span>
+                    <span class="rda-badge">{{ demograficosParsedData().length }}</span>
+                </div>
+                @if (isLoadingDemograficos()) {
+                <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando datos demográficos...</div>
+                } @else if (demograficosParsedData().length > 0) {
+                <div class="p-3 bg-white border-round-bottom text-sm">
+                    <div class="grid justify-content-start">
+                        @for (obs of demograficosParsedData(); track obs.id) {
+                        <div class="col-12 md:col-1">
+                            <div
+                                class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                                <div
+                                    class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                                    <div class="text-xl font-bold text-primary flex align-items-center"
+                                        style="word-break: break-word;">
+                                        <i class="pi pi-briefcase mr-2 text-sm"></i>
+                                        <span style="font-size: small;">#{{ $index + 1 }} {{ obs.codigoDisplay |
+                                            uppercase }}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                            [ngClass]="obs.status === 'final' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                            {{ obs.status === 'final' ? '✅ Final' : '⚠️ ' + (obs.status | titlecase) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 grid m-0 justify-content-start text-sm text-gray-700">
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-id-card text-primary mr-1"></i>Ocupación:</strong>
+                                        <span>{{ obs.valorDisplay | uppercase }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-2">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-hashtag text-primary mr-1"></i>Código:</strong>
+                                        <span>{{ obs.codigoCode }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-3">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-info-circle text-primary mr-1"></i>Descripción:</strong>
+                                        <span>{{ obs.codigoText }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin otros datos demográficos.</div>
+                }
+            </div>
+
+            <!-- ==========================================
+                SECCIÓN [11]: CLASIFICACIÓN DE TRIAJE
+                (Destacada al inicio por visibilidad en Urgencias)
+            =========================================== -->
+            @if (isLoadingTriaje()) {
+            <div class="bordes-card-0 mb-3">
+                <div class="rda-section-header" style="background: #dc2626;">
+                    <i class="pi pi-exclamation-triangle"></i><span>Clasificación de Triaje</span>
+                </div>
+                <div class="p-3 bg-white border-round-bottom text-sm">
+                    <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando triaje...</div>
+                </div>
+            </div>
+            } @else if (triajeParsedData().length > 0) {
+            <div class="bordes-card-0 mb-3" style="border: 2px solid #dc2626;">
+                <div class="rda-section-header" style="background: #dc2626;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Clasificación de Triaje</span>
+                    <span class="rda-badge">{{ triajeParsedData().length }}</span>
+                </div>
+                <div class="p-3 bg-white border-round-bottom text-sm">
+                    <div class="grid justify-content-start">
+                        @for (t of triajeParsedData(); track t.id) {
+                        <div class="col-12 md:col-1">
+                            <div
+                                class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                                <div
+                                    class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                                    <div class="text-xl font-bold text-primary flex align-items-center"
+                                        style="word-break: break-word;">
+                                        <i class="pi pi-bolt mr-2 text-sm"></i>
+                                        <span style="font-size: small;">#{{ $index + 2 }} {{ t.codigoDisplay |
+                                            uppercase }}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                            [ngClass]="t.status === 'final' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                            {{ t.status === 'final' ? '✅ Final' : '⚠️ ' + (t.status | titlecase) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 grid m-0 justify-content-start text-sm text-gray-700">
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-exclamation-circle text-primary mr-1"></i>Nivel:</strong>
+                                        <span
+                                            class="inline-flex align-items-center justify-content-center font-bold text-white border-round px-2 py-0"
+                                            [style.background-color]="t.colorBadge">
+                                            {{ t.nivelTriajeDisplay | uppercase }}
+                                        </span>
+                                    </div>
+                                    <div class="col-12 md:col-2">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-hashtag text-primary mr-1"></i>Código:</strong>
+                                        <span>{{ t.codigoCode }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-3">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-info-circle text-primary mr-1"></i>Descripción:</strong>
+                                        <span>{{ t.codigoText }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-4">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-calendar text-primary mr-1"></i>Fecha Efectiva:</strong>
+                                        <span>{{ t.efectivaFecha | safeDate:'yyyy-MM-dd' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- SECCIÓN [8]: Resultados de tecnologías en salud -->
+            <div class="bordes-card-0 mb-3">
+                <div class="rda-section-header" style="background: #65a30d;">
+                    <i class="pi pi-microscope"></i>
+                    <span>Resultados Tecnologías en Salud</span>
+                    <span class="rda-badge">{{ resultadoParsedData().length }}</span>
+                </div>
+                @if (isLoadingResultado()) {
+                <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando resultados...</div>
+                } @else if (resultadoParsedData().length > 0) {
+                <div class="p-3 bg-white border-round-bottom text-sm">
+                    <div class="grid justify-content-start">
+                        @for (obs of resultadoParsedData(); track obs.id) {
+                        <div class="col-12 md:col-1">
+                            <div
+                                class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                                <div
+                                    class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                                    <div class="text-xl font-bold text-primary flex align-items-center"
+                                        style="word-break: break-word;">
+                                        <i class="pi pi-microscope mr-2 text-sm"></i>
+                                        <span style="font-size: small;">#{{ $index + 3 }} {{ obs.codigoDisplay |
+                                            uppercase }}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                            [ngClass]="obs.status === 'final' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                            {{ obs.status === 'final' ? '✅ Final' : '⚠️ ' + (obs.status | titlecase) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 grid m-0 justify-content-start text-sm text-gray-700">
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-hashtag text-primary mr-1"></i>Código:</strong>
+                                        <span>{{ obs.codigoCode }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-calendar text-primary mr-1"></i>Fecha Efectiva:</strong>
+                                        <span>{{ obs.efectivaFecha | safeDate:'yyyy-MM-dd' }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-cog text-primary mr-1"></i>Dispositivo/Equipo:</strong>
+                                        <span>{{ obs.dispositivo }}</span>
+                                    </div>
+
+                                    @if (obs.componentes.length > 0) {
+                                    <div class="col-12 md:col-1">
+                                        <div class="font-bold text-gray-900 mb-2">Componentes:</div>
+                                        <table class="rda-table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Campo</th>
+                                                    <th>Valor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (comp of obs.componentes; track $index) {
+                                                <tr>
+                                                    <td class="text-pink-500">{{ comp.codigoDisplay }}</td>
+                                                    <td class="text-gray-700 font-medium">{{ comp.valor }}</td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin resultados registrados.</div>
+                }
+            </div>
+
+
+            <!-- SECCIÓN [2]: Datos incapacidad (SIPE) -->
+            <div class="bordes-card-0">
+                <div class="rda-section-header" style="background: #d97706;">
+                    <i class="pi pi-file-edit"></i>
+                    <span>Datos de Incapacidad (SIPE)</span>
+                    <span class="rda-badge">{{ incapacidadParsedData().length }}</span>
+                </div>
+                @if (isLoadingIncapacidad()) {
+                <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando incapacidades...</div>
+                } @else if (incapacidadParsedData().length > 0) {
+                <div class="p-3 bg-white border-round-bottom text-sm">
+                    <div class="grid justify-content-start">
+                        @for (obs of incapacidadParsedData(); track obs.id) {
+                        <div class="col-12 md:col-1">
+                            <div
+                                class="border-1 surface-border border-round surface-card hover:shadow-2 transition-all transition-duration-200">
+                                <div
+                                    class="p-3 surface-100 border-bottom-1 surface-border flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 border-round-top">
+                                    <div class="text-xl font-bold text-primary flex align-items-center"
+                                        style="word-break: break-word;">
+                                        <i class="pi pi-briefcase mr-2 text-sm"></i>
+                                        <span style="font-size: small;">#{{ $index + 4 }} {{ obs.codigoDisplay |
+                                            uppercase }}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="inline-flex align-items-center px-2 py-1 border-round text-xs font-semibold"
+                                            [ngClass]="obs.status === 'final' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                                            {{ obs.status === 'final' ? '✅ Final' : '⚠️ ' + (obs.status | titlecase) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 grid m-0 justify-content-start text-sm text-gray-700">
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-hashtag text-primary mr-1"></i>Código:</strong>
+                                        <span>{{ obs.codigoCode }}</span>
+                                    </div>
+                                    <div class="col-12 md:col-1">
+                                        <strong class="text-gray-900 mr-2"><i
+                                                class="pi pi-info-circle text-primary mr-1"></i>Descripción:</strong>
+                                        <span class="text-gray-600">{{ obs.codigoText }}</span>
+                                    </div>
+
+                                    @if (obs.componentes.length > 0) {
+                                    <div class="col-12 md:col-1">
+                                        <div class="font-bold text-gray-900 mb-2">Componentes:</div>
+                                        <table class="rda-table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Campo</th>
+                                                    <th>Valor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (comp of obs.componentes; track $index) {
+                                                <tr>
+                                                    <td class="text-pink-500">
+                                                        <div class="font-bold">{{ comp.codigoDisplay }}</div>
+                                                        <div class="text-xs text-gray-500">{{ comp.codigoCode }}</div>
+                                                    </td>
+                                                    <td class="text-gray-700 font-medium">{{ comp.valor }}</td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin datos de incapacidad registrados.</div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECCIÓN [5]: Factores de riesgo -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #8b5cf6;">
+            <i class="pi pi-shield"></i>
+            <span>Factores de Riesgo</span>
+            <span class="rda-badge">{{ riesgoParsedData().length }}</span>
+        </div>
+        @if (isLoadingRiesgo()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando factores de riesgo...</div>
+        } @else if (riesgoParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Factor</th>
+                    <th>Descripción</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of riesgoParsedData(); track item.id) {
+                <tr>
+                    <td class="text-pink-500">{{ item.codigoCode }}</td>
+                    <td>{{ item.codigoDisplay }}</td>
+                    <td>{{ item.codigoText }}</td>
+                    <td>{{ item.fechaRegistro | safeDate:'yyyy-MM-dd' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin factores de riesgo registrados.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [9]: Órdenes, prescripciones o solicitudes -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #0ea5e9;">
+            <i class="pi pi-list-check"></i>
+            <span>Órdenes y Solicitudes de Servicio</span>
+            <span class="rda-badge">{{ solicitudParsedData().length }}</span>
+        </div>
+        @if (isLoadingSolicitud()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando solicitudes...</div>
+        } @else if (solicitudParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Servicio</th>
+                    <th>Categoría</th>
+                    <th>Finalidad</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of solicitudParsedData(); track item.id) {
+                <tr>
+                    <td class="text-pink-500">{{ item.codigoCode }}</td>
+                    <td>{{ item.codigoDisplay }}</td>
+                    <td>{{ item.categoriaDisplay }}</td>
+                    <td>{{ item.finalidadDisplay }}</td>
+                    <td>{{ item.prioridad }}</td>
+                    <td>
+                        <span class="rda-status-badge"
+                            [ngClass]="item.status === 'active' ? 'status-active' : 'status-inactive'">
+                            {{ item.status }}
+                        </span>
+                    </td>
+                    <td>{{ item.fechaSolicitud | safeDate:'yyyy-MM-dd' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin solicitudes de servicio registradas.</div>
+        }
+    </div>
+
+    <!-- SECCIÓN [10]: Documentos de soporte -->
+    <div class="bordes-card-0 mb-3">
+        <div class="rda-section-header" style="background: #64748b;">
+            <i class="pi pi-file-pdf"></i>
+            <span>Documentos de Soporte</span>
+            <span class="rda-badge">{{ documentoParsedData().length }}</span>
+        </div>
+        @if (isLoadingDocumento()) {
+        <div class="rda-loading"><i class="pi pi-spin pi-spinner mr-2"></i>Cargando documentos...</div>
+        } @else if (documentoParsedData().length > 0) {
+        <table class="rda-table">
+            <thead>
+                <tr>
+                    <th>Fecha Creación</th>
+                    <th>Tipo</th>
+                    <th>Tipo Contenido</th>
+                    <th>Enlace</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of documentoParsedData(); track item.id) {
+                <tr>
+                    <td>{{ item.fechaCreacion | safeDate:'yyyy-MM-dd' }}</td>
+                    <td class="text-pink-500 font-semibold">{{ item.tipoDisplay }}</td>
+                    <td>{{ item.contentType }}</td>
+                    <td>
+                        @if (item.url !== '---') {
+                        <!-- <a [href]="item.url" target="_blank" class="p-button p-button-link p-1 text-sm"><i
+                                class="pi pi-external-link mr-1"></i>Ver adjunto</a> -->
+                        <button type="button" class="p-button p-button-link p-1 text-sm"
+                            (click)="procesarDocumento($event, item.url, item.tipoDisplay)">
+                            <i class="pi pi-external-link mr-1"></i>Ver adjunto
+                        </button>
+                        } @else {
+                        <span class="text-gray-400">Sin URL</span>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        } @else {
+        <div class="rda-empty"><i class="pi pi-inbox mr-2"></i>Sin documentos de soporte registrados.</div>
+        }
+
+        <!-- ── Visor PDF seguro (bloqueado para descarga e impresión) ───────────── -->
+        @if (isLoadingDocumentoExterno()) {
+        <div class="pdf-visor-loading">
+            <i class="pi pi-spin pi-spinner mr-2"></i>
+            <span>Cargando documento del Ministerio IHCE...</span>
+        </div>
+        }
+
+        @if (documentoExternoError()) {
+        <div class="pdf-visor-error">
+            <i class="pi pi-exclamation-triangle mr-2"></i>
+            <span>{{ documentoExternoError() }}</span>
+        </div>
+        }
+
+        @if (pdfBytes()) {
+        <div class="pdf-visor-wrapper" [class.pdf-visor-fullscreen]="isVisorFullscreen()">
+            <!-- Barra de título del visor -->
+            <div class="pdf-visor-header">
+                <div class="pdf-visor-title">
+                    <i class="pi pi-file-pdf mr-2"></i>
+                    <span>{{ pdfTitulo() }}</span>
+                    <span class="pdf-visor-badge">Solo lectura</span>
+                </div>
+                <div class="pdf-visor-actions">
+                    <button class="pdf-visor-action-btn" (click)="toggleVisorFullscreen()" [title]="isVisorFullscreen() ? 'Restaurar tamaño' : 'Pantalla completa'" type="button">
+                        <i class="pi" [class.pi-window-maximize]="!isVisorFullscreen()" [class.pi-window-minimize]="isVisorFullscreen()"></i>
+                    </button>
+                    <button class="pdf-visor-action-btn pdf-visor-close-btn" (click)="cerrarVisorPdf()" title="Cerrar visor" type="button">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor seguro: bloquea clic derecho y selección de texto -->
+            <div class="pdf-visor-container no-print" oncontextmenu="return false;"
+                style="user-select: none; -webkit-user-select: none;">
+                <pdf-viewer [src]="pdfBytes()!" [render-text]="false" [original-size]="false" [fit-to-page]="true"
+                    [show-all]="true" [zoom]="1" [autoresize]="true" 
+                    (error)="onPdfError($event)"
+                    style="display: block; width: 100%; height: 600px;">
+                </pdf-viewer>
+            </div>
+        </div>
+        }
+        <!-- ── Fin Visor PDF ─────────────────────────────────────────────────── -->
+
+    </div>
+</div>

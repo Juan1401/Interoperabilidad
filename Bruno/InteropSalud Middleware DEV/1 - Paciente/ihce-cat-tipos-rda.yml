@@ -1,0 +1,17 @@
+info:
+  name: ihce-cat-tipos-rda
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{base_url}}/api/hl7/system/ihce-cat-tipos-rda"
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

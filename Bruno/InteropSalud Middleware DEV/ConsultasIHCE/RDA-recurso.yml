@@ -1,0 +1,25 @@
+info:
+  name: RDA-recurso
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{base_url}}/api/hl7/consulta-ministerio/recurso"
+  body:
+    type: json
+    data: |-
+      { 
+      //   "resource_path": "/Patient/d30a6eb6-a31b-89e1-e157-58c0bfd196e4"
+      //   "resource_path": "/Practitioner/10c21843-4267-da2e-6a50-500b51881043"
+        "resource_path": "/Condition/87cd1795-afbe-4992-be3d-695c0fd180cd" 
+      }
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

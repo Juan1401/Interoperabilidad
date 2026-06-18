@@ -1,0 +1,73 @@
+info:
+  name: consultar-paciente-similar
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{APIMurl}}/Patient/$consultar-paciente-similar"
+  headers:
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  body:
+    type: json
+    data: "/*En los parametros:\r
+
+      - Cambiar Tipo de Identificación (CC) y Número de identificación (0000000)\r
+
+      - Cambiar stringValue de humanuser con el tipo y número de identificación del profesional que este realizando la petición\r
+
+      */\r
+
+      {\r
+
+      \    \"resourceType\": \"Parameters\",\r
+
+      \    \"parameter\": [\r
+
+      \        {\r
+
+      \            \"name\": \"identifier\",\r
+
+      \            \"part\": [\r
+
+      \                {\r
+
+      \                    \"name\": \"type\",\r
+
+      \                    \"valueString\": \"CC\"\r
+
+      \                },\r
+
+      \                {\r
+
+      \                    \"name\": \"value\",\r
+
+      \                    \"valueString\": \"80189301\"\r
+
+      \                }\r
+
+      \            ]\r
+
+      \        },\r
+
+      \        {\r
+
+      \            \"name\": \"humanuser\",\r
+
+      \            \"valueString\": \"CC-123123\"\r
+
+      \        }\r
+
+      \    ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

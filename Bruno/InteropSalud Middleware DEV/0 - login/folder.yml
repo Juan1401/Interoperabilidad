@@ -1,0 +1,7 @@
+info:
+  name: 0 - login
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit

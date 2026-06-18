@@ -1,0 +1,625 @@
+    @if (selectedRda()) {
+    <div class="rda-modal-content py-3">
+        <div class="rda-origen-banner">
+            <div class="rda-origen-label">
+                <i class="pi pi-info-circle"></i>
+                <span>Origen del documento:</span>
+            </div>
+            <div class="rda-origen-pill">
+                <i class="pi pi-user"></i>
+                <span>{{ selectedRda().resource?.title || 'RDA de antecedentes manifestados por el paciente *-*'
+                    }}</span>
+            </div>
+        </div>
+
+        <!-- Aquí se renderizará el resto de la información en un futuro -->
+        <div class="mt-4">
+            <!-- Datos Dinámicos del Paciente -->
+            @if (isLoadingPatientData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando recurso del paciente...</span>
+            </div>
+            } @else if (patientParsedData()) {
+            <!-- <pre class="surface-ground p-3 border-round text-sm border-left-3 border-primary"
+                style="overflow: auto; max-height: 50vh;">
+                {{ patientParsedData() | json }}
+            </pre> -->
+
+            <div class="card bordes-card-0">
+                <div
+                    class="bg-green-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-user text-2xl"></i>
+                    <span>Datos del Paciente</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-id-card text-primary mr-2 text-lg"></i>
+                            <span>Nombre Completo:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().fullName }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-file text-primary mr-2 text-lg"></i>
+                            <span>Tipo de Documento:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().docType }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-hashtag text-primary mr-2 text-lg"></i>
+                            <span>Documento:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().documentValue }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-check-circle text-primary mr-2 text-lg"></i>
+                            <span>Activo:</span>
+                        </div>
+                        <div class="col-12 md:col-4 flex align-items-center font-bold mb-4 md:mb-3"
+                            [ngClass]="{'text-green-600': patientParsedData().active === 'Sí', 'text-red-500': patientParsedData().active !== 'Sí'}">
+                            {{ patientParsedData().active }}
+                        </div>
+
+                        <!-- fila 3 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-times-circle text-primary mr-2 text-lg"></i>
+                            <span>Fallecido:</span>
+                        </div>
+                        <div class="col-12 md:col-2 flex align-items-center font-bold mb-4 md:mb-3"
+                            [ngClass]="{'text-green-600': patientParsedData().deceased === 'Sí', 'text-red-500': patientParsedData().deceased !== 'Sí'}">
+                            {{ patientParsedData().deceased }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-calendar text-primary mr-2 text-lg"></i>
+                            <span>Fecha Nacimiento:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().birthDate }}
+                        </div>
+
+                        <!-- fila 4 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-clock text-primary mr-2 text-lg"></i>
+                            <span>Hora Nacimiento:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().birthTime }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-star text-primary mr-2 text-lg"></i>
+                            <span>Edad:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().age }}
+                        </div>
+
+                        <!-- fila 5 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-users text-primary mr-2 text-lg"></i>
+                            <span>Sexo Biológico:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().biologicalGender }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-heart text-primary mr-2 text-lg"></i>
+                            <span>Identidad de Género:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().genderIdentity }}
+                        </div>
+
+                        <!-- fila 6 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-info-circle text-primary mr-2 text-lg"></i>
+                            <span>Etnia:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().ethnicity }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-eye-slash text-primary mr-2 text-lg"></i>
+                            <span>Discapacidad:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().disability }}
+                        </div>
+
+                        <!-- fila 7 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-flag text-primary mr-2 text-lg"></i>
+                            <span>Nacionalidad:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().nationality }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-globe text-primary mr-2 text-lg"></i>
+                            <span>País Residencia (Cód):</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ patientParsedData().country }} ({{ patientParsedData().countryCode }})
+                        </div>
+
+                        <!-- fila 8 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-0">
+                            <i class="pi pi-map-marker text-primary mr-2 text-lg"></i>
+                            <span>Municipio:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ patientParsedData().city }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-0">
+                            <i class="pi pi-map text-primary mr-2 text-lg"></i>
+                            <span>Zona / DIVIPOLA:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ patientParsedData().residenceZone }} ({{ patientParsedData().divipola }})
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-exclamation-triangle mr-2"></i> No se ha cargado la información del paciente.
+            </p>
+            }
+
+            @if (isLoadingCustodianData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando recurso de la organización...</span>
+            </div>
+            } @else if (custodianParsedData()) {
+            <!-- <pre class="surface-ground p-3 border-round text-sm border-left-3 border-primary"
+                style="overflow: auto; max-height: 50vh;">{{ custodianData() | json }}</pre> -->
+
+
+            <div class="card bordes-card-0">
+                <div
+                    class="bg-gray-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-building text-2xl"></i>
+                    <span>Organización prestadora de salud</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-bookmark text-primary mr-2 text-lg"></i>
+                            <span>Nombre:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ custodianParsedData().name }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-id-card text-primary mr-2 text-lg"></i>
+                            <span>NIT:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ custodianParsedData().nit }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-verified text-primary mr-2 text-lg"></i>
+                            <span>Código de habilitación (REPS):</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ custodianParsedData().reps }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-0">
+                            <i class="pi pi-tags text-primary mr-2 text-lg"></i>
+                            <span>Tipo de organización:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ custodianParsedData().type }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> No se encontró referencia de organización para este documento.
+            </p>
+            }
+
+            <!-- Datos Dinámicos del Profesional (Practitioner) -->
+            <!-- <h3 class="text-xl font-semibold mb-2 mt-4 text-color">Profesional de la Salud (Autor)</h3> -->
+
+            @if (isLoadingPractitionerData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando recurso del profesional...</span>
+            </div>
+            } @else if (practitionerParsedData()) {
+
+            <div class="card bordes-card-0">
+                <div
+                    class="bg-teal-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-user-edit text-2xl"></i>
+                    <span>Profesional de la Salud (Autor)</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- Fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-user text-primary mr-2 text-lg"></i>
+                            <span>Nombre:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ practitionerParsedData().fullName }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-verified text-primary mr-2 text-lg"></i>
+                            <span>No. RETHUS:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ practitionerParsedData().rethus }}
+                        </div>
+
+                        <!-- Fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-file text-primary mr-2 text-lg"></i>
+                            <span>Tipo de Documento:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ practitionerParsedData().docType }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-id-card text-primary mr-2 text-lg"></i>
+                            <span>Número Documento:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ practitionerParsedData().documentValue }}
+                        </div>
+
+                        <!-- Fila 3 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-center mb-2 md:mb-0">
+                            <i class="pi pi-briefcase text-primary mr-2 text-lg"></i>
+                            <span>Especialidad:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ practitionerParsedData().specialty }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-0">
+                            <i class="pi pi-calendar text-primary mr-2 text-lg"></i>
+                            <span>Vigente desde:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ practitionerParsedData().qualificationStart }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> No se encontró referencia de profesional para este documento.
+            </p>
+            }
+
+            <!-- Datos de Diagnósticos (Condition) -->
+            <!-- <h3 class="text-xl font-semibold mb-2 mt-4 text-color">Diagnósticos y Condiciones</h3> -->
+
+            @if (isLoadingConditionData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando condiciones clínicas...</span>
+            </div>
+            } @else if (conditionParsedData().length > 0) {
+
+            @for (condition of conditionParsedData(); track $index) {
+            <div class="card bordes-card-0 mb-3">
+                <div
+                    class="bg-orange-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-heart-fill text-2xl"></i>
+                    <span>Diagnóstico {{ conditionParsedData().length > 1 ? ($index + 1) : '' }}</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-tag text-primary mr-2 text-lg"></i>
+                            <span>Código Dx:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ condition.diagnosisCode }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-align-left text-primary mr-2 text-lg"></i>
+                            <span>Diagnóstico:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ condition.diagnosisDisplay }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-file-edit text-primary mr-2 text-lg"></i>
+                            <span>Texto clínico:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ condition.diagnosisText }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-list text-primary mr-2 text-lg"></i>
+                            <span>Categoría:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ condition.categoryDisplay }}
+                        </div>
+
+                        <!-- fila 3 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-0">
+                            <i class="pi pi-check-circle text-primary mr-2 text-lg"></i>
+                            <span>Estado clínico:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ condition.clinicalStatusDisplay }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-0">
+                            <i class="pi pi-info-circle text-primary mr-2 text-lg"></i>
+                            <span>Verificación:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ condition.verificationDisplay }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            }
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> Sin registro de diagnósticos en este documento.
+            </p>
+            }
+
+            <!-- Datos de Alergias -->
+
+            @if (isLoadingAllergyData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando alergias...</span>
+            </div>
+            } @else if (allergyParsedData().length > 0) {
+
+            @for (allergy of allergyParsedData(); track $index) {
+            <div class="card bordes-card-0 mb-3">
+                <div
+                    class="bg-purple-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-exclamation-triangle text-2xl"></i>
+                    <span>Alergia / Intolerancia {{ allergyParsedData().length > 1 ? ($index + 1) : '' }}</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-tag text-primary mr-2 text-lg"></i>
+                            <span>Código:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ allergy.allergyCode }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-align-left text-primary mr-2 text-lg"></i>
+                            <span>Tipo de Alergia:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ allergy.allergyDisplay }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-file-edit text-primary mr-2 text-lg"></i>
+                            <span>Descripción:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ allergy.allergyText }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-check-circle text-primary mr-2 text-lg"></i>
+                            <span>Estado clínico:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ allergy.clinicalStatusDisplay }}
+                        </div>
+
+                        <!-- fila 3 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-0">
+                            <i class="pi pi-info-circle text-primary mr-2 text-lg"></i>
+                            <span>Verificación:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ allergy.verificationDisplay }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            }
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> Sin registro de alergias en este documento.
+            </p>
+            }
+
+            <!-- Antecedentes Familiares -->
+
+            @if (isLoadingFamilyHistoryData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando antecedentes familiares...</span>
+            </div>
+            } @else if (familyHistoryParsedData().length > 0) {
+
+            @for (family of familyHistoryParsedData(); track $index) {
+            <div class="card bordes-card-0 mb-3">
+                <div
+                    class="bg-indigo-700 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-sitemap text-2xl"></i>
+                    <span>Antecedente Familiar {{ familyHistoryParsedData().length > 1 ? ($index + 1) : '' }}</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-users text-primary mr-2 text-lg"></i>
+                            <span>Parentesco:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ family.relationshipDisplay }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-tag text-primary mr-2 text-lg"></i>
+                            <span>Cód. Parentesco:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ family.relationshipCode }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-heart-fill text-primary mr-2 text-lg"></i>
+                            <span>Código Dx:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ family.conditionCode }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-align-left text-primary mr-2 text-lg"></i>
+                            <span>Antecedente:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ family.conditionDisplay }}
+                        </div>
+
+                        <!-- fila 3 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-0">
+                            <i class="pi pi-check-circle text-primary mr-2 text-lg"></i>
+                            <span>Estado registro:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ family.status }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            }
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> Sin registro de antecedentes familiares en este documento.
+            </p>
+            }
+
+            <!-- Medicamentos -->
+
+            @if (isLoadingMedicationData()) {
+            <div class="flex align-items-center gap-3 surface-ground p-3 border-round">
+                <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                <span class="text-color-secondary">Cargando medicamentos...</span>
+            </div>
+            } @else if (medicationParsedData().length > 0) {
+
+            @for (medication of medicationParsedData(); track $index) {
+            <div class="card bordes-card-0 mb-3">
+                <div
+                    class="bg-cyan-800 text-white font-semibold text-xl p-3 flex align-items-center gap-2 border-round-top">
+                    <i class="pi pi-box text-2xl"></i>
+                    <span>Medicamento {{ medicationParsedData().length > 1 ? ($index + 1) : '' }}</span>
+                </div>
+
+                <div class="p-4 surface-section">
+                    <div class="grid m-0">
+
+                        <!-- fila 1 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-3">
+                            <i class="pi pi-tag text-primary mr-2 text-lg"></i>
+                            <span>Código:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ medication.medicationCode }}
+                        </div>
+
+                        <div class="col-12 md:col-3 font-bold text-900 flex align-items-center mb-2 md:mb-3">
+                            <i class="pi pi-align-left text-primary mr-2 text-lg"></i>
+                            <span>Medicamento:</span>
+                        </div>
+                        <div class="col-12 md:col-4 text-700 flex align-items-center mb-4 md:mb-3">
+                            {{ medication.medicationDisplay }}
+                        </div>
+
+                        <!-- fila 2 -->
+                        <div class="col-12 md:col-1 font-bold text-900 flex align-items-left mb-2 md:mb-0">
+                            <i class="pi pi-check-circle text-primary mr-2 text-lg"></i>
+                            <span>Estado:</span>
+                        </div>
+                        <div class="col-12 md:col-2 text-700 flex align-items-center mb-2 md:mb-0">
+                            {{ medication.status }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            }
+
+            } @else {
+            <p class="text-secondary p-3 surface-ground border-round">
+                <i class="pi pi-info-circle mr-2"></i> Sin registro de medicamentos en este documento.
+            </p>
+            }
+
+
+            <!-- <p class="text-color-secondary text-sm mt-5">Vista previa de datos crudos de la RDA (Temporal):</p>
+            <pre class="surface-ground p-3 border-round text-sm"
+                style="overflow: auto; max-height: 30vh;">{{ selectedRda() | json }}</pre> -->
+        </div>
+    </div>
+    }

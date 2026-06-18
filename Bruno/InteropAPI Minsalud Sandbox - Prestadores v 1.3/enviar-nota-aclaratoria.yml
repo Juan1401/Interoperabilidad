@@ -1,0 +1,372 @@
+info:
+  name: enviar-nota-aclaratoria
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{APIMurl}}/Composition/<reemplazar-por-id-composition>/$enviar-nota-aclaratoria"
+  headers:
+    - name: x-functions-key
+      value: "{{APIkey}}"
+      disabled: true
+    - name: Ocp-Apim-Subscription-Key
+      value: "{{APIMsubsKey}}"
+  params:
+    - name: code
+      value: 0bo-yhf8DVVChFofHfsAoawlSaLZy1HBCG-d9ti6cDevAzFuMtNtfA==
+      type: query
+      disabled: true
+  body:
+    type: json
+    data: "{\r
+
+      \  \"resourceType\" : \"Bundle\",\r
+
+      \  \"type\" : \"transaction\",\r
+
+      \  \"entry\" : [\r
+
+      \    {\r
+
+      \      \"resource\" : {\r
+
+      \        \"resourceType\" : \"Observation\",\r
+
+      \        \"id\" : \"Observation-1\",\r
+
+      \        \"meta\": {\r
+
+      \            \"profile\": [\r
+
+      \                \"https://fhir.minsalud.gov.co/rda/StructureDefinition/ObservationClarificationNoteRDA\"\r
+
+      \            ]\r
+
+      \        },\r
+
+      \        \"status\" : \"final\",\r
+
+      \        \"code\" : {\r
+
+      \          \"coding\" : [\r
+
+      \            {\r
+
+      \              \"system\" : \"http://snomed.info/sct\",\r
+
+      \              \"code\" : \"445664008\",\r
+
+      \              \"display\" : \"informe enmendado\"\r
+
+      \            }\r
+
+      \          ],\r
+
+      \          \"text\" : \"Nota aclaratoria\"\r
+
+      \        },\r
+
+      \        \"subject\" : {\r
+
+      \          \"reference\" : \"Patient/d756d466-0ca1-877b-f7aa-5a79da6511fc\"\r
+
+      \        },\r
+
+      \        \"focus\" : [\r
+
+      \          {\r
+
+      \            \"id\" : \"CompositionRDA\",\r
+
+      \            \"reference\" : \"Composition/0be4fb3d-2173-44f8-a1c1-bfdbf8573bff\"\r
+
+      \          }\r
+
+      \        ],\r
+
+      \        \"encounter\" : {\r
+
+      \          \"reference\" : \"Encounter/a82a6eee-fee0-4d0f-9979-12419162894a\"\r
+
+      \        },\r
+
+      \        \"effectiveDateTime\" : \"2025-12-18T10:30:00+00:00\",\r
+
+      \        \"performer\" : [\r
+
+      \          {\r
+
+      \            \"reference\" : \"#CC-111111\"\r
+
+      \          }\r
+
+      \        ],\r
+
+      \        \"valueString\" : \"Se aclara que el diagnóstico prevido de Intoxicación alimentaria bacteriana (A05.9), corresponde a un cuadro leve autolimitado, sin complicaciones, que no requirió hospitalización ni tratamiento específico.\"\r
+
+      \      },\r
+
+      \      \"request\" : {\r
+
+      \        \"method\" : \"POST\",\r
+
+      \        \"url\" : \"Observation\"\r
+
+      \      }\r
+
+      \    },\r
+
+      \    {\r
+
+      \      \"resource\" : {\r
+
+      \        \"resourceType\" : \"Observation\",\r
+
+      \        \"id\" : \"Observation-0\",\r
+
+      \        \"meta\": {\r
+
+      \            \"profile\": [\r
+
+      \                \"https://fhir.minsalud.gov.co/rda/StructureDefinition/ObservationClarificationNoteRDA\"\r
+
+      \            ]\r
+
+      \        },\r
+
+      \        \"status\" : \"final\",\r
+
+      \        \"code\" : {\r
+
+      \          \"coding\" : [\r
+
+      \            {\r
+
+      \              \"system\" : \"http://snomed.info/sct\",\r
+
+      \              \"code\" : \"445664008\",\r
+
+      \              \"display\" : \"informe enmendado\"\r
+
+      \            }\r
+
+      \          ],\r
+
+      \          \"text\" : \"Nota aclaratoria\"\r
+
+      \        },\r
+
+      \        \"subject\" : {\r
+
+      \          \"reference\" : \"Patient/d756d466-0ca1-877b-f7aa-5a79da6511fc\"\r
+
+      \        },\r
+
+      \        \"focus\" : [\r
+
+      \          {\r
+
+      \            \"id\" : \"CompositionRDA\",\r
+
+      \            \"reference\" : \"Composition/0be4fb3d-2173-44f8-a1c1-bfdbf8573bff\"\r
+
+      \          }\r
+
+      \        ],\r
+
+      \        \"encounter\" : {\r
+
+      \          \"reference\" : \"Encounter/a82a6eee-fee0-4d0f-9979-12419162894a\"\r
+
+      \        },\r
+
+      \        \"effectiveDateTime\" : \"2025-12-18T10:30:00+00:00\",\r
+
+      \        \"performer\" : [\r
+
+      \          {\r
+
+      \            \"reference\" : \"#CC-111111\"\r
+
+      \          }\r
+
+      \        ],\r
+
+      \        \"valueString\" : \"Se aclara que no es el medicamento recetado, se da nueva orden para otro medicamento\"\r
+
+      \      },\r
+
+      \      \"request\" : {\r
+
+      \        \"method\" : \"POST\",\r
+
+      \        \"url\" : \"Observation\"\r
+
+      \      }\r
+
+      \    },\r
+
+      \    {\r
+
+      \      \"resource\": {\r
+
+      \    \"resourceType\": \"Practitioner\",\r
+
+      \    \"id\": \"CC-111111\",\r
+
+      \    \"meta\": {\r
+
+      \        \"profile\": [\r
+
+      \            \"https://fhir.minsalud.gov.co/rda/StructureDefinition/PractitionerRDA\"\r
+
+      \        ]\r
+
+      \    },\r
+
+      \    \"identifier\": [\r
+
+      \        {\r
+
+      \            \"id\": \"NationalPersonIdentifier-0\",\r
+
+      \            \"use\": \"official\",\r
+
+      \            \"type\": {\r
+
+      \                \"coding\": [\r
+
+      \                    {\r
+
+      \                        \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\r
+
+      \                        \"code\": \"PN\",\r
+
+      \                        \"display\": \"Person number\"\r
+
+      \                    },\r
+
+      \                    {\r
+
+      \                        \"system\": \"https://fhir.minsalud.gov.co/rda/CodeSystem/ColombianPersonIdentifier\",\r
+
+      \                        \"code\": \"CC\",\r
+
+      \                        \"display\": \"Cédula ciudadanía\"\r
+
+      \                    }\r
+
+      \                ]\r
+
+      \            },\r
+
+      \            \"value\": \"111111\"\r
+
+      \        }\r
+
+      \    ],\r
+
+      \    \"active\": true,\r
+
+      \    \"name\": [\r
+
+      \        {\r
+
+      \            \"use\": \"official\",\r
+
+      \            \"family\": \"APELLIDOS PROFESIONAL DE LA SALUD\",\r
+
+      \            \"_family\": {\r
+
+      \                \"extension\": [\r
+
+      \                    {\r
+
+      \                        \"url\": \"https://fhir.minsalud.gov.co/rda/StructureDefinition/ExtensionFathersFamilyName\",\r
+
+      \                        \"valueString\": \"PRIMER APELLIDO\"\r
+
+      \                    },\r
+
+      \                    {\r
+
+      \                        \"url\": \"https://fhir.minsalud.gov.co/rda/StructureDefinition/ExtensionMothersFamilyName\",\r
+
+      \                        \"valueString\": \"SEGUNDO APELLIDO\"\r
+
+      \                    }\r
+
+      \                ]\r
+
+      \            },\r
+
+      \            \"given\": [\r
+
+      \                \"PRIMER NOMBRE\",\r
+
+      \                \"SEGUNDO NOMBRE\"\r
+
+      \            ]\r
+
+      \        }\r
+
+      \    ]\r
+
+      },\r
+
+      \      \"request\" : {\r
+
+      \        \"method\" : \"GET\",\r
+
+      \        \"url\" : \"#CC-111111\"\r
+
+      \      }\r
+
+      \    }\r
+
+      \  ]\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: "// Get the current date and time\r
+
+        let now = new Date();\r
+
+        \r
+
+        // Clone and subtract 5 hours\r
+
+        let fiveHoursAgo = new Date(now);\r
+
+        fiveHoursAgo.setHours(now.getHours() - 5);\r
+
+        \r
+
+        // Format to ISO string without milliseconds and timezone (e.g. 2025-11-07T14:00:00)\r
+
+        function formatDate(date) {\r
+
+        \    return date.toISOString().split('.')[0] + 'Z';\r
+
+        }\r
+
+        \r
+
+        // Set Postman variables\r
+
+        bru.setEnvVar(\"hora-fin\", formatDate(now));\r
+
+        bru.setEnvVar(\"hora-inicio\", formatDate(fiveHoursAgo));"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

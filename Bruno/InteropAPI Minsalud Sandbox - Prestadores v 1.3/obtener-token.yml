@@ -1,0 +1,30 @@
+info:
+  name: obtener-token
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: https://login.microsoftonline.com/{{tenantid}}/oauth2/v2.0/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: grant_type
+        value: Client_Credentials
+      - name: client_id
+        value: "{{clientid}}"
+      - name: client_secret
+        value: "{{clientsecret}}"
+      - name: scope
+        value: "{{scope}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setVar("bearerToken", res.getBody().access_token);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

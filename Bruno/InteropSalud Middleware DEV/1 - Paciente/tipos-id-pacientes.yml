@@ -1,0 +1,17 @@
+info:
+  name: tipos-id-pacientes
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{base_url}}/api/hl7/system/tipos-id-pacientes"
+  auth:
+    type: bearer
+    token: "{{Token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

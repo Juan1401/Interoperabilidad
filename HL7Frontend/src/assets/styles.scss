@@ -1,0 +1,202 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'primeicons/primeicons.css';
+@use '@/assets/layout/layout.scss';
+
+@use '@/assets/demo/demo.scss';
+
+// ============================================================
+// Estilos del Modal de Detalles RDA (Global)
+// ============================================
+
+.rda-modal {
+    .p-dialog-header {
+        background: var(--surface-card, #ffffff) !important;
+        color: var(--text-color, #1e293b) !important;
+        padding: 1.25rem 1.75rem !important;
+        border-bottom: 1px solid var(--surface-border, #e2e8f0);
+
+        .p-dialog-title {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            color: var(--text-color, #1e293b) !important;
+        }
+
+        .p-dialog-header-icons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .p-button.p-button-text.p-button-secondary,
+            .p-dialog-header-icon,
+            .p-dialog-header-action {
+                background: transparent !important;
+                border-color: transparent !important;
+                color: var(--text-color-secondary, #475569) !important;
+                width: 2.2rem !important;
+                height: 2.2rem !important;
+                border-radius: 50% !important;
+                transition: all 0.2s ease-in-out !important;
+                margin: 0 !important;
+
+                .pi,
+                .p-icon,
+                svg,
+                path {
+                    color: var(--text-color-secondary, #475569) !important;
+                    fill: var(--text-color-secondary, #475569) !important;
+                    stroke: var(--text-color-secondary, #475569) !important;
+                    width: 1.1rem !important;
+                    height: 1.1rem !important;
+                }
+
+                &:hover {
+                    background: var(--surface-hover, #f1f5f9) !important;
+                    color: var(--text-color, #1e293b) !important;
+                    transform: scale(1.1);
+
+                    .pi,
+                    .p-icon,
+                    svg,
+                    path {
+                        color: var(--text-color, #1e293b) !important;
+                        fill: var(--text-color, #1e293b) !important;
+                        stroke: var(--text-color, #1e293b) !important;
+                    }
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 2px var(--surface-border, #cbd5e1) !important;
+                }
+            }
+        }
+    }
+
+    .p-dialog-content {
+        padding: 1.5rem !important;
+        background: var(--surface-card, #ffffff) !important;
+    }
+
+    .p-dialog-footer {
+        padding: 1rem 1.5rem !important;
+        border-top: 1px solid var(--surface-border, #e2e8f0);
+    }
+}
+
+// Estilos de contenido compartidos por los modales RDA
+.rda-origen-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--surface-section, #f0f4f8);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+
+    .rda-origen-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color, #2563ab);
+        font-weight: 600;
+        font-size: 0.95rem;
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .rda-origen-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: var(--primary-700, #244186);
+        color: var(--primary-color-text, #ffffff);
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+
+        i {
+            font-size: 0.9rem;
+        }
+    }
+}
+
+.bordes-card-0 {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--surface-border, #e2e8f0);
+    margin-bottom: 1.5rem;
+}
+
+// ============================================================
+// SEGURIDAD: Bloqueo de impresión vía @media print
+// ============================================================
+// Este bloque CSS es el mecanismo de RESPALDO OBLIGATORIO
+// para la restricción de impresión. El bloqueo por JavaScript
+// (HostListener en app.layout.ts) intercepta el atajo Ctrl+P,
+// pero NO puede impedir que el usuario imprima usando el menú
+// nativo del navegador (Archivo > Imprimir o clic derecho).
+// Esta regla @media print garantiza que, independientemente
+// del método de acceso a la impresión, la página aparecerá
+// en blanco con un mensaje de aviso de seguridad.
+// ============================================================
+@media print {
+
+    // Ocultar absolutamente todo el contenido de la aplicación
+    body,
+    app-root,
+    .layout-wrapper,
+    .layout-main-container,
+    .layout-main,
+    app-topbar,
+    app-sidebar,
+    app-footer {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    // El mensaje de seguridad es el único elemento visible al imprimir.
+    // En modo normal (pantalla) permanece oculto gracias a display: none.
+    .print-security-notice {
+        display: block !important;
+        visibility: visible !important;
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: 'Inter', Arial, sans-serif;
+        padding: 3rem;
+        background: #ffffff;
+        color: #1e293b;
+
+        &::before {
+            content: '⚠';
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 1.5rem;
+            color: #dc2626;
+        }
+
+        &::after {
+            content: 'Por política de seguridad institucional, la impresión de documentos clínicos no está permitida en esta aplicación. Si requiere una copia oficial del documento, comuníquese con el área de sistemas o con el profesional de salud responsable.';
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #475569;
+            max-width: 600px;
+            display: block;
+            margin-top: 1rem;
+        }
+    }
+}
+
+// Clase auxiliar: el div del mensaje de seguridad se oculta en pantalla
+// y solo se vuelve visible bajo la regla @media print de arriba.
+.print-security-notice {
+    display: none;
+}

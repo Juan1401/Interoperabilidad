@@ -1,0 +1,8 @@
+# Hl7RestAPI/.dockerignore
+
+.git
+.gitignore
+.dockerignore
+node_modules
+vendor
+.env
