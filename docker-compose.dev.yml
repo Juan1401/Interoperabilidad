@@ -4,6 +4,21 @@
 #   - Acceso limpio por dominio: raziel-dev.fciclubnoel.com → Nginx:80 → contenedor
 
 services:
+# ─── Base de Datos Local (PostgreSQL) ─────────
+  postgres_db:
+    container_name: hl7postgres_dev
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-rda_saas_db}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - hl7_dev_pgdata:/var/lib/postgresql/data
+    networks:
+      - hl7_network_dev
+    restart: unless-stopped
   # ─── Backend (API Laravel) para Desarrollo ───
   api:
     container_name: hl7restapi_dev
@@ -59,3 +74,4 @@ networks:
 # ─── Volúmenes Nombrados ──────────────────────
 volumes:
   hl7_dev_node_modules:
+  hl7_dev_pgdata:

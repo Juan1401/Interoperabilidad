@@ -54,9 +54,18 @@ fi
 echo "⏳ Esperando 10 segundos para inicialización de servicios..."
 sleep 10
 
+echo "⏳ Esperando inicialización de servicios base..."
+sleep 5
+
 if [ "$BUILD_BACKEND" = true ]; then
-    # 2. Configuración Backend
     echo "🔧 Configurando Backend (Laravel)..."
+    
+    echo "⏳ Esperando a que PostgreSQL esté listo (Puerto 5432)..."
+    until docker exec hl7postgres_dev pg_isready -U postgres; do
+      echo "   ...esperando a PostgreSQL..."
+      sleep 2
+    done
+    echo "✅ PostgreSQL está listo y aceptando conexiones."
 
     # Crear estructura de directorios de caché PRIMERO
     docker exec hl7restapi_dev mkdir -p storage/framework/cache/data
