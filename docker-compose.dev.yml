@@ -31,6 +31,7 @@ services:
       - "8002:80"   # Acceso directo: raziel-dev-api.fciclubnoel.com:8002
     volumes:
       - ./Hl7RestAPI:/var/www/html
+      - ./definitions_hl7_json:/var/www/html/definitions_hl7_json
     networks:
       - hl7_network_dev
     restart: unless-stopped

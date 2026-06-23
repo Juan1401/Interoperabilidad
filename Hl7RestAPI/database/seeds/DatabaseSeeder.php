@@ -38,6 +38,10 @@ class DatabaseSeeder extends Seeder
         $this->call(ColombianOrganizationIdentifierSeeder::class);
         $this->call(IhceCatalogsSeeder::class);
         $this->call(Ciuo88AcSeeder::class);
+        $this->call(Hl7ClinicalCatalogsSeeder::class);
+        $this->call(Hl7PharmacologicalCatalogsSeeder::class);
+        $this->call(Hl7AdministrativeCatalogsSeeder::class);
+        $this->call(Hl7DemographicCatalogsSeeder::class);
         /**
          * Fin de siembra de datos para HL7 RDA Paciente
          */
