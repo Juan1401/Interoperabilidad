@@ -13,9 +13,13 @@ class AddOptimizedIndexToIngresos extends Migration
      */
     public function up()
     {
-        // Índices sugeridos para optimizar la consulta de RDAs
-        \Illuminate\Support\Facades\DB::statement('CREATE INDEX IF NOT EXISTS ingresos_fecha_ingreso_index ON public.ingresos (fecha_ingreso)');
-        \Illuminate\Support\Facades\DB::statement('CREATE INDEX IF NOT EXISTS ingresos_paciente_id_tipo_paciente_index ON public.ingresos (paciente_id, tipo_id_paciente)');
+        try {
+            // Índices sugeridos para optimizar la consulta de RDAs
+            \Illuminate\Support\Facades\DB::statement('CREATE INDEX IF NOT EXISTS ingresos_fecha_ingreso_index ON public.ingresos (fecha_ingreso)');
+            \Illuminate\Support\Facades\DB::statement('CREATE INDEX IF NOT EXISTS ingresos_paciente_id_tipo_paciente_index ON public.ingresos (paciente_id, tipo_id_paciente)');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Tabla public.ingresos no encontrada, omitiendo creación de índices.");
+        }
     }
 
     /**
