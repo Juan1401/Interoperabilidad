@@ -18,11 +18,11 @@ class CreateIhceControlEnviosTable extends Migration
 
             // FK to public.ingresos
             $table->integer('ingreso_id')->comment('Llave foránea numérica que referencia al ingreso en el sistema principal (INTEGER).');
-            $table->foreign('ingreso_id')->references('ingreso')->on('public.ingresos')->onDelete('restrict');
+            // $table->foreign('ingreso_id')->references('ingreso')->on('public.ingresos')->onDelete('restrict');
 
             // FK to public.hc_evoluciones
             $table->integer('evolucion_id')->nullable()->comment('Llave foránea numérica que referencia a la evolución (INTEGER).');
-            $table->foreign('evolucion_id')->references('evolucion_id')->on('public.hc_evoluciones')->onDelete('restrict');
+            // $table->foreign('evolucion_id')->references('evolucion_id')->on('public.hc_evoluciones')->onDelete('restrict');
 
             // FK to ihce_cat_tipos_rda
             $table->integer('tipo_rda_id')->unsigned()->comment('ID foráneo al catálogo de tipos de RDA.');

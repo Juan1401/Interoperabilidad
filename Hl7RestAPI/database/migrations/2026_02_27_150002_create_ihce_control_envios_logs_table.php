@@ -23,7 +23,7 @@ class CreateIhceControlEnviosLogsTable extends Migration
 
             // FK to public.system_usuarios
             $table->integer('usuario_id')->nullable()->comment('Usuario que ejecutó la acción.');
-            $table->foreign('usuario_id')->references('usuario_id')->on('public.system_usuarios')->onDelete('restrict');
+            // $table->foreign('usuario_id')->references('usuario_id')->on('public.system_usuarios')->onDelete('restrict');
 
             // FK to ihce_cat_acciones_log
             $table->integer('accion_log_id')->unsigned()->nullable()->comment('Tipo de acción, foráneo a ihce_cat_acciones_log.');

@@ -1,39 +1,39 @@
 # docker-compose.yml (Produccion - Interoperabilidad HL7)
 # Arquitectura dual:
-#   - Acceso directo por puerto: api:8003 / frontend:4203 (host → contenedor)
+#   - Acceso directo por puerto: api:8005 / frontend:4205 (host → contenedor)
 #   - Acceso limpio por dominio: raziel.fciclubnoel.com → Nginx:80 → contenedor
 
 services:
   # ─── Backend (API Laravel) ───────────────────
   api:
-    container_name: hl7restapi
+    container_name: iops_api
     build:
       context: ./Hl7RestAPI
       dockerfile: Dockerfile
     ports:
-      - "8003:80"   # Acceso directo: raziel-api.fciclubnoel.com:8003
+      - "8005:80"   # Acceso directo: raziel-api.fciclubnoel.com:8005
     volumes:
       - ./Hl7RestAPI/.env:/var/www/html/.env
-      - hl7_prod_storage:/var/www/html/storage  # Delega a Docker la persistencia y permisos del storage
+      - iops_prod_storage:/var/www/html/storage  # Delega a Docker la persistencia y permisos del storage
     networks:
-      - hl7_network
+      - iops_network
     restart: unless-stopped
 
   # ─── Frontend (Angular compilado con Nginx) ───
   frontend:
-    container_name: hl7frontend
+    container_name: iops_frontend
     build:
       context: ./HL7Frontend
       dockerfile: Dockerfile
     ports:
-      - "4203:80"   # Acceso directo: raziel.fciclubnoel.com:4203
+      - "4205:80"   # Acceso directo: raziel.fciclubnoel.com:4205
     networks:
-      - hl7_network
+      - iops_network
     restart: unless-stopped
 
   # ─── Proxy Inverso Nginx (acceso limpio por dominio) ─
   nginx:
-    container_name: hl7nginx
+    container_name: iops_nginx
     image: nginx:alpine
     ports:
       - "8080:80"    # Acceso limpio PROD: raziel.fciclubnoel.com:8080 (en servidor Linux usar 80:80)
@@ -43,14 +43,14 @@ services:
       - api
       - frontend
     networks:
-      - hl7_network
+      - iops_network
     restart: unless-stopped
 
 # ─── Red interna compartida ───────────────────
 networks:
-  hl7_network:
+  iops_network:
     driver: bridge
 
 # ─── Volúmenes Nombrados ──────────────────────
 volumes:
-  hl7_prod_storage:
+  iops_prod_storage:

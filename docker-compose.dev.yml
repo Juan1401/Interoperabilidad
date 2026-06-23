@@ -1,12 +1,12 @@
 # docker-compose.dev.yml (Desarrollo - Interoperabilidad HL7)
 # Arquitectura dual:
-#   - Acceso directo por puerto: api:8002 / frontend:4202 (host → contenedor)
+#   - Acceso directo por puerto: api:8004 / frontend:4204 (host → contenedor)
 #   - Acceso limpio por dominio: raziel-dev.fciclubnoel.com → Nginx:80 → contenedor
 
 services:
 # ─── Base de Datos Local (PostgreSQL) ─────────
   postgres_db:
-    container_name: hl7postgres_dev
+    container_name: iops_postgres_dev
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: ${DB_DATABASE:-rda_saas_db}
@@ -15,45 +15,45 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - hl7_dev_pgdata:/var/lib/postgresql/data
+      - iops_dev_pgdata:/var/lib/postgresql/data
     networks:
-      - hl7_network_dev
+      - iops_network_dev
     restart: unless-stopped
   # ─── Backend (API Laravel) para Desarrollo ───
   api:
-    container_name: hl7restapi_dev
+    container_name: iops_api_dev
     build:
       context: ./Hl7RestAPI
       dockerfile: Dockerfile
     env_file:
       - ./Hl7RestAPI/.env
     ports:
-      - "8002:80"   # Acceso directo: raziel-dev-api.fciclubnoel.com:8002
+      - "8004:80"   # Acceso directo: raziel-dev-api.fciclubnoel.com:8004
     volumes:
       - ./Hl7RestAPI:/var/www/html
     networks:
-      - hl7_network_dev
+      - iops_network_dev
     restart: unless-stopped
 
   # ─── Frontend (Angular en modo ng serve) ─────
   frontend:
-    container_name: hl7frontend_dev
+    container_name: iops_frontend_dev
     image: node:20-bookworm
     working_dir: /app
     ports:
-      - "4202:4200"  # Acceso directo: raziel-dev.fciclubnoel.com:4202
+      - "4204:4200"  # Acceso directo: raziel-dev.fciclubnoel.com:4204
     volumes:
       - ./HL7Frontend:/app
-      - hl7_dev_node_modules:/app/node_modules    # Aisla node_modules en un volumen nombrado para mejor rendimiento
+      - iops_dev_node_modules:/app/node_modules    # Aisla node_modules en un volumen nombrado para mejor rendimiento
     entrypoint: /app/entrypoint.sh
     command: node --max-old-space-size=4096 node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --poll=2000
     networks:
-      - hl7_network_dev
+      - iops_network_dev
     restart: unless-stopped
 
   # ─── Proxy Inverso Nginx (acceso limpio por dominio) ─
   nginx:
-    container_name: hl7nginx_dev
+    container_name: iops_nginx_dev
     image: nginx:alpine
     ports:
       - "8080:80"    # Acceso limpio DEV: raziel-dev.fciclubnoel.com:8080 (puerto 80 ocupado por IIS en Windows)
@@ -63,15 +63,15 @@ services:
       - api
       - frontend
     networks:
-      - hl7_network_dev
+      - iops_network_dev
     restart: unless-stopped
 
 # ─── Red interna compartida ───────────────────
 networks:
-  hl7_network_dev:
+  iops_network_dev:
     driver: bridge
 
 # ─── Volúmenes Nombrados ──────────────────────
 volumes:
-  hl7_dev_node_modules:
-  hl7_dev_pgdata:
+  iops_dev_node_modules:
+  iops_dev_pgdata:
