@@ -31,11 +31,11 @@ return new class extends Migration
                   ->onUpdate('cascade')
                   ->onDelete('restrict');
 
-            $table->foreign('user_id', 'fk_rda_audit_system_usuario')
-                  ->references('usuario_id')
-                  ->on('public.system_usuarios')
-                  ->onUpdate('cascade')
-                  ->onDelete('restrict');
+            // $table->foreign('user_id', 'fk_rda_audit_system_usuario')
+            //       ->references('usuario_id')
+            //       ->on('public.system_usuarios')
+            //       ->onUpdate('cascade')
+            //       ->onDelete('restrict');
 
             // Índice para filtrado por fecha
             $table->index('created_at');
