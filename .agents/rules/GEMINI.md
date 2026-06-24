@@ -9,9 +9,9 @@ Este documento es la "Fuente de Verdad" absoluta para tu comportamiento como age
 1. Identidad y Arquitectura Core
 Este es un ecosistema de interoperabilidad clínica basado en el estándar HL7 FHIR.
 
-Backend (/Hl7RestAPI): Laravel 10 (PHP 8.2). Actúa como motor de integración y API REST.
+Backend (/iops_api): Laravel 10 (PHP 8.2). Actúa como motor de integración y API REST.
 
-Frontend (/HL7Frontend): Angular 21 + PrimeNG + TailwindCSS. Actúa como interfaz de gestión.
+Frontend (/iops_frontend): Angular 21 + PrimeNG + TailwindCSS. Actúa como interfaz de gestión.
 
 Infraestructura: Orquestación estricta con Docker Compose. Nginx funciona como proxy inverso.
 
@@ -21,9 +21,9 @@ Idioma: Todas tus explicaciones, comentarios en el código (//) y documentación
 
 Rutas de Salida (Logs/Tests): Si generas scripts de pruebas o logs, NUNCA los guardes en la raíz. Utiliza siempre:
 
-Backend: Hl7RestAPI/cache/
+Backend: iops_api/cache/
 
-Frontend: HL7Frontend/cache/
+Frontend: iops_frontend/cache/
 
 Validación de Base de Datos: NUNCA asumas ni inventes nombres de tablas o columnas. Verifica siempre la estructura de PostgreSQL (específicamente el esquema ihce) antes de generar consultas o migraciones.
 

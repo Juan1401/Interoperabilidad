@@ -12,59 +12,59 @@ Thumbs.db
 
 # Logs
 *.log
-Hl7RestAPI/migration_error.log
+iops_api/migration_error.log
 temp_log.log
 
-# HL7Frontend (Angular)
-HL7Frontend/.angular/cache
-HL7Frontend/.sass-cache/
-HL7Frontend/dist/
-HL7Frontend/tmp/
-HL7Frontend/out-tsc/
-HL7Frontend/bazel-out/
-HL7Frontend/node_modules/
-HL7Frontend/npm-debug.log
-HL7Frontend/yarn-error.log
-HL7Frontend/connect.lock
-HL7Frontend/coverage/
-HL7Frontend/libpeerconnection.log
-HL7Frontend/testem.log
-HL7Frontend/typings/
-HL7Frontend/src/environments/environment.ts
-HL7Frontend/src/environments/environment.prod.ts
+# iops_frontend (Angular)
+iops_frontend/.angular/cache
+iops_frontend/.sass-cache/
+iops_frontend/dist/
+iops_frontend/tmp/
+iops_frontend/out-tsc/
+iops_frontend/bazel-out/
+iops_frontend/node_modules/
+iops_frontend/npm-debug.log
+iops_frontend/yarn-error.log
+iops_frontend/connect.lock
+iops_frontend/coverage/
+iops_frontend/libpeerconnection.log
+iops_frontend/testem.log
+iops_frontend/typings/
+iops_frontend/src/environments/environment.ts
+iops_frontend/src/environments/environment.prod.ts
 
-# Hl7RestAPI (Laravel)
-Hl7RestAPI/node_modules/
-Hl7RestAPI/public/hot
-Hl7RestAPI/public/storage
-Hl7RestAPI/storage/*.key
-Hl7RestAPI/storage/logs/*.log
-Hl7RestAPI/storage/framework/cache/data/*
-Hl7RestAPI/storage/framework/views/*.php
-Hl7RestAPI/storage/framework/sessions/*
-Hl7RestAPI/storage/framework/testing/*
-Hl7RestAPI/vendor/
-Hl7RestAPI/.env
-Hl7RestAPI/.env.backup
-Hl7RestAPI/.phpunit.result.cache
-Hl7RestAPI/Homestead.json
-Hl7RestAPI/Homestead.yaml
-Hl7RestAPI/npm-debug.log
-Hl7RestAPI/yarn-error.log
-Hl7RestAPI/.vscode/
-Hl7RestAPI/public/upload/
-Hl7RestAPI/public/favicon.ico
+# iops_api (Laravel)
+iops_api/node_modules/
+iops_api/public/hot
+iops_api/public/storage
+iops_api/storage/*.key
+iops_api/storage/logs/*.log
+iops_api/storage/framework/cache/data/*
+iops_api/storage/framework/views/*.php
+iops_api/storage/framework/sessions/*
+iops_api/storage/framework/testing/*
+iops_api/vendor/
+iops_api/.env
+iops_api/.env.backup
+iops_api/.phpunit.result.cache
+iops_api/Homestead.json
+iops_api/Homestead.yaml
+iops_api/npm-debug.log
+iops_api/yarn-error.log
+iops_api/.vscode/
+iops_api/public/upload/
+iops_api/public/favicon.ico
 
-# Additional Hl7RestAPI ignores based on analysis
-Hl7RestAPI/test-*.php
-Hl7RestAPI/bootstrap/cache/*
-!Hl7RestAPI/bootstrap/cache/.gitignore
-Hl7RestAPI/html/
-Hl7RestAPI/coverage/
-Hl7RestAPI/database/*.sqlite
-Hl7RestAPI/database/*.sqlite3
-Hl7RestAPI/storage/app/public/*
-!Hl7RestAPI/storage/app/public/.gitignore
+# Additional iops_api ignores based on analysis
+iops_api/test-*.php
+iops_api/bootstrap/cache/*
+!iops_api/bootstrap/cache/.gitignore
+iops_api/html/
+iops_api/coverage/
+iops_api/database/*.sqlite
+iops_api/database/*.sqlite3
+iops_api/storage/app/public/*
+!iops_api/storage/app/public/.gitignore
 
 # IDEs and Editors
 .idea/
@@ -85,11 +85,11 @@ sakai-extracted/
 # Environments
 .env
 # Cache
-Hl7RestAPI/cache/
+iops_api/cache/
 
 # antigravity rules
 .agents/rules/context/rda_urgencias/rda_urgencias_base.json
 
 # ignorar los package-lock.json No se debe ignorar para que se instalen las mismas dependencias
-# Hl7RestAPI/package-lock.json
-# HL7Frontend/package-lock.json
+# iops_api/package-lock.json
+# iops_frontend/package-lock.json

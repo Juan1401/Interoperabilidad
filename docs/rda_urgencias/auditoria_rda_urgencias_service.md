@@ -1,7 +1,7 @@
 # Informe de Auditoría y Estado Actual: RdaUrgenciasService
 
 > **Fecha:** 27 de abril de 2026  
-> **Archivo:** `Hl7RestAPI/app/Services/Hl7/RdaUrgenciasService.php`  
+> **Archivo:** `iops_api/app/Services/Hl7/RdaUrgenciasService.php`  
 > **Líneas totales:** 1050 | **Peso:** ~51 KB  
 > **Perfil FHIR objetivo:** `CompositionEmergencyRDA` (Minsalud Colombia)
 

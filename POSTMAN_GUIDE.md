@@ -1,6 +1,6 @@
 # 📮 Guía de Uso - Colección Postman OAuth2
 
-Esta guía explica cómo usar la colección de Postman para autenticación OAuth2 con el backend Hl7RestAPI.
+Esta guía explica cómo usar la colección de Postman para autenticación OAuth2 con el backend iops_api.
 
 ---
 
@@ -10,7 +10,7 @@ Esta guía explica cómo usar la colección de Postman para autenticación OAuth
 
 1. Abrir **Postman**
 2. Clic en **Import** (esquina superior izquierda)
-3. Seleccionar el archivo: `Hl7RestAPI-OAuth2.postman_collection.json`
+3. Seleccionar el archivo: `iops_api-OAuth2.postman_collection.json`
 4. Clic en **Import**
 
 ### 2. Configurar Variables de Entorno
@@ -39,7 +39,7 @@ Esta guía explica cómo usar la colección de Postman para autenticación OAuth
 
 La colección ya incluye variables base. Solo necesitas actualizarlas:
 
-1. En Postman, clic derecho en la colección `Hl7RestAPI - OAuth2 Authentication`
+1. En Postman, clic derecho en la colección `iops_api - OAuth2 Authentication`
 2. **Edit**
 3. Ir a pestaña **Variables**
 4. Actualizar los valores según tu configuración
@@ -52,7 +52,7 @@ La colección ya incluye variables base. Solo necesitas actualizarlas:
 
 ```bash
 # Conectar al contenedor
-docker exec -it hl7restapi_dev bash
+docker exec -it iops_api_dev bash
 
 # Ejecutar tinker
 php artisan tinker
@@ -255,7 +255,7 @@ console.log("✅ Token guardado:", jsonData.access_token);
 **Solución:**
 1. Verificar Client ID y Secret en BD:
    ```bash
-   docker exec hl7restapi_dev php artisan tinker
+   docker exec iops_api_dev php artisan tinker
    DB::table('oauth_clients')->get(['id', 'secret']);
    ```
 2. Actualizar variables de entorno en Postman

@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-# El 'HL7Frontend' debe coincidir con el nombre en angular.json
+# El 'iops_frontend' debe coincidir con el nombre en angular.json
 RUN npm run build -- --configuration production
 
 # --- ETAPA 2: Servidor (Serve) ---

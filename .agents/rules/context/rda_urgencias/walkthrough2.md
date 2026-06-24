@@ -10,9 +10,9 @@ Se implementó el servicio `RdaUrgenciasService.php` de forma **monolítica e in
 
 | Archivo | Acción | Propósito |
 |---|---|---|
-| [RdaUrgenciasService.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Services/Hl7/RdaUrgenciasService.php) | **CREADO** | Servicio monolítico con toda la lógica de Urgencias |
-| [Pacientes.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Models/Pacientes.php) | Modificado | Agregados 3 campos Minsalud a `$fillable` |
-| [Persona.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Models/Persona.php) | Modificado | Nuevas propiedades y mapeo en constructor |
+| [RdaUrgenciasService.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Services/Hl7/RdaUrgenciasService.php) | **CREADO** | Servicio monolítico con toda la lógica de Urgencias |
+| [Pacientes.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Models/Pacientes.php) | Modificado | Agregados 3 campos Minsalud a `$fillable` |
+| [Persona.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Models/Persona.php) | Modificado | Nuevas propiedades y mapeo en constructor |
 | Migration `2026_03_17_174101_add_minsalud_fields_to_personas_table.php` | **CREADA** | 4 columnas nuevas en `public.pacientes` |
 
 ---

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Hl7RestAPI') }}</title>
+    <title>{{ config('app.name', 'iops_api') }}</title>
 
     <!-- Fonts (Local) -->
     <link href="{{ asset('css/nunito.css') }}" rel="stylesheet">
@@ -121,7 +121,7 @@
 
         <div class="content-wrapper">
             <div class="title m-b-md">
-                {{ config('app.name', 'Hl7RestAPI') }}
+                {{ config('app.name', 'iops_api') }}
             </div>
 
             <div class="links">

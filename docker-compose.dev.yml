@@ -4,7 +4,7 @@
 #   - Acceso limpio por dominio: raziel-dev.fciclubnoel.com → Nginx:80 → contenedor
 
 services:
-# ─── Base de Datos Local (PostgreSQL) ─────────
+  # ─── Base de Datos Local (PostgreSQL) ─────────
   postgres_db:
     container_name: iops_postgres_dev
     image: postgres:15-alpine
@@ -23,14 +23,14 @@ services:
   api:
     container_name: iops_api_dev
     build:
-      context: ./Hl7RestAPI
+      context: ./iops_api
       dockerfile: Dockerfile
     env_file:
-      - ./Hl7RestAPI/.env
+      - ./iops_api/.env
     ports:
-      - "8004:80"   # Acceso directo: raziel-dev-api.fciclubnoel.com:8004
+      - "8004:80" # Acceso directo: raziel-dev-api.fciclubnoel.com:8004
     volumes:
-      - ./Hl7RestAPI:/var/www/html
+      - ./iops_api:/var/www/html
       - ./definitions_hl7_json:/var/www/html/definitions_hl7_json
     networks:
       - iops_network_dev
@@ -42,10 +42,10 @@ services:
     image: node:20-bookworm
     working_dir: /app
     ports:
-      - "4204:4200"  # Acceso directo: raziel-dev.fciclubnoel.com:4204
+      - "4204:4200" # Acceso directo: raziel-dev.fciclubnoel.com:4204
     volumes:
-      - ./HL7Frontend:/app
-      - iops_dev_node_modules:/app/node_modules    # Aisla node_modules en un volumen nombrado para mejor rendimiento
+      - ./iops_frontend:/app
+      - iops_dev_node_modules:/app/node_modules # Aisla node_modules en un volumen nombrado para mejor rendimiento
     entrypoint: /app/entrypoint.sh
     command: node --max-old-space-size=4096 node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --poll=2000
     networks:
@@ -57,7 +57,7 @@ services:
     container_name: iops_nginx_dev
     image: nginx:alpine
     ports:
-      - "8080:80"    # Acceso limpio DEV: raziel-dev.fciclubnoel.com:8080 (puerto 80 ocupado por IIS en Windows)
+      - "8080:80" # Acceso limpio DEV: raziel-dev.fciclubnoel.com:8080 (puerto 80 ocupado por IIS en Windows)
     volumes:
       - ./nginx/nginx-dev.conf:/etc/nginx/conf.d/default.conf
     depends_on:

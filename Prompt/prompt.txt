@@ -23,10 +23,10 @@ Actúa como Desarrollador Backend Senior. Analiza el patrón de arquitectura en 
 ---------------------------------------------------------------------------------------------------
 Ejecutar el seeder
 ---------------------------------------------------------------------------------------------------
-docker exec -i hl7restapi_dev php artisan tinker --execute="(new IhceCatalogsSeeder())->run();"
+docker exec -i iops_api_dev php artisan tinker --execute="(new IhceCatalogsSeeder())->run();"
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 Ejecutar el seeder
 ---------------------------------------------------------------------------------------------------
-docker exec hl7restapi_dev php artisan db:seed --class=Hl7MedicationStatementStatusSeeder
+docker exec iops_api_dev php artisan db:seed --class=Hl7MedicationStatementStatusSeeder
 ---------------------------------------------------------------------------------------------------

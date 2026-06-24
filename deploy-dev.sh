@@ -35,9 +35,9 @@ echo "🚀 Iniciando despliegue de entorno de DESARROLLO..."
 
 # 0. Preparar variables de entorno Frontend
 echo "📄 Verificando archivo environment.ts del Frontend..."
-if [ ! -f "HL7Frontend/src/environments/environment.ts" ] && [ -f "HL7Frontend/src/environments/environment.example.ts" ]; then
+if [ ! -f "iops_frontend/src/environments/environment.ts" ] && [ -f "iops_frontend/src/environments/environment.example.ts" ]; then
     echo "📄 Creando environment.ts a partir de environment.example.ts..."
-    cp HL7Frontend/src/environments/environment.example.ts HL7Frontend/src/environments/environment.ts
+    cp iops_frontend/src/environments/environment.example.ts iops_frontend/src/environments/environment.ts
 fi
 
 # 1. Levantar contenedores

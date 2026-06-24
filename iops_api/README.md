@@ -35,7 +35,7 @@ Laravel es accesible, potente y proporciona las herramientas necesarias para apl
 1. Se descarga el proyecto con el versionador git
 ```bash
 git init
-git remote add origin http://192.168.0.60/asistencial/hl7restapi.git
+git remote add origin http://192.168.0.60/asistencial/iops_api.git
 ```
 2. Se crea el archivo `.env` apartir del archivo `.env.example` y se configura los datos de la base de datos la linea `APP_URL=http://metatron.fciclubnoel.com`
 ```bash

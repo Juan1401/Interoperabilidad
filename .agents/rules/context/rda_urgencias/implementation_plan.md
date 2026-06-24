@@ -58,7 +58,7 @@ Cada builder recibe los datos ya resueltos (de BD / catálogos) y devuelve el ar
 
 ### Component 1: Builders FHIR (nuevos)
 
-#### [NEW] [FhirPatientBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Builders/Fhir/FhirPatientBuilder.php)
+#### [NEW] [FhirPatientBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Builders/Fhir/FhirPatientBuilder.php)
 
 Recibe DTO con datos del paciente y opciones de configuración. Genera el recurso `Patient` FHIR.
 
@@ -67,7 +67,7 @@ Recibe DTO con datos del paciente y opciones de configuración. Genera el recurs
 - `includeActive` (bool) → false para Urgencias
 - `includeDeceased` (bool) → false para Urgencias
 
-#### [NEW] [FhirPractitionerBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Builders/Fhir/FhirPractitionerBuilder.php)
+#### [NEW] [FhirPractitionerBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Builders/Fhir/FhirPractitionerBuilder.php)
 
 Genera el recurso `Practitioner` FHIR.
 
@@ -75,7 +75,7 @@ Genera el recurso `Practitioner` FHIR.
 - `includeHl7PN` (bool) → true = incluye el coding PN de v2-0203 (RDA Paciente), false = solo ColombianPersonIdentifier (Urgencias)
 - `includeFamilyExtension` (bool) → true para RDA Paciente, false para Urgencias
 
-#### [NEW] [FhirOrganizationBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Builders/Fhir/FhirOrganizationBuilder.php)
+#### [NEW] [FhirOrganizationBuilder.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Builders/Fhir/FhirOrganizationBuilder.php)
 
 Genera el recurso `Organization` FHIR.
 
@@ -86,7 +86,7 @@ Genera el recurso `Organization` FHIR.
 
 ### Component 2: Servicio RDA Urgencias
 
-#### [MODIFY] [RdaUrgenciasService.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Services/Hl7/RdaUrgenciasService.php)
+#### [MODIFY] [RdaUrgenciasService.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Services/Hl7/RdaUrgenciasService.php)
 
 Implementar completamente el método `getDataForRda()`:
 1. Obtener ingreso → paciente → persona
@@ -101,7 +101,7 @@ Implementar completamente el método `getDataForRda()`:
 
 ### Component 3: Refactorización RdaPacienteService (DRY)
 
-#### [MODIFY] [RdaPacienteService.php](file:///c:/Docker_Tests/hl7interoperabilidad/Hl7RestAPI/app/Services/Hl7/RdaPacienteService.php)
+#### [MODIFY] [RdaPacienteService.php](file:///c:/Docker_Tests/hl7interoperabilidad/iops_api/app/Services/Hl7/RdaPacienteService.php)
 
 Reemplazar los bloques inline de construcción de Patient, Practitioner y Organization por llamadas a los mismos Builders, con las opciones correspondientes (`includeGenderIdentity=true`, `includeActive=true`, `mode='full'`).
 
@@ -130,7 +130,7 @@ ALTER TABLE personas ADD COLUMN zona_residencia VARCHAR(2) NULL DEFAULT '01';
 
 ### Revisión de estructura JSON
 
-Guardar en `Hl7RestAPI/cache/test_rda_urgencias_demograficos.php` un script que:
+Guardar en `iops_api/cache/test_rda_urgencias_demograficos.php` un script que:
 1. Instancie `RdaUrgenciasService` con un `ingresoId` de prueba
 2. Llame a `getDataForRda($ingresoId)`
 3. Serialize a JSON y haga `echo` del resultado

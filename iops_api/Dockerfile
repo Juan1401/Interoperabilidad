@@ -1,4 +1,4 @@
-# Hl7RestAPI/Dockerfile - PHP 8.2 LTS
+# iops_api/Dockerfile - PHP 8.2 LTS
 
 # Usar imagen oficial PHP 8.2 con Apache
 FROM php:8.2-apache
