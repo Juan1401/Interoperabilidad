@@ -5,27 +5,21 @@
 <!-- Toast Headless para el progreso del Envío Masivo -->
 <p-toast position="top-center" key="envioMasivo" [baseZIndex]="6000">
     <ng-template let-message #headless>
-        <section class="flex flex-col p-5 gap-3 w-full bg-primary rounded-xl shadow-xl" style="min-width: 350px;">
+        <section class="flex flex-col p-5 gap-3 w-full bg-primary rounded-xl shadow-xl" style="min-width: 350px">
             <div class="flex items-center gap-3">
                 <i class="pi pi-send text-white text-xl"></i>
                 <span class="font-bold text-lg text-white">{{ message.summary }}</span>
             </div>
             <div class="flex flex-col gap-2">
-                <p-progressbar [value]="totalEnvioMasivo() > 0 ? (procesadosMasivo() / totalEnvioMasivo()) * 100 : 0"
-                    [showValue]="false" [style]="{ height: '8px' }">
-                </p-progressbar>
-                <span class="text-sm text-white font-medium">
-                    Procesando {{ procesadosMasivo() }} de {{ totalEnvioMasivo() }} ingresos...
-                </span>
+                <p-progressbar [value]="totalEnvioMasivo() > 0 ? (procesadosMasivo() / totalEnvioMasivo()) * 100 : 0" [showValue]="false" [style]="{ height: '8px' }"> </p-progressbar>
+                <span class="text-sm text-white font-medium"> Procesando {{ procesadosMasivo() }} de {{ totalEnvioMasivo() }} ingresos... </span>
             </div>
         </section>
     </ng-template>
 </p-toast>
 
 <!-- Modal de Resumen de Envío Masivo -->
-<p-dialog header="Resumen de Envío Masivo" [visible]="mostrarResumenMasivo()"
-    (visibleChange)="mostrarResumenMasivo.set($event)" [modal]="true" [style]="{width: '700px', 'z-index': '10000'}"
-    [closable]="false">
+<p-dialog header="Resumen de Envío Masivo" [visible]="mostrarResumenMasivo()" (visibleChange)="mostrarResumenMasivo.set($event)" [modal]="true" [style]="{width: '700px', 'z-index': '10000'}" [closable]="false">
     <p-table [value]="resultadosMasivo()" [tableStyle]="{'min-width': '50rem'}" styleClass="p-datatable-sm">
         <ng-template #header>
             <tr>
@@ -36,11 +30,10 @@
         </ng-template>
         <ng-template #body let-resultado>
             <tr>
-                <td style="font-weight: 600;">{{ resultado.ingreso }}</td>
+                <td style="font-weight: 600">{{ resultado.ingreso }}</td>
                 <td>
                     <span class="flex items-center gap-2">
-                        <i [class]="resultado.estado === true ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-500'"
-                            style="font-size: 1.2rem;"></i>
+                        <i [class]="resultado.estado === true ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-500'" style="font-size: 1.2rem"></i>
                         {{ resultado.estado == true ? 'Éxito' : 'Error' }}
                     </span>
                 </td>
@@ -54,33 +47,23 @@
 </p-dialog>
 
 <div class="card">
-    <div class="text-xl font-semibold mb-4 text-900 border-bottom-1 surface-border pb-2">
-        <i class="pi pi-search mr-2"></i>Buscador Avanzado
-    </div>
+    <div class="text-xl font-semibold mb-4 text-900 border-bottom-1 surface-border pb-2"><i class="pi pi-search mr-2"></i>Buscador Avanzado</div>
 
     <form [formGroup]="form" (ngSubmit)="buscar()" class="p-fluid">
         <div class="grid">
-
             <div class="col-12 md:col-1">
-                <label for="fechaInicio" class="block text-900 font-medium mb-2">Fecha Inicio <span
-                        class="text-red-500">*</span></label>
-                <p-datepicker id="fechaInicio" formControlName="fechaInicio" dateFormat="dd-mm-yy" [showIcon]="true"
-                    [maxDate]="form.get('fechaFin')?.value || maxDateValue"
-                    placeholder="Seleccione fecha inicio"></p-datepicker>
+                <label for="fechaInicio" class="block text-900 font-medium mb-2">Fecha Inicio <span class="text-red-500">*</span></label>
+                <p-datepicker id="fechaInicio" formControlName="fechaInicio" dateFormat="dd-mm-yy" [showIcon]="true" [maxDate]="form.get('fechaFin')?.value || maxDateValue" placeholder="Seleccione fecha inicio"></p-datepicker>
                 <div class="h-1rem mt-1 text-red-500">
-                    @if (form.errors?.['dateRangeIncomplete'] && (form.get('fechaInicio')?.touched ||
-                    form.get('fechaFin')?.touched)) {
+                    @if (form.errors?.['dateRangeIncomplete'] && (form.get('fechaInicio')?.touched || form.get('fechaFin')?.touched)) {
                     <small class="p-error block">Complete ambas fechas.</small>
                     }
                 </div>
             </div>
 
             <div class="col-12 md:col-3">
-                <label for="fechaFin" class="block text-900 font-medium mb-2">Fecha Fin <span
-                        class="text-red-500">*</span></label>
-                <p-datepicker id="fechaFin" formControlName="fechaFin" dateFormat="dd-mm-yy" [showIcon]="true"
-                    [minDate]="form.get('fechaInicio')?.value" [maxDate]="maxDateValue"
-                    placeholder="Seleccione fecha fin"></p-datepicker>
+                <label for="fechaFin" class="block text-900 font-medium mb-2">Fecha Fin <span class="text-red-500">*</span></label>
+                <p-datepicker id="fechaFin" formControlName="fechaFin" dateFormat="dd-mm-yy" [showIcon]="true" [minDate]="form.get('fechaInicio')?.value" [maxDate]="maxDateValue" placeholder="Seleccione fecha fin"></p-datepicker>
                 <div class="h-1rem mt-1 text-red-500">
                     @if (form.get('fechaFin')?.invalid && form.get('fechaFin')?.touched) {
                     <small class="p-error block">Campo requerido.</small>
@@ -91,12 +74,9 @@
             <!-- Fila 2 -->
             <div class="col-12 md:col-5">
                 <label for="tipoDocumento" class="block text-900 font-medium mb-2">Tipo de Documento</label>
-                <p-select id="tipoDocumento" [options]="tiposDocumento()" formControlName="tipoDocumento"
-                    optionLabel="label" optionValue="value" placeholder="Tipo" [filter]="true"
-                    filterBy="label"></p-select>
+                <p-select id="tipoDocumento" [options]="tiposDocumento()" formControlName="tipoDocumento" optionLabel="label" optionValue="value" placeholder="Tipo" [filter]="true" filterBy="label"></p-select>
                 <div class="h-1rem mt-1 text-red-500">
-                    @if (form.errors?.['documentPairIncomplete'] && (form.get('tipoDocumento')?.touched ||
-                    form.get('documento')?.touched)) {
+                    @if (form.errors?.['documentPairIncomplete'] && (form.get('tipoDocumento')?.touched || form.get('documento')?.touched)) {
                     <small class="p-error block text-xs">Requerido si hay nro.</small>
                     }
                 </div>
@@ -104,11 +84,9 @@
 
             <div class="col-12 md:col-7">
                 <label for="documento" class="block text-900 font-medium mb-2">Documento</label>
-                <input pInputText id="documento" formControlName="documento" type="text"
-                    placeholder="Número de documento" />
+                <input pInputText id="documento" formControlName="documento" type="text" placeholder="Número de documento" />
                 <div class="h-1rem mt-1 text-red-500">
-                    @if (form.errors?.['documentPairIncomplete'] && (form.get('tipoDocumento')?.touched ||
-                    form.get('documento')?.touched)) {
+                    @if (form.errors?.['documentPairIncomplete'] && (form.get('tipoDocumento')?.touched || form.get('documento')?.touched)) {
                     <small class="p-error block text-xs">Requerido si hay tipo.</small>
                     }
                 </div>
@@ -116,8 +94,7 @@
 
             <div class="col-12 md:col-1">
                 <label for="estado" class="block text-900 font-medium mb-2">Estado</label>
-                <p-select id="estado" [options]="estados()" formControlName="estado" optionLabel="label"
-                    optionValue="value" placeholder="Seleccione" [filter]="true" filterBy="label"></p-select>
+                <p-select id="estado" [options]="estados()" formControlName="estado" optionLabel="label" optionValue="value" placeholder="Seleccione" [filter]="true" filterBy="label"></p-select>
                 <div class="h-1rem mt-1"></div>
             </div>
 
@@ -129,31 +106,23 @@
 
             <div class="col-12 md:col-5">
                 <label for="atencionMedica" class="block text-900 font-medium mb-2">Atención Médica RDA</label>
-                <p-select id="atencionMedica" [options]="atencionesMedicas()" formControlName="atencionMedica"
-                    optionLabel="label" optionValue="value" placeholder="Seleccione el tipo de atención" [filter]="true"
-                    filterBy="label"></p-select>
+                <p-select id="atencionMedica" [options]="atencionesMedicas()" formControlName="atencionMedica" optionLabel="label" optionValue="value" placeholder="Seleccione el tipo de atención" [filter]="true" filterBy="label"></p-select>
                 <div class="h-1rem mt-1"></div>
             </div>
 
             <div class="col-12 md:col-7">
                 <label for="claseAtencionFhir" class="block text-900 font-medium mb-2">Atención Médica FHIR</label>
-                <p-select id="claseAtencionFhir" [options]="clasesAtencionFhir()" formControlName="claseAtencionFhir"
-                    optionLabel="label" optionValue="value" placeholder="-- SELECCIONE --">
-                </p-select>
+                <p-select id="claseAtencionFhir" [options]="clasesAtencionFhir()" formControlName="claseAtencionFhir" optionLabel="label" optionValue="value" placeholder="-- SELECCIONE --"> </p-select>
                 <div class="h-1rem mt-1"></div>
             </div>
-
         </div>
 
         <div class="flex flex-column md:flex-row justify-content-end gap-2 mt-4 border-top-1 surface-border pt-4">
             <!-- <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" [outlined]="true"
                 class="w-full md:w-auto"></p-button> -->
-            <p-button label="Borrar casillas" (onClick)="borrarCasillas()" icon="pi pi-trash" severity="danger"
-                [outlined]="true" class="w-full md:w-auto"></p-button>
-            <p-button label="Buscar" type="submit" [disabled]="form.invalid || isFormEmpty()" icon="pi pi-search"
-                class="w-full md:w-auto"></p-button>
+            <p-button label="Borrar casillas" (onClick)="borrarCasillas()" icon="pi pi-trash" severity="danger" [outlined]="true" class="w-full md:w-auto"></p-button>
+            <p-button label="Buscar" type="submit" [disabled]="form.invalid || isFormEmpty()" icon="pi pi-search" class="w-full md:w-auto"></p-button>
         </div>
-
     </form>
 </div>
 
@@ -163,21 +132,30 @@
 <div class="card mt-4">
     @if (resultadosBusqueda() && resultadosBusqueda().length > 0) {
     <!-- Tabla de Resultados -->
-    <p-table #dt [value]="resultadosBusqueda()" [rows]="100" [paginator]="true" [lazy]="true"
-        (onLazyLoad)="loadIngresosLazy($event)" [totalRecords]="totalRecords()"
-        [globalFilterFields]="['ingreso', 'nombre', 'descripcionDepartamento']" [tableStyle]="{ 'min-width': '60rem' }"
-        [selection]="ingresosSeleccionados()" (selectionChange)="ingresosSeleccionados.set($event)" [rowHover]="true"
-        dataKey="ingreso" currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} ingresos"
-        [showCurrentPageReport]="true" styleClass="p-datatable-sm p-datatable-gridlines">
-
+    <p-table
+        #dt
+        [value]="resultadosBusqueda()"
+        [rows]="100"
+        [paginator]="true"
+        [lazy]="true"
+        (onLazyLoad)="loadIngresosLazy($event)"
+        [totalRecords]="totalRecords()"
+        [globalFilterFields]="['ingreso', 'nombre', 'descripcionDepartamento']"
+        [tableStyle]="{ 'min-width': '60rem' }"
+        [selection]="ingresosSeleccionados()"
+        (selectionChange)="ingresosSeleccionados.set($event)"
+        [rowHover]="true"
+        dataKey="ingreso"
+        currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} ingresos"
+        [showCurrentPageReport]="true"
+        styleClass="p-datatable-sm p-datatable-gridlines"
+    >
         <!-- Barra superior del header de la tabla -->
         <ng-template #caption>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h5 class="m-0">Registros Encontrados</h5>
-                    <p-button label="Enviar Seleccionados" icon="pi pi-send" severity="primary"
-                        (onClick)="enviarSeleccionados()"
-                        [disabled]="!ingresosSeleccionados() || ingresosSeleccionados().length === 0"></p-button>
+                    <p-button label="Enviar Seleccionados" icon="pi pi-send" severity="primary" (onClick)="enviarSeleccionados()" [disabled]="!ingresosSeleccionados() || ingresosSeleccionados().length === 0"></p-button>
                 </div>
             </div>
         </ng-template>
@@ -186,8 +164,7 @@
         <ng-template #header>
             <tr>
                 <th style="width: 3rem">
-                    <p-checkbox [binary]="true" [ngModel]="allAllowedSelected()"
-                        (onChange)="toggleAllAllowed($event)"></p-checkbox>
+                    <p-checkbox [binary]="true" [ngModel]="allAllowedSelected()" (onChange)="toggleAllAllowed($event)"></p-checkbox>
                 </th>
                 <th pSortableColumn="ingreso" style="min-width: 7rem">
                     <div class="flex items-center gap-1">
@@ -236,56 +213,76 @@
                 <td>
                     <p-tableCheckbox [value]="ingreso" [disabled]="ingreso.estadoEnvioId === 2" />
                 </td>
-                <td style="font-weight: 600;">{{ ingreso.ingreso }}</td>
+                <td style="font-weight: 600">{{ ingreso.ingreso }}</td>
                 <td>
-                    <span style="font-weight: 500;">{{ ingreso.nombre }}</span><br>
-                    <small class="text-500">
-                        {{ ingreso.tipoIdPaciente || ingreso.tipo_id_paciente }} - {{ ingreso.pacienteId || ingreso.paciente_id }}
-                    </small>
+                    <span style="font-weight: 500">{{ ingreso.nombre }}</span><br />
+                    <small class="text-500"> {{ ingreso.tipoIdPaciente || ingreso.tipo_id_paciente }} - {{ ingreso.pacienteId || ingreso.paciente_id }} </small>
                 </td>
                 <!-- castear como php con el uppercase en typescript -->
                 <td>{{ ingreso.grupoServicioNombre.toUpperCase() || 'N/A' }}</td>
                 <td>{{ (ingreso.fechaRegistroSalida | date:'dd-MM-yyyy') || 'N/A' }}</td>
                 <td>{{ ingreso.tipoRda || 'N/A' }}</td>
                 <td>
-                    <p-tag [value]="ingreso.estado || 'Sin Enviar'"
-                        [severity]="getSeverityStatus(ingreso.estadoEnvioId)"></p-tag>
+                    <p-tag [value]="ingreso.estado || 'Sin Enviar'" [severity]="getSeverityStatus(ingreso.estadoEnvioId)"></p-tag>
                 </td>
                 <td>
                     <div class="flex gap-1">
                         <!-- Botón 1: Ver JSON enviado (nueva pestaña - existente) -->
-                        <p-button icon="pi pi-cloud-upload" severity="help" [rounded]="true" [text]="true"
-                            pTooltip="Ver JSON Enviado (pestaña)" tooltipPosition="top"
+                        <p-button
+                            icon="pi pi-cloud-upload"
+                            severity="help"
+                            [rounded]="true"
+                            [text]="true"
+                            pTooltip="Ver JSON Enviado (pestaña)"
+                            tooltipPosition="top"
                             (onClick)="abrirJsonLog(ingreso.ingreso, 'ihce-ultimo-json-enviado', ingreso.tipoRdaId)"
-                            [disabled]="!ingreso.estadoEnvioId || +ingreso.estadoEnvioId === 1" title="Json Enviado">
+                            [disabled]="!ingreso.estadoEnvioId || +ingreso.estadoEnvioId === 1"
+                            title="Json Enviado"
+                        >
                         </p-button>
                         <!-- Botón 2: Ver última respuesta (nueva pestaña - existente) -->
-                        <p-button icon="pi pi-cloud-download" severity="info" [rounded]="true" [text]="true"
-                            pTooltip="Ver Última Respuesta (pestaña)" tooltipPosition="top"
+                        <p-button
+                            icon="pi pi-cloud-download"
+                            severity="info"
+                            [rounded]="true"
+                            [text]="true"
+                            pTooltip="Ver Última Respuesta (pestaña)"
+                            tooltipPosition="top"
                             (onClick)="abrirJsonLog(ingreso.ingreso, 'ihce-ultima-respuesta-envio', ingreso.tipoRdaId)"
                             [disabled]="!ingreso.estadoEnvioId || +ingreso.estadoEnvioId === 1"
-                            title="Json Respuesta MinSalud">
+                            title="Json Respuesta MinSalud"
+                        >
                         </p-button>
                         <!-- Botón 3 (NUEVO): Graficar JSON Enviado en modal -->
-                        <p-button icon="pi pi-eye" severity="warn" [rounded]="true" [text]="true"
-                            pTooltip="Graficar JSON Enviado" tooltipPosition="top"
+                        <p-button
+                            icon="pi pi-eye"
+                            severity="warn"
+                            [rounded]="true"
+                            [text]="true"
+                            pTooltip="Graficar JSON Enviado"
+                            tooltipPosition="top"
                             (onClick)="abrirJsonLogModal(ingreso.ingreso, 'ihce-ultimo-json-enviado', 'JSON Enviado al Ministerio', ingreso.tipoRdaId)"
                             [disabled]="!ingreso.estadoEnvioId || +ingreso.estadoEnvioId === 1"
-                            title="Graficar JSON Enviado">
+                            title="Graficar JSON Enviado"
+                        >
                         </p-button>
                         <!-- Botón 4 (NUEVO): Graficar Respuesta MinSalud en modal -->
-                        <p-button icon="pi pi-file-check" severity="success" [rounded]="true" [text]="true"
-                            pTooltip="Graficar Respuesta MinSalud" tooltipPosition="top"
+                        <p-button
+                            icon="pi pi-file-check"
+                            severity="success"
+                            [rounded]="true"
+                            [text]="true"
+                            pTooltip="Graficar Respuesta MinSalud"
+                            tooltipPosition="top"
                             (onClick)="abrirJsonLogModal(ingreso.ingreso, 'ihce-ultima-respuesta-envio', 'Respuesta del Ministerio', ingreso.tipoRdaId)"
                             [disabled]="!ingreso.estadoEnvioId || +ingreso.estadoEnvioId === 1"
-                            title="Graficar Respuesta MinSalud">
+                            title="Graficar Respuesta MinSalud"
+                        >
                         </p-button>
                     </div>
                 </td>
                 <td>
-                    <p-button icon="pi pi-send" severity="primary" [rounded]="true" [outlined]="true"
-                        pTooltip="Reenviar a MinSalud" (onClick)="enviarFila(ingreso)"
-                        [disabled]="ingreso.estadoEnvioId === 2" title="Enviar a MinSalud"></p-button>
+                    <p-button icon="pi pi-send" severity="primary" [rounded]="true" [outlined]="true" pTooltip="Reenviar a MinSalud" (onClick)="enviarFila(ingreso)" [disabled]="ingreso.estadoEnvioId === 2" title="Enviar a MinSalud"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -320,69 +317,64 @@
     [maximizable]="true"
     [style]="{ width: '85vw', 'max-height': '90vh' }"
     [contentStyle]="{ overflow: 'auto', padding: '1rem' }"
-    styleClass="json-viewer-dialog">
-
+    styleClass="json-viewer-dialog"
+>
     <ng-template #header>
         <div class="flex align-items-center justify-content-between w-full pr-3">
             <div class="flex align-items-center gap-2">
                 <i class="pi pi-code text-primary text-xl"></i>
                 <span class="font-bold text-900 text-base">{{ jsonViewerTitulo() }}</span>
                 @if (jsonViewerCargando()) {
-                    <i class="pi pi-spin pi-spinner text-primary ml-2"></i>
+                <i class="pi pi-spin pi-spinner text-primary ml-2"></i>
                 }
             </div>
-            
+
             @if (!jsonViewerCargando() && jsonViewerData() !== null) {
-                <div class="flex gap-2">
-                    <p-button 
-                        [icon]="jsonViewerExpandAll() ? 'pi pi-angle-double-up' : 'pi pi-angle-double-down'" 
-                        [label]="jsonViewerExpandAll() ? 'Contraer Todo' : 'Expandir Todo'" 
-                        size="small" 
-                        [outlined]="true" 
-                        severity="secondary"
-                        (onClick)="jsonViewerExpandAll.set(!jsonViewerExpandAll())" />
-                </div>
+            <div class="flex gap-2">
+                <p-button
+                    [icon]="jsonViewerExpandAll() ? 'pi pi-angle-double-up' : 'pi pi-angle-double-down'"
+                    [label]="jsonViewerExpandAll() ? 'Contraer Todo' : 'Expandir Todo'"
+                    size="small"
+                    [outlined]="true"
+                    severity="secondary"
+                    (onClick)="jsonViewerExpandAll.set(!jsonViewerExpandAll())"
+                />
+            </div>
             }
         </div>
     </ng-template>
 
     <!-- Estado de carga -->
     @if (jsonViewerCargando()) {
-        <div class="flex flex-column align-items-center justify-content-center py-6 gap-3">
-            <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2.5rem;"></i>
-            <span class="text-color-secondary text-sm font-medium">Obteniendo datos del servidor...</span>
-        </div>
+    <div class="flex flex-column align-items-center justify-content-center py-6 gap-3">
+        <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2.5rem"></i>
+        <span class="text-color-secondary text-sm font-medium">Obteniendo datos del servidor...</span>
+    </div>
     }
 
     <!-- Visor del JSON -->
     @if (!jsonViewerCargando() && jsonViewerData() !== null) {
-        <div class="jvd-container surface-ground border-round p-3">
-            <div class="flex align-items-center justify-content-between mb-2">
-                <span class="text-xs font-mono text-color-secondary">
-                    <i class="pi pi-info-circle mr-1"></i>
-                    Expande cada nodo haciendo clic en el acordeón
-                </span>
-                <p-tag icon="pi pi-check-circle" value="JSON cargado" severity="success" styleClass="text-xs"></p-tag>
-            </div>
-            <app-json-viewer [data]="jsonViewerData()" [expandAll]="jsonViewerExpandAll()" />
+    <div class="jvd-container surface-ground border-round p-3">
+        <div class="flex align-items-center justify-content-between mb-2">
+            <span class="text-xs font-mono text-color-secondary">
+                <i class="pi pi-info-circle mr-1"></i>
+                Expande cada nodo haciendo clic en el acordeón
+            </span>
+            <p-tag icon="pi pi-check-circle" value="JSON cargado" severity="success" styleClass="text-xs"></p-tag>
         </div>
+        <app-json-viewer [data]="jsonViewerData()" [expandAll]="jsonViewerExpandAll()" />
+    </div>
     }
 
     <!-- Sin datos -->
     @if (!jsonViewerCargando() && jsonViewerData() === null) {
-        <div class="flex flex-column align-items-center justify-content-center py-5 gap-2">
-            <i class="pi pi-inbox text-4xl text-400"></i>
-            <span class="text-color-secondary text-sm">No hay datos disponibles para mostrar.</span>
-        </div>
+    <div class="flex flex-column align-items-center justify-content-center py-5 gap-2">
+        <i class="pi pi-inbox text-4xl text-400"></i>
+        <span class="text-color-secondary text-sm">No hay datos disponibles para mostrar.</span>
+    </div>
     }
 
     <ng-template #footer>
-        <p-button
-            label="Cerrar"
-            icon="pi pi-times"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="jsonViewerVisible.set(false)">
-        </p-button>
+        <p-button label="Cerrar" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="jsonViewerVisible.set(false)"> </p-button>
     </ng-template>
 </p-dialog>

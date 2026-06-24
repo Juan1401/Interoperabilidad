@@ -3,7 +3,7 @@ trigger: always_on
 description: Guía maestra para agentes de IA en el proyecto HL7 Interoperabilidad
 ---
 
-🤖 Guía Maestra de Interoperabilidad (FCI Club Noel)
+🤖 Guía Maestra de Interoperabilidad (ONE SOLUTION)
 Este documento es la "Fuente de Verdad" absoluta para tu comportamiento como agente de IA en este proyecto. Debes seguir estas instrucciones de forma estricta para garantizar la integridad, escalabilidad y seguridad del ecosistema.
 
 1. Identidad y Arquitectura Core
@@ -52,3 +52,8 @@ Pruebas (Testing): Utiliza exclusivamente las colecciones de Bruno ubicadas en /
 El acceso desde los contenedores al Host (Base de Datos) debe usar obligatoriamente host.docker.internal o la IP configurada en tu archivo .env.
 
 Queda estrictamente prohibido modificar los archivos de configuración de Nginx (/nginx) sin validar previamente el impacto total en el proxy inverso.
+
+7. Codificaci�n de Archivos
+
+Codificaci�n: Todo archivo creado, generado o modificado debe guardarse obligatoriamente en codificaci�n UTF-8. Nunca utilizar ISO-8859-1 o Latin-1.
+Saltos de L�nea: Configurar estrictamente en LF (Unix), cero CRLF.

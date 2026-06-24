@@ -1,19 +1,25 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { AuthService } from '../../services/auth.service';
+import { AuthState } from '../../models/auth.models';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ReactiveFormsModule, ButtonModule, InputTextModule, PasswordModule, RippleModule, CheckboxModule, ToastModule],
+    providers: [MessageService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <app-floating-configurator />
+        <p-toast />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
             <div class="flex flex-col items-center justify-center">
                 <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
@@ -36,36 +42,83 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                     />
                                 </g>
                             </svg>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
-                            <span class="text-muted-color font-medium">Sign in to continue</span>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">ONE SOLUTION</div>
+                            <span class="text-muted-color font-medium">Inicia sesión</span>
                         </div>
 
-                        <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email1" type="text" placeholder="Email address" class="w-full md:w-120 mb-8" [(ngModel)]="email" />
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                            @if (errorMessage()) {
+                                <div class="p-3 mb-6 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                                    <i class="pi pi-exclamation-circle"></i>
+                                    <span>{{ errorMessage() }}</span>
+                                </div>
+                            }
 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                            <label for="usuario" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Usuario</label>
+                            <input pInputText id="usuario" type="text" placeholder="Usuario" class="w-full md:w-120 mb-8" formControlName="usuario" />
+
+                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
+                            <p-password id="password" formControlName="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
-                                    <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
-                                    <label for="rememberme1">Remember me</label>
+                                    <!-- Espacio para recordar contraseña en el futuro -->
                                 </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                                <!-- <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">¿Olvidó su contraseña?</span> -->
                             </div>
-                            <p-button label="Sign In" styleClass="w-full" routerLink="/"></p-button>
-                        </div>
+
+                            <p-button type="submit" label="Ingresar al Sistema" styleClass="w-full" [loading]="isLoading()" [disabled]="loginForm.invalid || isLoading()"></p-button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     `
 })
-export class Login {
-    email: string = '';
+export class Login implements OnInit {
+    private fb = inject(FormBuilder);
+    private authService = inject(AuthService);
+    private router = inject(Router);
+    private messageService = inject(MessageService);
 
-    password: string = '';
+    public loginForm = this.fb.group({
+        usuario: ['', [Validators.required]],
+        password: ['', [Validators.required]]
+    });
 
-    checked: boolean = false;
+    public authState = signal<AuthState>('idle');
+    public errorMessage = signal<string>('');
+
+    public isLoading = computed(() => this.authState() === 'loading');
+
+    async ngOnInit() {
+        try {
+            await firstValueFrom(this.authService.fetchAndStoreToken());
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Aplicacion en linea y lista para procesar solicitudes' });
+        } catch (error) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo obtener el token de acceso' });
+        }
+    }
+
+    public async onSubmit() {
+        if (this.loginForm.invalid) {
+            this.loginForm.markAllAsTouched();
+            return;
+        }
+
+        this.authState.set('loading');
+        this.errorMessage.set('');
+
+        try {
+            const credentials = this.loginForm.getRawValue() as { usuario: string; password: string };
+            await firstValueFrom(this.authService.login(credentials));
+
+            this.authState.set('success');
+            // Login exitoso, vamos a la raíz que está protegida por el authGuard
+            await this.router.navigate(['/']);
+        } catch (error: any) {
+            this.authState.set('error');
+            this.errorMessage.set(error.message || 'Error al conectar con el servidor.');
+        }
+    }
 }

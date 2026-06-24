@@ -11,8 +11,6 @@ import { MessageService } from 'primeng/api';
 // import { MessageService } from 'primeng/api'; // Importante
 // import { Router } from '@angular/router';
 
-
-
 @Component({
     selector: 'app-topbar',
     standalone: true,
@@ -20,7 +18,7 @@ import { MessageService } from 'primeng/api';
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-                <i class="pi pi-bars"></i> 
+                <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
                 <img src="/demo/images/cn/logo-club-noel-2024-horizontal.png" alt="Logo" style="height: 40px;" />
@@ -28,8 +26,7 @@ import { MessageService } from 'primeng/api';
         </div>
 
         <!-- IP Central -->
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-lg pointer-events-none" 
-             style="color: var(--text-color);">
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-lg pointer-events-none" style="color: var(--text-color);">
             @if (sessionData()?.IP) {
                 <span>IP: {{ sessionData()?.IP }}</span>
             }
@@ -68,7 +65,12 @@ import { MessageService } from 'primeng/api';
                     -->
 
                     <!-- Botón Cerrar sesión -->
-                    <button type="button" class="layout-topbar-action text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200" style="width: auto; padding: 0 1rem; border-radius: 8px; font-weight: bold; gap: 0.5rem;" (click)="logout()">
+                    <button
+                        type="button"
+                        class="layout-topbar-action text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200"
+                        style="width: auto; padding: 0 1rem; border-radius: 8px; font-weight: bold; gap: 0.5rem;"
+                        (click)="logout()"
+                    >
                         <i class="pi pi-power-off"></i>
                         <span>Cerrar sesión</span>
                     </button>
@@ -86,7 +88,6 @@ import { MessageService } from 'primeng/api';
 //     private sessionService = inject(SessionService);
 //     // ... otros injects
 // }
-
 export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
 
@@ -158,7 +159,7 @@ export class AppTopbar implements OnInit, OnDestroy {
             window.close();
 
             // Fallback: Si el navegador bloquea window.close(), redirigimos a una página neutra
-            window.location.href = "about:blank";
+            window.location.href = 'about:blank';
         }, 4000);
     }
 }

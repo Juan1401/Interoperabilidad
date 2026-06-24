@@ -113,8 +113,8 @@ export class LayoutService {
     }
 
     cerrarMenu() {
-        this.layoutState.update((prev) => ({ 
-            ...prev, 
+        this.layoutState.update((prev) => ({
+            ...prev,
             staticMenuDesktopInactive: true,
             overlayMenuActive: false,
             mobileMenuActive: false

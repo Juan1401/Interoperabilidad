@@ -9,4 +9,4 @@ import { Component } from '@angular/core';
         <a href="https://clubnoel.org" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Club Noel</a>
     </div>`
 })
-export class AppFooter { }
+export class AppFooter {}

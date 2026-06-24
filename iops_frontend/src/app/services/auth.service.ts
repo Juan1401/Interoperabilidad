@@ -1,7 +1,9 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { Observable, tap, catchError, throwError, firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
+import { LoginCredentials, LoginResponse, UsuarioInfo } from '../models/auth.models';
 
 /**
  * Interface para la solicitud de auditoría de acceso
@@ -35,35 +37,46 @@ export class AuthService {
     // Signal para almacenar la respuesta de auditoría y hacerla reactiva
     public auditoriaRespuesta = signal<any>(null);
 
+    // Estado del usuario autenticado en la sesión actual
+    private _currentUser = signal<UsuarioInfo | null>(this.getStoredUser());
+    public readonly currentUser = this._currentUser.asReadonly();
+    public readonly isAuthenticated = computed(() => this._currentUser() !== null);
+
+    private router = inject(Router);
+
+    /**
+     * Recupera el usuario guardado del sessionStorage
+     */
+    private getStoredUser(): UsuarioInfo | null {
+        const stored = sessionStorage.getItem('HL7_USER_INFO');
+        return stored ? JSON.parse(stored) : null;
+    }
+
     /**
      * Ejecuta la petición POST a Laravel para obtener el Crendetial Token.
      * Utiliza las variables almacenadas en environment.ts para evitar quemar datos sensibles.
      * Al resolverse, almacena directamente el JWT en SessionStorage.
      */
     public fetchAndStoreToken(): Observable<OAuthTokenResponse> {
-        const payload = new HttpParams()
-            .set('grant_type', environment.apiAuth.grantType)
-            .set('client_id', environment.apiAuth.clientId)
-            .set('client_secret', environment.apiAuth.clientSecret);
+        const payload = new HttpParams().set('grant_type', environment.apiAuth.grantType).set('client_id', environment.apiAuth.clientId).set('client_secret', environment.apiAuth.clientSecret);
 
         const headers = new HttpHeaders({
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json'
+            Accept: 'application/json'
         });
 
-        return this.http.post<OAuthTokenResponse>(environment.apiAuth.url + '/oauth/token', payload.toString(), { headers })
-            .pipe(
-                tap((response: OAuthTokenResponse) => {
-                    if (response && response.access_token) {
-                        this.setSessionToken(response.access_token);
-                        // console.log('Token de API obtenido y guardado en sesión exitosamente.');
-                    }
-                }),
-                catchError((error: any) => {
-                    console.error('Error obteniendo el token OAuth de Laravel:', error);
-                    return throwError(() => new Error('Fallo la autenticación con el servidor.'));
-                })
-            );
+        return this.http.post<OAuthTokenResponse>(environment.apiAuth.url + '/oauth/token', payload.toString(), { headers }).pipe(
+            tap((response: OAuthTokenResponse) => {
+                if (response && response.access_token) {
+                    this.setSessionToken(response.access_token);
+                    // console.log('Token de API obtenido y guardado en sesión exitosamente.');
+                }
+            }),
+            catchError((error: any) => {
+                console.error('Error obteniendo el token OAuth de Laravel:', error);
+                return throwError(() => new Error('Fallo la autenticación con el servidor.'));
+            })
+        );
     }
 
     /**
@@ -95,7 +108,7 @@ export class AuthService {
 
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         });
 
         const body = {
@@ -115,19 +128,56 @@ export class AuthService {
 
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         });
 
-        return this.http.post<any>(url, data, { headers })
-            .pipe(
-                tap((response: any) => this.auditoriaRespuesta.set(response)),
-                catchError((error: any) => {
-                    console.error('Error al registrar la auditoría de acceso:', error);
-                    if (error.error && error.error.errors) {
-                        console.error('Detalles de la validación (Laravel):', error.error.errors);
-                    }
-                    return throwError(() => new Error('Fallo al enviar la auditoría de acceso.'));
-                })
-            );
+        return this.http.post<any>(url, data, { headers }).pipe(
+            tap((response: any) => this.auditoriaRespuesta.set(response)),
+            catchError((error: any) => {
+                console.error('Error al registrar la auditoría de acceso:', error);
+                if (error.error && error.error.errors) {
+                    console.error('Detalles de la validación (Laravel):', error.error.errors);
+                }
+                return throwError(() => new Error('Fallo al enviar la auditoría de acceso.'));
+            })
+        );
+    }
+
+    /**
+     * Autenticación de usuario con credenciales (usuario y password)
+     */
+    public login(credentials: LoginCredentials): Observable<LoginResponse> {
+        const url = `${environment.apiAuth.url}/api/login`;
+
+        const token = this.getSessionToken();
+        let headers = new HttpHeaders();
+        if (token) {
+            headers = headers.set('Authorization', `Bearer ${token}`);
+        }
+
+        // Petición POST, enviando el Bearer token obtenido previamente
+        return this.http.post<LoginResponse>(url, credentials, { headers }).pipe(
+            tap((response) => {
+                if (response && response.access_token) {
+                    this.setSessionToken(response.access_token);
+                    sessionStorage.setItem('HL7_USER_INFO', JSON.stringify(response.user));
+                    this._currentUser.set(response.user);
+                }
+            }),
+            catchError((error: any) => {
+                console.error('Error en login:', error);
+                return throwError(() => new Error(error.error?.message || 'Error de autenticación. Verifica tus credenciales.'));
+            })
+        );
+    }
+
+    /**
+     * Cerrar sesión del usuario actual
+     */
+    public logout(): void {
+        this.clearSessionToken();
+        sessionStorage.removeItem('HL7_USER_INFO');
+        this._currentUser.set(null);
+        this.router.navigate(['/auth/login']);
     }
 }

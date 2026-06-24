@@ -1,0 +1,32 @@
+opencollection: 1.0.0
+
+info:
+  name: Interoperabilidad ONE Solution
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: base_url
+      value: http://localhost:8004
+    - name: ID_Client_Credentials
+      value: "1"
+    - name: Password_Secret_Cliente_Credentials
+      value: st3xaFuHoFhHVeFq37tZgBkZ5LucoM7Dg8l1cDHy
+    - name: Token
+      value: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMzY0NDVjNzY4YWUwMDE4M2E0YjFlNzNmNTJlZjUzMjQ4ZTZjZDYyYTcyYTdkYmU1YTRmZDk2ZTBhYTg4NjJmMTgxYWVjNjI1ZmEzMzI1YzgiLCJpYXQiOjE3ODIzMjE1NTYuMTQyNjMzLCJuYmYiOjE3ODIzMjE1NTYuMTQyNjM3LCJleHAiOjE4MTM4NTc1NTUuNDc5NzA0LCJzdWIiOiIiLCJzY29wZXMiOltdfQ.yTcFJ5sILhupjD2cj4PUo-vNI4KMFs4mX2C8F30p8YflcH6HuyGQOr09yeL3mzdV9bVu9nfJZxTZwtL11w3eBtIUxVGupAgVZipZTJLqFeYOHOIE8PHLObxHgcagXO-ecZxhhcG5t2EXAp8oQmtO31dCvozXtXhy_aFAncab44RYJJ_pdfnSDiTJUc2Gsyy9qkxtz4OSbYqQ-Zqe913twUc6mCeZjjWZjXuCD2_qNTjKiNAcY4QKvcTeqMS4oMJtxyKotw2sbWemKq9ZVxsMZRW4BHf8bVWZSmQf2x109iHXtymvGUL5yMXL9ZlwtMw22U2vneI9GZbPAdHO88KS7P0IV3WxK6iQQskMenDfEOkpCP0xYd11m6fQdU5SPhRO0Bjp3Ukw3GI710gttWmQp1YY0vIyzYcZ_thxbeMF1zxu6taU9RLPfOlXrRGkkbm2eFMY1gH5yV1_sWRLMzaeampAdpRy_ePngWJzJ1pnAXNFRUpEVxNaW4PgQ_KNhFlHaCOQReU6bqD9opOBh1PqMhEHY4Q9dACTQ0Pt9CvTOLIw1HZf2OQbj9LgWprZijQ81FoZtdSfPTkq0Mg9YvU3hPvyhUxVjcO3-HJElHGWpC_ATGhu1G-CnH7gn4H5WtXdJkdp1Cg_RL3sNtUQK2_eQIL30AxHIZcAOhJI3LaDdac
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

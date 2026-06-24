@@ -5,7 +5,6 @@ import * as CryptoJS from 'crypto-js';
     providedIn: 'root'
 })
 export class CryptoService {
-
     // TODO: Se recomienda mover esta llave a un archivo environment.ts para mayor seguridad.
     // private readonly secretKey = '12345678901234567890123456789012';
     private secretKey = '';
@@ -20,7 +19,7 @@ export class CryptoService {
     /**
      * Desencripta un token JWT o Base64 URL Safe y devuelve su carga útil.
      * Encapsula la lógica de desencriptación CBC que antes residía en el componente principal.
-     * 
+     *
      * @param tokenParam El token Base64 URL Safe proveniente de la URL
      * @returns El objeto JSON desencriptado original, o null si el token es inválido
      */
@@ -74,7 +73,6 @@ export class CryptoService {
 
             // 9. Transformar de string a su JSON objeto subyacente
             return JSON.parse(decryptedStr) as T;
-
         } catch (error: any) {
             console.warn('[CryptoService] Fallo al desencriptar token:', error.message);
             return null; // Retornamos null elegantemente para no romper el ciclo de vida de la App

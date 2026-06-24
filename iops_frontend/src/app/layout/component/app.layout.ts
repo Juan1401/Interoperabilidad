@@ -14,10 +14,11 @@ import { LayoutService } from '@/app/layout/service/layout.service';
     imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, ToastModule],
     providers: [MessageService],
     template: `
-    <p-toast position="top-center" key="print-block" life="4000"></p-toast>
-    @if (tabDuplicada()) {
-        <!-- Pantalla de bloqueo por pestaña duplicada -->
-        <div style="
+        <p-toast position="top-center" key="print-block" life="4000"></p-toast>
+        @if (tabDuplicada()) {
+            <!-- Pantalla de bloqueo por pestaña duplicada -->
+            <div
+                style="
             position: fixed;
             inset: 0;
             z-index: 99999;
@@ -30,8 +31,10 @@ import { LayoutService } from '@/app/layout/service/layout.service';
             font-family: 'Inter', sans-serif;
             text-align: center;
             padding: 2rem;
-        ">
-            <div style="
+        "
+            >
+                <div
+                    style="
                 background: rgba(239, 68, 68, 0.15);
                 border: 2px solid rgba(239, 68, 68, 0.5);
                 border-radius: 50%;
@@ -40,21 +43,20 @@ import { LayoutService } from '@/app/layout/service/layout.service';
                 display: flex;
                 align-items: center;
                 justify-content: center;
-            ">
-                <i class="pi pi-lock" style="font-size: 2.5rem; color: #ef4444;"></i>
-            </div>
-            <div>
-                <h2 style="color: #f1f5f9; font-size: 1.5rem; margin: 0 0 0.75rem 0; font-weight: 700;">
-                    Acceso bloqueado por seguridad
-                </h2>
-                <p style="color: #94a3b8; font-size: 1rem; margin: 0; max-width: 480px; line-height: 1.6;">
-                    La aplicación clínica ya está abierta en otra pestaña del navegador.<br>
-                    Por favor, cierre esta ventana y continúe en la pestaña original.
-                </p>
-            </div>
-            <button
-                (click)="cerrarTab()"
-                style="
+            "
+                >
+                    <i class="pi pi-lock" style="font-size: 2.5rem; color: #ef4444;"></i>
+                </div>
+                <div>
+                    <h2 style="color: #f1f5f9; font-size: 1.5rem; margin: 0 0 0.75rem 0; font-weight: 700;">Acceso bloqueado por seguridad</h2>
+                    <p style="color: #94a3b8; font-size: 1rem; margin: 0; max-width: 480px; line-height: 1.6;">
+                        La aplicación clínica ya está abierta en otra pestaña del navegador.<br />
+                        Por favor, cierre esta ventana y continúe en la pestaña original.
+                    </p>
+                </div>
+                <button
+                    (click)="cerrarTab()"
+                    style="
                     background: #ef4444;
                     color: white;
                     border: none;
@@ -64,29 +66,29 @@ import { LayoutService } from '@/app/layout/service/layout.service';
                     font-weight: 600;
                     cursor: pointer;
                     margin-top: 0.5rem;
-                ">
-                Cerrar esta ventana
-            </button>
-        </div>
-    } @else {
-        <div class="layout-wrapper" [ngClass]="containerClass()">
-            <app-topbar></app-topbar>
-            <app-sidebar></app-sidebar>
-            <div class="layout-main-container">
-                <div class="layout-main">
-                    <router-outlet></router-outlet>
-                </div>
-                <app-footer></app-footer>
+                "
+                >
+                    Cerrar esta ventana
+                </button>
             </div>
-            <div class="layout-mask"></div>
-        </div>
-    }
-    <!-- Aviso de seguridad: oculto en pantalla, visible solo al imprimir (@media print en styles.scss) -->
-    <div class="print-security-notice" aria-hidden="true"></div>
+        } @else {
+            <div class="layout-wrapper" [ngClass]="containerClass()">
+                <app-topbar></app-topbar>
+                <app-sidebar></app-sidebar>
+                <div class="layout-main-container">
+                    <div class="layout-main">
+                        <router-outlet></router-outlet>
+                    </div>
+                    <app-footer></app-footer>
+                </div>
+                <div class="layout-mask"></div>
+            </div>
+        }
+        <!-- Aviso de seguridad: oculto en pantalla, visible solo al imprimir (@media print en styles.scss) -->
+        <div class="print-security-notice" aria-hidden="true"></div>
     `
 })
 export class AppLayout implements OnInit, OnDestroy {
-
     layoutService = inject(LayoutService);
     private messageService = inject(MessageService);
 
@@ -164,8 +166,7 @@ export class AppLayout implements OnInit, OnDestroy {
     @HostListener('window:keydown', ['$event'])
     onKeydown(event: KeyboardEvent): void {
         // Detectar Ctrl+P en Windows/Linux o Cmd+P en macOS
-        const esPrintShortcut =
-            (event.ctrlKey || event.metaKey) && event.key === 'p';
+        const esPrintShortcut = (event.ctrlKey || event.metaKey) && event.key === 'p';
 
         if (esPrintShortcut) {
             // Cancelar el evento de impresión del navegador

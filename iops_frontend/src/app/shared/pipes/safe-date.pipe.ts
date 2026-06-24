@@ -9,22 +9,22 @@ import { DatePipe } from '@angular/common';
  * Uso en template: {{ valor | safeDate }}  o  {{ valor | safeDate:'dd/MM/yyyy' }}
  */
 @Pipe({
-  name: 'safeDate',
-  standalone: true,
+    name: 'safeDate',
+    standalone: true
 })
 export class SafeDatePipe implements PipeTransform {
-  private datePipe = new DatePipe('en-US');
+    private datePipe = new DatePipe('en-US');
 
-  transform(value: any, format: string = 'yyyy-MM-dd', fallback: string = '---'): string {
-    if (!value || value === '---' || value === '' || value === 'N/A') {
-      return fallback;
-    }
+    transform(value: any, format: string = 'yyyy-MM-dd', fallback: string = '---'): string {
+        if (!value || value === '---' || value === '' || value === 'N/A') {
+            return fallback;
+        }
 
-    try {
-      const result = this.datePipe.transform(value, format);
-      return result ?? fallback;
-    } catch {
-      return fallback;
+        try {
+            const result = this.datePipe.transform(value, format);
+            return result ?? fallback;
+        } catch {
+            return fallback;
+        }
     }
-  }
 }

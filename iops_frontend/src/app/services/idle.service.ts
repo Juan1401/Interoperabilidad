@@ -15,12 +15,7 @@ export class IdleService implements OnDestroy {
     private confirmationService = inject(ConfirmationService);
 
     private destroy$ = new Subject<void>();
-    private activityEvents$ = merge(
-        fromEvent(document, 'mousemove'),
-        fromEvent(document, 'keydown'),
-        fromEvent(document, 'click'),
-        fromEvent(document, 'scroll')
-    );
+    private activityEvents$ = merge(fromEvent(document, 'mousemove'), fromEvent(document, 'keydown'), fromEvent(document, 'click'), fromEvent(document, 'scroll'));
 
     // Configuración desde environment
     private idleMinutes = environment.sessionInactivityMinutes || 30;
@@ -38,13 +33,15 @@ export class IdleService implements OnDestroy {
     private startWatching(): void {
         this.stopWatching();
 
-        this.idleSubscription = this.activityEvents$.pipe(
-            takeUntil(this.destroy$),
-            // Reinicia el timer cada vez que hay un evento
-            switchMap(() => timer(this.idleMilliseconds))
-        ).subscribe(() => {
-            this.handleIdleLimitReached();
-        });
+        this.idleSubscription = this.activityEvents$
+            .pipe(
+                takeUntil(this.destroy$),
+                // Reinicia el timer cada vez que hay un evento
+                switchMap(() => timer(this.idleMilliseconds))
+            )
+            .subscribe(() => {
+                this.handleIdleLimitReached();
+            });
 
         // Trigger initial timer
         document.dispatchEvent(new Event('mousemove'));
@@ -79,19 +76,21 @@ export class IdleService implements OnDestroy {
         });
 
         // Actualizar el mensaje dinámicamente con el contador
-        this.countdownSubscription = timer(0, 1000).pipe(
-            takeWhile(() => countdown > 0),
-            tap(() => {
-                countdown--;
-                this.idleMessage.set(this.getAlertMessage(countdown));
-            }),
-            finalize(() => {
-                if (countdown === 0) {
-                    this.confirmationService.close(); // Cerrar el diálogo programáticamente
-                    this.logout();
-                }
-            })
-        ).subscribe();
+        this.countdownSubscription = timer(0, 1000)
+            .pipe(
+                takeWhile(() => countdown > 0),
+                tap(() => {
+                    countdown--;
+                    this.idleMessage.set(this.getAlertMessage(countdown));
+                }),
+                finalize(() => {
+                    if (countdown === 0) {
+                        this.confirmationService.close(); // Cerrar el diálogo programáticamente
+                        this.logout();
+                    }
+                })
+            )
+            .subscribe();
     }
 
     private getAlertMessage(seconds: number): string {
@@ -118,7 +117,7 @@ export class IdleService implements OnDestroy {
             window.close();
 
             // Fallback: Si el navegador bloquea window.close(), redirigimos a una página neutra
-            window.location.href = "about:blank";
+            window.location.href = 'about:blank';
         }, 1000);
     }
 

@@ -17,7 +17,7 @@ import { SessionService } from '../../services/session.service';
                 <li class="menu-separator"></li>
             }
         }
-    </ul> `,
+    </ul> `
 })
 export class AppMenu implements OnInit {
     model: MenuItem[] = [];
@@ -37,7 +37,7 @@ export class AppMenu implements OnInit {
 
     updateMenu(sessionData: any) {
         const dashboardItems: MenuItem[] = [
-            { label: 'Inicio', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
+            { label: 'Inicio', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
             // { label: 'Envío IHCE', icon: 'pi pi-fw pi-send', routerLink: ['/send-ihce'] },
             // { label: 'Consultar IHCE', icon: 'pi pi-fw pi-search', routerLink: ['/consultar-ihce'] }
         ];

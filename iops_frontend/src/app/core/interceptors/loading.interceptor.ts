@@ -4,16 +4,16 @@ import { finalize } from 'rxjs/operators';
 import { LoadingService } from '../services/loading.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
-  const loadingService = inject(LoadingService);
+    const loadingService = inject(LoadingService);
 
-  // Excepciones: peticiones que no queremos que muestren Loading
-  // if (req.url.includes('/silencioso')) { return next(req); }
+    // Excepciones: peticiones que no queremos que muestren Loading
+    // if (req.url.includes('/silencioso')) { return next(req); }
 
-  loadingService.show();
+    loadingService.show();
 
-  return next(req).pipe(
-    finalize(() => {
-      loadingService.hide();
-    })
-  );
+    return next(req).pipe(
+        finalize(() => {
+            loadingService.hide();
+        })
+    );
 };

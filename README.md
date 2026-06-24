@@ -1,4 +1,4 @@
-# Proyecto de Interoperabilidad HL7 - FCI Club Noel
+# Proyecto de Interoperabilidad HL7 - ONE SOLUTION
 
 Este proyecto facilita la interoperabilidad de datos de salud utilizando el estándar HL7 FHIR, integrando un backend robusto en Laravel y un frontend moderno en Angular.
 
