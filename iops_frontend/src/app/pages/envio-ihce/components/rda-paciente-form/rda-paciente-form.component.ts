@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { MenuItem, MessageService } from 'primeng/api';
 import { StepsModule } from 'primeng/steps';
 import { ButtonModule } from 'primeng/button';
@@ -20,20 +21,22 @@ import { EnvioIhceService } from '../../envio-ihce.service';
   providers: [MessageService],
   templateUrl: './rda-paciente-form.component.html'
 })
-export class RdaPacienteFormComponent {
+export class RdaPacienteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private envioService = inject(EnvioIhceService);
   private messageService = inject(MessageService);
 
   enviando = false;
 
-  // Mock data arrays
-  tiposDocumento: any[] = [{ label: 'Cédula de Ciudadanía', value: 'CC' }, { label: 'Tarjeta de Identidad', value: 'TI' }];
-  generosBiologicos: any[] = [{ label: 'Masculino', value: '1' }, { label: 'Femenino', value: '2' }];
-  zonasResidencia: any[] = [{ label: 'Urbana', value: 'U' }, { label: 'Rural', value: 'R' }];
+  // Catálogos — se poblan desde Laravel en ngOnInit()
+  tiposDocumento: any[]    = [];
+  generosBiologicos: any[] = [];
+  zonasResidencia: any[]   = [];
+  municipios: any[]        = [];
+
+  // País fijo Colombia; EAPB opcional (sin catálogo de API por ahora)
   paises: any[] = [{ label: 'Colombia (170)', value: '170' }];
-  municipios: any[] = [{ label: 'Santiago de Cali', value: '76001' }];
-  eapb: any[] = [{ label: 'EPS Sanitas', value: 'EPS001' }];
+  eapb:   any[] = [];
 
   items: MenuItem[] = [
     { label: 'Datos Demográficos' },
@@ -84,26 +87,59 @@ export class RdaPacienteFormComponent {
     return this.rdaPacienteForm.get('caja_antecedentes.familiares') as FormArray;
   }
 
-  // --- Sugerencias Mock para Autocompletar ---
+  /** Ciclo de vida: carga todos los catálogos en paralelo al montar el componente */
+  ngOnInit(): void {
+    forkJoin({
+      tiposDocumento:   this.envioService.getCatalogoTiposDocumento(),
+      generos:          this.envioService.getCatalogoGeneros(),
+      zonas:            this.envioService.getCatalogoZonas(),
+      municipios:       this.envioService.getCatalogoMunicipios()
+    }).subscribe({
+      next: (data) => {
+        this.tiposDocumento    = data.tiposDocumento;
+        this.generosBiologicos = data.generos;
+        this.zonasResidencia   = data.zonas;
+        this.municipios        = data.municipios;
+      },
+      error: (err) => {
+        // Si falla la carga de catálogos, notificamos al usuario sin bloquear el formulario
+        console.error('Error cargando catálogos:', err);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Catálogos no disponibles',
+          detail: 'No se pudieron cargar las listas desplegables. Verifique su conexión.',
+          life: 6000
+        });
+      }
+    });
+  }
+
+  // --- Sugerencias para Autocompletar — conectadas al servicio real ---
   sugerenciasDiagnosticos: any[] = [];
   sugerenciasMedicamentos: any[] = [];
 
-  buscarDiagnostico(event: any) {
-    // Aquí luego conectaremos al servicio que consulta CIE-10 / CIE-11
-    this.sugerenciasDiagnosticos = [
-      { label: 'J01 - Sinusitis aguda', value: 'J01' },
-      { label: 'I10 - Hipertensión esencial', value: 'I10' },
-      { label: 'E11 - Diabetes mellitus tipo 2', value: 'E11' }
-    ].filter(d => d.label.toLowerCase().includes(event.query.toLowerCase()));
+  /** Delega la búsqueda de diagnósticos CIE-10 al CatalogController de Laravel */
+  buscarDiagnostico(event: any): void {
+    if (!event.query || event.query.trim().length < 2) {
+      this.sugerenciasDiagnosticos = [];
+      return;
+    }
+    this.envioService.searchDiagnosticos(event.query).subscribe({
+      next:  (resultados) => { this.sugerenciasDiagnosticos = resultados; },
+      error: ()           => { this.sugerenciasDiagnosticos = []; }
+    });
   }
 
-  buscarMedicamento(event: any) {
-    // Aquí luego conectaremos al servicio que consulta medicamentos (MIPRES)
-    this.sugerenciasMedicamentos = [
-      { label: 'Paracetamol 500mg', value: '001' },
-      { label: 'Amoxicilina 500mg', value: '002' },
-      { label: 'Loratadina 10mg', value: '003' }
-    ].filter(m => m.label.toLowerCase().includes(event.query.toLowerCase()));
+  /** Delega la búsqueda de medicamentos (CUM/INN) al CatalogController de Laravel */
+  buscarMedicamento(event: any): void {
+    if (!event.query || event.query.trim().length < 2) {
+      this.sugerenciasMedicamentos = [];
+      return;
+    }
+    this.envioService.searchMedicamentos(event.query).subscribe({
+      next:  (resultados) => { this.sugerenciasMedicamentos = resultados; },
+      error: ()           => { this.sugerenciasMedicamentos = []; }
+    });
   }
 
   // --- Métodos para gestionar los arreglos dinámicos ---

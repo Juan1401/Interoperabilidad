@@ -83,4 +83,57 @@ export class EnvioIhceService {
             headers: this.getAuthHeaders().set('Content-Type', 'application/json')
         });
     }
+
+    // ─── Catálogos HL7 (Listas desplegables para el formulario RDA) ───────────────
+
+    /** Retorna los tipos de documento de identificación (CC, TI, RC, etc.) */
+    getCatalogoTiposDocumento(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/tipos-documento`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna los grupos de género biológico (Masculino, Femenino, Indeterminado) */
+    getCatalogoGeneros(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/generos`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna las zonas de residencia (Urbana / Rural) */
+    getCatalogoZonas(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/zonas`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna todos los municipios activos de Colombia ordenados por nombre */
+    getCatalogoMunicipios(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/municipios`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /**
+     * Búsqueda de diagnósticos CIE-10 por autocompletado.
+     * @param query Término de búsqueda (mínimo 2 caracteres).
+     */
+    searchDiagnosticos(query: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/search/diagnosticos`, {
+            headers: this.getAuthHeaders().set('X-Skip-Loading', 'true'),
+            params: { q: query }
+        });
+    }
+
+    /**
+     * Búsqueda de medicamentos (CUM / INN) por autocompletado.
+     * @param query Término de búsqueda (mínimo 2 caracteres).
+     */
+    searchMedicamentos(query: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/search/medicamentos`, {
+            headers: this.getAuthHeaders().set('X-Skip-Loading', 'true'),
+            params: { q: query }
+        });
+    }
 }
+

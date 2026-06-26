@@ -6,8 +6,11 @@ import { LoadingService } from '../services/loading.service';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     const loadingService = inject(LoadingService);
 
-    // Excepciones: peticiones que no queremos que muestren Loading
-    // if (req.url.includes('/silencioso')) { return next(req); }
+    // Verificar si la petición debe ser silenciosa (sin loader)
+    if (req.headers.has('X-Skip-Loading')) {
+        const clonedRequest = req.clone({ headers: req.headers.delete('X-Skip-Loading') });
+        return next(clonedRequest);
+    }
 
     loadingService.show();
 

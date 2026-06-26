@@ -10,7 +10,8 @@ use App\Http\Controllers\Api\Ihce\AuditoriaAccesoLinkController;
 use App\Http\Controllers\Api\Hl7\ListaIngresosController;
 use App\Http\Controllers\Api\Ihce\ConsultaMinisterioController;
 use App\Http\Controllers\Api\Ihce\RdaAuditController;
-use App\Http\Controllers\Api\Hl7\RdaManualController; // ⬅️ NUEVO: Importamos tu nuevo controlador
+use App\Http\Controllers\Api\Hl7\RdaManualController;
+use App\Http\Controllers\Api\Hl7\CatalogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,8 +51,28 @@ Route::post('/hl7/rda/urgencias', [RdaController::class, 'getRdaUrgencias'])->mi
 // Endpoint para obtener datos de RDA Hospitalización (En desarrollo).
 Route::post('/hl7/rda/hospitalizacion', [RdaController::class, 'getRdaHospitalizacion'])->middleware('client');
 
-// 🚀 NUEVA RUTA: Para guardar el formulario manual que acabamos de hacer en Angular
+// Ruta para guardar el formulario manual de RDA Paciente
 Route::post('/hl7/rda/paciente/manual', [RdaManualController::class, 'storePaciente'])->middleware('auth:api');
+
+/*
+|--------------------------------------------------------------------------
+| Catálogos HL7 — Listas desplegables y autocompletados para el formulario RDA
+|--------------------------------------------------------------------------
+| Todas protegidas con auth:api (requieren Bearer token de usuario).
+| Prefijo: /api/hl7/catalogs/
+*/
+Route::prefix('hl7/catalogs')->middleware('auth:api')->group(function () {
+
+    // Listas estáticas (catálogos de MinSalud)
+    Route::get('/tipos-documento', [CatalogController::class, 'getTiposDocumento']);
+    Route::get('/generos',         [CatalogController::class, 'getGeneros']);
+    Route::get('/zonas',           [CatalogController::class, 'getZonas']);
+    Route::get('/municipios',      [CatalogController::class, 'getMunicipios']);
+
+    // Búsquedas dinámicas para autocompletado (?q=término, mínimo 2 caracteres)
+    Route::get('/search/diagnosticos',  [CatalogController::class, 'searchDiagnosticos']);
+    Route::get('/search/medicamentos',  [CatalogController::class, 'searchMedicamentos']);
+});
 
 /*
 |--------------------------------------------------------------------------

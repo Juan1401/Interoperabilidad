@@ -138,7 +138,7 @@
                   <label class="font-medium">Diagnóstico CIE-10/11</label>
                   <p-autoComplete formControlName="codigo_cie10" [suggestions]="sugerenciasDiagnosticos"
                     (completeMethod)="buscarDiagnostico($event)" optionLabel="label" appendTo="body"
-                    placeholder="Buscar diagnóstico..." styleClass="w-full"></p-autoComplete>
+                    placeholder="Buscar diagnóstico..." styleClass="w-full" [delay]="500"></p-autoComplete>
                 </div>
                 <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
                   <label class="font-medium">Descripción / Observación</label>
@@ -179,7 +179,7 @@
                   <label class="font-medium">Medicamento</label>
                   <p-autoComplete formControlName="medicamento" [suggestions]="sugerenciasMedicamentos"
                     (completeMethod)="buscarMedicamento($event)" optionLabel="label" appendTo="body"
-                    placeholder="Buscar medicamento..." styleClass="w-full"></p-autoComplete>
+                    placeholder="Buscar medicamento..." styleClass="w-full" [delay]="500"></p-autoComplete>
                 </div>
                 <div class="col-span-12 md:col-span-3 flex flex-col gap-2">
                   <label class="font-medium">Dosis</label>
@@ -261,7 +261,7 @@
                   <label class="font-medium">Enfermedad (Diagnóstico)</label>
                   <p-autoComplete formControlName="codigo_cie10" [suggestions]="sugerenciasDiagnosticos"
                     (completeMethod)="buscarDiagnostico($event)" optionLabel="label" appendTo="body"
-                    placeholder="Buscar..." styleClass="w-full"></p-autoComplete>
+                    placeholder="Buscar..." styleClass="w-full" [delay]="500"></p-autoComplete>
                 </div>
                 <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
                   <label class="font-medium">Observación</label>
