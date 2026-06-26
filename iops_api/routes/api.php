@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Ihce\AuditoriaAccesoLinkController;
 use App\Http\Controllers\Api\Hl7\ListaIngresosController;
 use App\Http\Controllers\Api\Ihce\ConsultaMinisterioController;
 use App\Http\Controllers\Api\Ihce\RdaAuditController;
+use App\Http\Controllers\Api\Hl7\RdaManualController; // ⬅️ NUEVO: Importamos tu nuevo controlador
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,9 @@ Route::post('/hl7/rda/urgencias', [RdaController::class, 'getRdaUrgencias'])->mi
 
 // Endpoint para obtener datos de RDA Hospitalización (En desarrollo).
 Route::post('/hl7/rda/hospitalizacion', [RdaController::class, 'getRdaHospitalizacion'])->middleware('client');
+
+// 🚀 NUEVA RUTA: Para guardar el formulario manual que acabamos de hacer en Angular
+Route::post('/hl7/rda/paciente/manual', [RdaManualController::class, 'storePaciente'])->middleware('auth:api');
 
 /*
 |--------------------------------------------------------------------------

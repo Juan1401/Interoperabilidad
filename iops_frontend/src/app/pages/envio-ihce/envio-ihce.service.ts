@@ -64,12 +64,22 @@ export class EnvioIhceService {
         return this.http.post<any>(`${environment.apiAuth.url}/api/hl7/system/${tipoEndpoint}`, payload, { headers: this.getAuthHeaders().set('Content-Type', 'application/json') });
     }
 
+    // /**
+    //  * Envía el JSON del formulario manual RDA Paciente al orquestador HL7.
+    //  * @param payload Objeto que mapea exactamente la estructura del FormGroup.
+    //  */
+    // postRdaPaciente(payload: any): Observable<any> {
+    //     return this.http.post<any>(`${this.apiUrl}/rda/paciente`, payload, {
+    //         headers: this.getAuthHeaders().set('Content-Type', 'application/json')
+    //     });
+    // }
+
     /**
-     * Envía el JSON del formulario manual RDA Paciente al orquestador HL7.
-     * @param payload Objeto que mapea exactamente la estructura del FormGroup.
+     * Envía el JSON del formulario manual RDA Paciente al backend de Laravel.
+     * @param payload Objeto con los datos demográficos y antecedentes del paciente.
      */
     postRdaPaciente(payload: any): Observable<any> {
-        return this.http.post<any>(`${this.apiUrl}/rda/paciente`, payload, {
+        return this.http.post<any>(`${this.apiUrl}/rda/paciente/manual`, payload, {
             headers: this.getAuthHeaders().set('Content-Type', 'application/json')
         });
     }
