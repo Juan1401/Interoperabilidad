@@ -11,6 +11,7 @@ import { Inicio } from './app/pages/inicio/inicio';
 import { EnvioIhce } from './app/pages/envio-ihce/envio-ihce';
 import { AccesoNoAutorizado } from './app/pages/acceso-no-autorizado/acceso-no-autorizado';
 import { ConsultarIhce } from './app/pages/consultar-ihce/consultar-ihce';
+import { RdaPacienteFormComponent } from './app/pages/envio-ihce/components/rda-paciente-form/rda-paciente-form.component';
 
 export const appRoutes: Routes = [
     {
@@ -22,6 +23,7 @@ export const appRoutes: Routes = [
             { path: '', component: Inicio },
             { path: 'send-ihce', component: EnvioIhce },
             { path: 'consultar-ihce', component: ConsultarIhce },
+            { path: 'rda-paciente', component: RdaPacienteFormComponent },
             { path: 'acceso-no-autorizado', component: AccesoNoAutorizado },
 
             // Legacy Sakai Demo
