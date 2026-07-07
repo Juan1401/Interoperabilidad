@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "postgresql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://usuario:pass@host:port/NameDatabase"
+      ]
+    }
+  }
+}
+/* 
+NOTA: Se debe hacer copia nueva de este archivo al cual se le reemplaza el .example por .json, adicional dentro del archivo se asignan 
+las credenciales correspondientes.
+ */

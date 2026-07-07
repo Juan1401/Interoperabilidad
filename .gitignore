@@ -93,3 +93,6 @@ iops_api/cache/
 # ignorar los package-lock.json No se debe ignorar para que se instalen las mismas dependencias
 # iops_api/package-lock.json
 # iops_frontend/package-lock.json
+
+# antigravity mcp config
+.agents/mcp_config.json

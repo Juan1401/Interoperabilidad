@@ -9,7 +9,7 @@ class AddUsuarioToUsersTable extends Migration
     public function up()
     {
         Schema::table('ihce.users', function (Blueprint $table) {
-            $table->string('usuario')->unique();
+            $table->string('usuario')->nullable()->unique();
         });
     }
 

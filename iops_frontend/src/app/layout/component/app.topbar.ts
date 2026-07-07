@@ -21,7 +21,7 @@ import { MessageService } from 'primeng/api';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
-                <img src="/demo/images/cn/logo-club-noel-2024-horizontal.png" alt="Logo" style="height: 40px;" />
+                <img src="/demo/images/one/one.jpeg" alt="Logo" style="height: 40px;" />
             </a>
         </div>
 
