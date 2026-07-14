@@ -33,7 +33,14 @@ export class RdaPacienteFormComponent implements OnInit {
   generosBiologicos: any[] = [];
   zonasResidencia: any[]   = [];
   municipios: any[]        = [];
-
+  unidadesMedida: any[]    = [];
+  viasAdministracion: any[] = [];
+  unidadesTiempo = [
+    {label: 'Horas (h)', value: 'h'}, 
+    {label: 'Días (d)', value: 'd'}, 
+    {label: 'Semanas (wk)', value: 'wk'}, 
+    {label: 'Meses (mo)', value: 'mo'}
+  ];
   // País fijo Colombia; EAPB opcional (sin catálogo de API por ahora)
   paises: any[] = [{ label: 'Colombia (170)', value: '170' }];
   eapb:   any[] = [];
@@ -93,13 +100,17 @@ export class RdaPacienteFormComponent implements OnInit {
       tiposDocumento:   this.envioService.getCatalogoTiposDocumento(),
       generos:          this.envioService.getCatalogoGeneros(),
       zonas:            this.envioService.getCatalogoZonas(),
-      municipios:       this.envioService.getCatalogoMunicipios()
+      municipios:       this.envioService.getCatalogoMunicipios(),
+      unidadesMedida:   this.envioService.getUnidadesMedida(),
+      viasAdmin:        this.envioService.getViasAdministracion()
     }).subscribe({
       next: (data) => {
-        this.tiposDocumento    = data.tiposDocumento;
-        this.generosBiologicos = data.generos;
-        this.zonasResidencia   = data.zonas;
-        this.municipios        = data.municipios;
+        this.tiposDocumento     = data.tiposDocumento;
+        this.generosBiologicos  = data.generos;
+        this.zonasResidencia    = data.zonas;
+        this.municipios         = data.municipios;
+        this.unidadesMedida     = data.unidadesMedida;
+        this.viasAdministracion = data.viasAdmin;
       },
       error: (err) => {
         // Si falla la carga de catálogos, notificamos al usuario sin bloquear el formulario
@@ -157,8 +168,11 @@ export class RdaPacienteFormComponent implements OnInit {
   addFarmacologico() {
     this.farmacologicos.push(this.fb.group({
       medicamento: ['', Validators.required],
-      dosis: [''],
-      frecuencia: ['']
+      dosis_valor: ['', [Validators.required, Validators.min(0.1)]],
+      dosis_unidad: ['', Validators.required],
+      frecuencia_valor: ['', Validators.required],
+      frecuencia_unidad: ['', Validators.required],
+      via_administracion: ['', Validators.required]
     }));
   }
   removeFarmacologico(index: number) {

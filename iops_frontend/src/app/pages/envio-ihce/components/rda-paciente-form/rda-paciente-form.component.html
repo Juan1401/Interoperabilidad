@@ -175,23 +175,47 @@
               @for (farmaco of farmacologicos.controls; track $index) {
               <div [formGroupName]="$index"
                 class="grid grid-cols-12 gap-4 items-end mb-3 pb-3 border-b border-gray-200">
-                <div class="col-span-12 md:col-span-5 flex flex-col gap-2">
+                
+                <!-- Columna 1: Medicamento -->
+                <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
                   <label class="font-medium">Medicamento</label>
                   <p-autoComplete formControlName="medicamento" [suggestions]="sugerenciasMedicamentos"
                     (completeMethod)="buscarMedicamento($event)" optionLabel="label" appendTo="body"
                     placeholder="Buscar medicamento..." styleClass="w-full" [delay]="500"></p-autoComplete>
                 </div>
+
+                <!-- Columna 2: Dosis -->
                 <div class="col-span-12 md:col-span-3 flex flex-col gap-2">
                   <label class="font-medium">Dosis</label>
-                  <input pInputText formControlName="dosis" class="w-full" placeholder="Ej. 500mg" />
+                  <div class="flex gap-2 w-full">
+                    <input pInputText type="number" formControlName="dosis_valor" class="w-1/2" placeholder="Valor" />
+                    <p-select formControlName="dosis_unidad" [options]="unidadesMedida" optionLabel="label" optionValue="value"
+                      placeholder="Unidad" styleClass="w-1/2" appendTo="body"></p-select>
+                  </div>
                 </div>
-                <div class="col-span-12 md:col-span-3 flex flex-col gap-2">
+
+                <!-- Columna 3: Frecuencia -->
+                <div class="col-span-12 md:col-span-2 flex flex-col gap-2">
                   <label class="font-medium">Frecuencia</label>
-                  <input pInputText formControlName="frecuencia" class="w-full" placeholder="Ej. Cada 8h" />
+                  <div class="flex gap-2 w-full">
+                    <input pInputText type="number" formControlName="frecuencia_valor" class="w-1/2" placeholder="Valor" />
+                    <p-select formControlName="frecuencia_unidad" [options]="unidadesTiempo" optionLabel="label" optionValue="value"
+                      placeholder="Unidad" styleClass="w-1/2" appendTo="body"></p-select>
+                  </div>
                 </div>
-                <div class="col-span-12 md:col-span-1 flex justify-end items-end">
+
+                <!-- Columna 4: Vía de Administración -->
+                <div class="col-span-12 md:col-span-2 flex flex-col gap-2">
+                  <label class="font-medium">Vía Admin.</label>
+                  <p-select formControlName="via_administracion" [options]="viasAdministracion" optionLabel="label" optionValue="value"
+                    placeholder="Vía" styleClass="w-full" appendTo="body"></p-select>
+                </div>
+
+                <!-- Columna 5: Botón Eliminar -->
+                <div class="col-span-12 md:col-span-1 flex justify-end items-end pb-1">
                   <p-button icon="pi pi-trash" severity="danger" (onClick)="removeFarmacologico($index)"></p-button>
                 </div>
+
               </div>
               }
             </div>
