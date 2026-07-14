@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'empresa_id', 'tipo_documento', 'numero_documento', 'apellidos', 'especialidad_codigo',
     ];
 
     /**
@@ -45,4 +45,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Relación con el tenant (Empresa)
+     */
+    public function empresa()
+    {
+        return $this->belongsTo(\App\Models\Empresa::class);
+    }
 }

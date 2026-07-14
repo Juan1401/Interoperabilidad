@@ -11,18 +11,31 @@ class RdaManualController extends Controller
 {
     public function storePaciente(StoreRdaPacienteRequest $request): JsonResponse
     {
-        // 1. Obtener al médico que hizo la petición
+        // 1. Obtener al médico que hizo la petición y cargar su empresa
+        /** @var \App\User $user */
         $user = auth()->user();
+        $user->load('empresa');
 
         // 2. Obtener los datos limpios que pasaron el validador
         $payload = $request->validated();
 
         // 3. ZERO TRUST: Inyectamos los datos del médico y la clínica desde el backend
         // Angular no nos manda esto por seguridad, nosotros lo ponemos.
+
+        // Organización (Club Noel)
+        $payload['caja_1_demograficos']['organizacion'] = [
+            'nit' => $user->empresa->nit ?? '',
+            'nombre' => $user->empresa->razon_social ?? '',
+            'codigo_habilitacion' => $user->empresa->codigo_habilitacion ?? '',
+        ];
+
+        // Profesional (Médico)
         $payload['caja_1_demograficos']['profesional'] = [
+            'tipo_documento' => $user->tipo_documento ?? 'CC',
+            'numero_documento' => $user->numero_documento ?? '0000000000',
             'nombres' => $user->name,
-            'email' => $user->email,
-            // 'especialidad_rethus' => $user->profesional->especialidad ... etc (Ajustarás esto luego)
+            'apellidos' => $user->apellidos ?? 'Prueba',
+            'especialidad_codigo' => $user->especialidad_codigo ?? '389', // 389 = Medicina General
         ];
 
         // 4. Guardar en la Base de Datos
