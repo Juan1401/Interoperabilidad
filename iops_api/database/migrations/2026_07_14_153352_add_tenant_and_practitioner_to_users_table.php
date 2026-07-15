@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ihce.users', function (Blueprint $table) {
-            $table->foreignId('empresa_id')->nullable()->constrained('ihce.empresas');
+            $table->foreignId('organization_id')->nullable()->constrained('ihce.organizations');
             $table->string('tipo_documento', 5)->nullable();
             $table->string('numero_documento', 20)->nullable();
             $table->string('apellidos')->nullable();
@@ -26,9 +26,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ihce.users', function (Blueprint $table) {
-            $table->dropForeign(['empresa_id']);
+            $table->dropForeign(['organization_id']);
             $table->dropColumn([
-                'empresa_id',
+                'organization_id',
                 'tipo_documento',
                 'numero_documento',
                 'apellidos',

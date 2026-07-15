@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'empresa_id', 'tipo_documento', 'numero_documento', 'apellidos', 'especialidad_codigo',
+        'name', 'email', 'password', 'organization_id', 'tipo_documento', 'numero_documento', 'apellidos', 'especialidad_codigo',
     ];
 
     /**
@@ -47,10 +47,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * Relación con el tenant (Empresa)
+     * Relación con el tenant (Organización/IPS)
      */
-    public function empresa()
+    public function organization()
     {
-        return $this->belongsTo(\App\Models\Empresa::class);
+        return $this->belongsTo(\App\Models\Organization::class);
     }
 }

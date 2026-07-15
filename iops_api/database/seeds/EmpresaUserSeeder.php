@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\Empresa;
+use App\Models\Organization;
 use App\User;
 
 class EmpresaUserSeeder extends Seeder
@@ -13,8 +13,8 @@ class EmpresaUserSeeder extends Seeder
      */
     public function run()
     {
-        // 1. Crear o actualizar la empresa de prueba con datos reales de Club Noel
-        $empresa = Empresa::updateOrCreate(
+        // 1. Crear o actualizar la organización de prueba con datos reales de Club Noel
+        $organization = Organization::updateOrCreate(
             ['nit' => '890303093'],
             [
                 'razon_social' => 'FUNDACION CLINICA INFANTIL CLUB NOEL',
@@ -26,7 +26,7 @@ class EmpresaUserSeeder extends Seeder
         $user = User::first();
         if ($user) {
             $user->update([
-                'empresa_id' => $empresa->id,
+                'organization_id' => $organization->id,
                 'tipo_documento' => 'CC',
                 'numero_documento' => '123456789',
                 'apellidos' => 'Médico Prueba',

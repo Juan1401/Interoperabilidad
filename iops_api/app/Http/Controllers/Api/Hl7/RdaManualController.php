@@ -11,10 +11,10 @@ class RdaManualController extends Controller
 {
     public function storePaciente(StoreRdaPacienteRequest $request): JsonResponse
     {
-        // 1. Obtener al médico que hizo la petición y cargar su empresa
+        // 1. Obtener al médico que hizo la petición y cargar su organización (IPS)
         /** @var \App\User $user */
         $user = auth()->user();
-        $user->load('empresa');
+        $user->load('organization');
 
         // 2. Obtener los datos limpios que pasaron el validador
         $payload = $request->validated();
@@ -24,9 +24,9 @@ class RdaManualController extends Controller
 
         // Organización (Club Noel)
         $payload['caja_1_demograficos']['organizacion'] = [
-            'nit' => $user->empresa->nit ?? '',
-            'nombre' => $user->empresa->razon_social ?? '',
-            'codigo_habilitacion' => $user->empresa->codigo_habilitacion ?? '',
+            'nit' => $user->organization->nit ?? '',
+            'nombre' => $user->organization->razon_social ?? '',
+            'codigo_habilitacion' => $user->organization->codigo_habilitacion ?? '',
         ];
 
         // Profesional (Médico)

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ihce.empresas', function (Blueprint $table) {
+        Schema::create('ihce.organizations', function (Blueprint $table) {
             $table->id();
             $table->string('nit')->unique();
             $table->string('razon_social');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ihce.empresas');
+        Schema::dropIfExists('ihce.organizations');
     }
 };
