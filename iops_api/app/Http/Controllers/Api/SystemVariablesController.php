@@ -58,13 +58,23 @@ class SystemVariablesController extends Controller
     public function getTiposIdPacientes(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $tipos = \App\Models\TipoIdPaciente::select('tipo_id_paciente', 'descripcion', 'indice_de_orden')
-                ->orderBy('indice_de_orden', 'asc')
+            $tipos = \Illuminate\Support\Facades\DB::table('ihce.colombian_person_identifier')
+                ->where('active', true)
+                ->orderBy('display', 'asc')
                 ->get();
+
+            $mapped = $tipos->map(function ($item) {
+                return [
+                    'tipoId'      => $item->code,
+                    'abreviatura' => $item->code,
+                    'descripcion' => $item->display,
+                    'indiceOrden' => 0,
+                ];
+            });
 
             return response()->json([
                 'success' => true,
-                'data' => \App\Http\Resources\Hl7\TipoIdPacienteResource::collection($tipos)
+                'data' => $mapped
             ]);
         } catch (\Exception $e) {
             return response()->json([

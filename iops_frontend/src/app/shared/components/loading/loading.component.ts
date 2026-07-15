@@ -15,7 +15,7 @@ import { LoadingService } from '../../../core/services/loading.service';
 
                     <p-progressSpinner ariaLabel="Cargando" strokeWidth="4" [style]="{ width: '75px', height: '75px' }" fill="transparent" animationDuration=".8s"> </p-progressSpinner>
 
-                    <div class="loading-text">Cargando la información, por favor espere...</div>
+                    <div class="loading-text">Cargando información...</div>
                 </div>
             </div>
         }
