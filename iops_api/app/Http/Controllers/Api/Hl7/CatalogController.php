@@ -187,5 +187,45 @@ class CatalogController extends Controller
 
         return response()->json($items);
     }
+
+    /**
+     * Retorna las Unidades de Medida de Medicamentos (UMM).
+     * Fuente: tabla ihce.fhir_umm — columnas: code, display.
+     *
+     * GET /api/hl7/catalogs/unidades-medida
+     */
+    public function getUnidadesMedida(): JsonResponse
+    {
+        $items = DB::table('ihce.fhir_umm')
+            ->where('active', true)
+            ->orderBy('display')
+            ->get(['code', 'display'])
+            ->map(fn ($row) => [
+                'label' => $row->code . ' - ' . $row->display,
+                'value' => $row->code,
+            ]);
+
+        return response()->json($items);
+    }
+
+    /**
+     * Retorna las Vías de Administración de Medicamentos (VAD).
+     * Fuente: tabla ihce.fhir_vad — columnas: code, display.
+     *
+     * GET /api/hl7/catalogs/vias-administracion
+     */
+    public function getViasAdministracion(): JsonResponse
+    {
+        $items = DB::table('ihce.fhir_vad')
+            ->where('active', true)
+            ->orderBy('display')
+            ->get(['code', 'display'])
+            ->map(fn ($row) => [
+                'label' => $row->code . ' - ' . $row->display,
+                'value' => $row->code,
+            ]);
+
+        return response()->json($items);
+    }
 }
 

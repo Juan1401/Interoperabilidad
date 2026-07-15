@@ -135,5 +135,19 @@ export class EnvioIhceService {
             params: { q: query }
         });
     }
+
+    /** Retorna las Unidades de Medida (UMM) */
+    getUnidadesMedida(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/unidades-medida`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna las Vías de Administración (VAD) */
+    getViasAdministracion(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/vias-administracion`, {
+            headers: this.getAuthHeaders()
+        });
+    }
 }
 
