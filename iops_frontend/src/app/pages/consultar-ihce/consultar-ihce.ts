@@ -153,8 +153,9 @@ export class ConsultarIhce implements OnInit {
 
     asignarValoresSesion() {
         const data = this.sessionData();
-        // console.log('data::', data);
+        console.log('data::', data);
 
+        /*
         // Validación de credenciales del usuario logueado
         if (!data?.tipo_documento_us || !data?.documento_us) {
             this.usuarioValidoParaConsultar.set(false);
@@ -181,6 +182,7 @@ export class ConsultarIhce implements OnInit {
                 this.form.patchValue({ documento: data.ID });
             }
         }
+        */
     }
 
     cargarCatalogos() {
@@ -369,7 +371,7 @@ export class ConsultarIhce implements OnInit {
                 if (typeof response === 'string') {
                     try {
                         parsedData = JSON.parse(response);
-                    } catch (e) {}
+                    } catch (e) { }
                 }
 
                 let extractedEntries = findEntry(parsedData);
@@ -426,7 +428,7 @@ export class ConsultarIhce implements OnInit {
                 if (typeof response === 'string') {
                     try {
                         parsedData = JSON.parse(response);
-                    } catch (e) {}
+                    } catch (e) { }
                 }
 
                 const extracted = findEntry(parsedData);
