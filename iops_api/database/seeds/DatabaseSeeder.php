@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(UserAdminSeeder::class);
+        $this->call(OrganizationUserSeeder::class);
         /**
          * Inicio de siembra de datos para HL7 RDA Paciente
          */
