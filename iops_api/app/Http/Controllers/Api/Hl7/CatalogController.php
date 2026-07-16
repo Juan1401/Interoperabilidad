@@ -10,6 +10,7 @@ use App\Models\Municipality;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Hl7CatalogItem;
 
 /**
  * Controlador de catálogos HL7/FHIR para el formulario manual de RDA.
@@ -224,6 +225,98 @@ class CatalogController extends Controller
                 'label' => $row->code . ' - ' . $row->display,
                 'value' => $row->code,
             ]);
+
+        return response()->json($items);
+    }
+
+    /**
+     * Retorna los Tipos de Alergia.
+     * Busca en el catálogo HL7 genérico, con fallback a valores por defecto si no existe.
+     *
+     * GET /api/hl7/catalogs/tipos-alergia
+     */
+    public function getTiposAlergia(): JsonResponse
+    {
+        $items = Hl7CatalogItem::whereHas('catalog', function ($query) {
+            $query->whereIn('name', ['ColombianAllergyType', 'AllergyIntoleranceCategory']);
+        })->where('active', true)
+          ->orderBy('display')
+          ->get(['code', 'display'])
+          ->map(fn ($row) => [
+              'label' => $row->display,
+              'value' => $row->code,
+          ]);
+
+        if ($items->isEmpty()) {
+            $items = collect([
+                ['value' => '01', 'label' => 'Medicamento'],
+                ['value' => '02', 'label' => 'Alimento'],
+                ['value' => '03', 'label' => 'Sustancia del ambiente'],
+                ['value' => '04', 'label' => 'Sustancia que entran en contacto con la piel'],
+                ['value' => '05', 'label' => 'Picadura de insectos'],
+                ['value' => '06', 'label' => 'Otra'],
+            ]);
+        }
+
+        return response()->json($items);
+    }
+
+    /**
+     * Retorna los Parentescos familiares.
+     * Busca en el catálogo HL7 genérico, con fallback a valores por defecto.
+     *
+     * GET /api/hl7/catalogs/parentescos
+     */
+    public function getParentescos(): JsonResponse
+    {
+        $items = Hl7CatalogItem::whereHas('catalog', function ($query) {
+            $query->whereIn('name', ['ColombianFamilyMemberRelationship', 'FamilyMemberRelationship']);
+        })->where('active', true)
+          ->orderBy('display')
+          ->get(['code', 'display'])
+          ->map(fn ($row) => [
+              'label' => $row->display,
+              'value' => $row->code,
+          ]);
+
+        if ($items->isEmpty()) {
+            $items = collect([
+                ['value' => '01', 'label' => 'Padres'],
+                ['value' => '02', 'label' => 'Hijos'],
+                ['value' => '03', 'label' => 'Hermanos'],
+                ['value' => '04', 'label' => 'Abuelos'],
+                ['value' => '99', 'label' => 'Otros familiares'],
+            ]);
+        }
+
+        return response()->json($items);
+    }
+
+    /**
+     * Retorna los niveles de Severidad de Alergias.
+     * Busca en el catálogo HL7 genérico, con fallback a valores por defecto.
+     *
+     * GET /api/hl7/catalogs/severidad
+     */
+    public function getSeveridad(): JsonResponse
+    {
+        $items = Hl7CatalogItem::whereHas('catalog', function ($query) {
+            $query->whereIn('name', ['ColombianAllergySeverity', 'AllergyIntoleranceSeverity']);
+        })->where('active', true)
+          ->orderBy('display')
+          ->get(['code', 'display'])
+          ->map(fn ($row) => [
+              'label' => $row->display,
+              'value' => $row->code,
+          ]);
+
+        if ($items->isEmpty()) {
+            $items = collect([
+                ['value' => 'mild', 'label' => 'Leve'],
+                ['value' => 'moderate', 'label' => 'Moderada'],
+                ['value' => 'severe', 'label' => 'Severa'],
+            ]);
+        }
 
         return response()->json($items);
     }

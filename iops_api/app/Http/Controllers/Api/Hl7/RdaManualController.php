@@ -39,6 +39,31 @@ class RdaManualController extends Controller
             'especialidad_codigo' => $user->especialidad_codigo ?? '389', // 389 = Medicina General
         ];
 
+        // Hidratar descripciones reales de CIE-10 para evitar rechazos del Ministerio
+        if (!empty($payload['caja_antecedentes']['patologicos'])) {
+            foreach ($payload['caja_antecedentes']['patologicos'] as &$patologia) {
+                if (!empty($patologia['codigo_cie10'])) {
+                    $cie10 = \Illuminate\Support\Facades\DB::table('ihce.icd10co')
+                        ->where('code', $patologia['codigo_cie10'])->first();
+                    if ($cie10) {
+                        $patologia['descripcion'] = $cie10->display;
+                    }
+                }
+            }
+        }
+
+        if (!empty($payload['caja_antecedentes']['familiares'])) {
+            foreach ($payload['caja_antecedentes']['familiares'] as &$familiar) {
+                if (!empty($familiar['codigo_cie10'])) {
+                    $cie10 = \Illuminate\Support\Facades\DB::table('ihce.icd10co')
+                        ->where('code', $familiar['codigo_cie10'])->first();
+                    if ($cie10) {
+                        $familiar['descripcion'] = $cie10->display;
+                    }
+                }
+            }
+        }
+
         // 4. Guardar en la Base de Datos
         $document = RdaDocument::create([
             'user_id' => $user->id,

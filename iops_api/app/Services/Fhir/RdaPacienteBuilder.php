@@ -529,8 +529,16 @@ class RdaPacienteBuilder
 
         $resources = [];
 
+        $tipoAlergiaMap = [
+            '01' => 'Medicamento', '02' => 'Alimento', '03' => 'Sustancia del ambiente', 
+            '04' => 'Sustancia que entran en contacto con la piel', '05' => 'Picadura de insectos', '06' => 'Otra'
+        ];
+
         foreach ($alergias as $index => $alergia) {
             $allergyId = 'AllergyIntolerance-' . $index;
+
+            $codigoAlergia = $alergia['codigo'] ?? '01';
+            $displayAlergia = $tipoAlergiaMap[$codigoAlergia] ?? 'Medicamento';
 
             $resources[] = [
                 'resourceType' => 'AllergyIntolerance',
@@ -560,8 +568,8 @@ class RdaPacienteBuilder
                     'coding' => [
                         [
                             'system'  => self::SYS_TIPO_ALERGIA,
-                            'code'    => $alergia['codigo'] ?? '01',
-                            'display' => $alergia['alergeno'] ?? 'Alergia no especificada',
+                            'code'    => $codigoAlergia,
+                            'display' => $displayAlergia,
                         ],
                     ],
                     'text' => $alergia['alergeno'] ?? '',
@@ -592,24 +600,27 @@ class RdaPacienteBuilder
         $resources = [];
 
         $parentescoMap = [
-            'Padre'   => '01',
-            'Madre'   => '02',
-            'Hijo'    => '03',
-            'Hermano' => '04',
-            'Abuelo'  => '05',
-            'Abuela'  => '06',
-            'Tío'     => '07',
-            'Tía'     => '08',
-            'Primo'   => '09',
-            'Prima'   => '10',
-            'Otro'    => '99',
+            'Padre'   => ['code' => '01', 'display' => 'Padres'],
+            'Madre'   => ['code' => '01', 'display' => 'Padres'], // Ambos caen en '01'
+            'Hijo'    => ['code' => '02', 'display' => 'Hijos'],
+            'Hermano' => ['code' => '03', 'display' => 'Hermanos'],
+            'Abuelo'  => ['code' => '04', 'display' => 'Abuelos'],
+            'Abuela'  => ['code' => '04', 'display' => 'Abuelos'],
+            'Tío'     => ['code' => '99', 'display' => 'Otros familiares'],
+            'Tía'     => ['code' => '99', 'display' => 'Otros familiares'],
+            'Primo'   => ['code' => '99', 'display' => 'Otros familiares'],
+            'Prima'   => ['code' => '99', 'display' => 'Otros familiares'],
+            'Otro'    => ['code' => '99', 'display' => 'Otros'],
         ];
 
         foreach ($familiares as $index => $familiar) {
             $familyId = 'FamilyMemberHistory-' . $index;
 
             $parentescoRaw = empty($familiar['parentesco']) ? 'Padres' : $familiar['parentesco'];
-            $parentescoCode = $parentescoMap[$parentescoRaw] ?? '99';
+            $map = $parentescoMap[$parentescoRaw] ?? ['code' => '99', 'display' => 'Otros'];
+            
+            $parentescoCode = $map['code'];
+            $parentescoDisplay = $map['display'];
 
             $resources[] = [
                 'resourceType' => 'FamilyMemberHistory',
@@ -626,7 +637,7 @@ class RdaPacienteBuilder
                         [
                             'system'  => self::SYS_PARENTESCO,
                             'code'    => $parentescoCode,
-                            'display' => $parentescoRaw,
+                            'display' => $parentescoDisplay,
                         ],
                     ],
                 ],

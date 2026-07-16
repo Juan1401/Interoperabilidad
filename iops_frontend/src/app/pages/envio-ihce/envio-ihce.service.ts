@@ -149,5 +149,26 @@ export class EnvioIhceService {
             headers: this.getAuthHeaders()
         });
     }
+
+    /** Retorna los Tipos de Alergia */
+    getTiposAlergia(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/tipos-alergia`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna los Parentescos Familiares */
+    getParentescos(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/parentescos`, {
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /** Retorna los Niveles de Severidad de Alergia */
+    getSeveridades(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/catalogs/severidad`, {
+            headers: this.getAuthHeaders()
+        });
+    }
 }
 

@@ -70,6 +70,9 @@ Route::prefix('hl7/catalogs')->middleware('auth:api')->group(function () {
     Route::get('/municipios',      [CatalogController::class, 'getMunicipios']);
     Route::get('/unidades-medida', [CatalogController::class, 'getUnidadesMedida']);
     Route::get('/vias-administracion', [CatalogController::class, 'getViasAdministracion']);
+    Route::get('/tipos-alergia',   [CatalogController::class, 'getTiposAlergia']);
+    Route::get('/parentescos',     [CatalogController::class, 'getParentescos']);
+    Route::get('/severidad',       [CatalogController::class, 'getSeveridad']);
 
     // Búsquedas dinámicas para autocompletado (?q=término, mínimo 2 caracteres)
     Route::get('/search/diagnosticos',  [CatalogController::class, 'searchDiagnosticos']);

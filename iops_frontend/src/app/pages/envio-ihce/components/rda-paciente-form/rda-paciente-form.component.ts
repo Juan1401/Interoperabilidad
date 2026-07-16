@@ -35,6 +35,9 @@ export class RdaPacienteFormComponent implements OnInit {
   municipios: any[]        = [];
   unidadesMedida: any[]    = [];
   viasAdministracion: any[] = [];
+  tiposAlergia: any[]      = [];
+  parentescos: any[]       = [];
+  severidadesAlergia: any[] = [];
   unidadesTiempo = [
     {label: 'Horas (h)', value: 'h'}, 
     {label: 'Días (d)', value: 'd'}, 
@@ -102,7 +105,10 @@ export class RdaPacienteFormComponent implements OnInit {
       zonas:            this.envioService.getCatalogoZonas(),
       municipios:       this.envioService.getCatalogoMunicipios(),
       unidadesMedida:   this.envioService.getUnidadesMedida(),
-      viasAdmin:        this.envioService.getViasAdministracion()
+      viasAdmin:        this.envioService.getViasAdministracion(),
+      tiposAlergia:     this.envioService.getTiposAlergia(),
+      parentescos:      this.envioService.getParentescos(),
+      severidades:      this.envioService.getSeveridades()
     }).subscribe({
       next: (data) => {
         this.tiposDocumento     = data.tiposDocumento;
@@ -111,6 +117,9 @@ export class RdaPacienteFormComponent implements OnInit {
         this.municipios         = data.municipios;
         this.unidadesMedida     = data.unidadesMedida;
         this.viasAdministracion = data.viasAdmin;
+        this.tiposAlergia       = data.tiposAlergia;
+        this.parentescos        = data.parentescos;
+        this.severidadesAlergia = data.severidades;
       },
       error: (err) => {
         // Si falla la carga de catálogos, notificamos al usuario sin bloquear el formulario
