@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -150,24 +151,30 @@ export class EnvioIhceService {
         });
     }
 
-    /** Retorna los Tipos de Alergia */
+    /** Retorna los Tipos de Alergia desde el catálogo dinámico */
     getTiposAlergia(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/catalogs/tipos-alergia`, {
+        return this.http.get<any>(`${this.apiUrl}/catalogs/dynamic/TipoAlergia`, {
             headers: this.getAuthHeaders()
-        });
+        }).pipe(map(res => res.data || []));
     }
 
-    /** Retorna los Parentescos Familiares */
+    /** Retorna los Parentescos Familiares desde el catálogo dinámico */
     getParentescos(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/catalogs/parentescos`, {
+        return this.http.get<any>(`${this.apiUrl}/catalogs/dynamic/ParentescoAntecedente`, {
             headers: this.getAuthHeaders()
-        });
+        }).pipe(map(res => res.data || []));
     }
 
-    /** Retorna los Niveles de Severidad de Alergia */
+    /** Retorna los Niveles de Severidad de Alergia (estático por ahora, sin catálogo SNOMED en BD) */
     getSeveridades(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/catalogs/severidad`, {
-            headers: this.getAuthHeaders()
+        // Fallback estático mientras no exista el catálogo SeveridadAlergia en BD
+        return new Observable(subscriber => {
+            subscriber.next([
+                { value: 'mild', label: 'Leve' },
+                { value: 'moderate', label: 'Moderada' },
+                { value: 'severe', label: 'Severa' }
+            ]);
+            subscriber.complete();
         });
     }
 }

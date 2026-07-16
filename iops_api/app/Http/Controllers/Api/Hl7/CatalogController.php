@@ -10,6 +10,7 @@ use App\Models\Municipality;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Hl7Catalog;
 use App\Models\Hl7CatalogItem;
 
 /**
@@ -238,7 +239,7 @@ class CatalogController extends Controller
     public function getTiposAlergia(): JsonResponse
     {
         $items = Hl7CatalogItem::whereHas('catalog', function ($query) {
-            $query->whereIn('name', ['ColombianAllergyType', 'AllergyIntoleranceCategory']);
+            $query->whereIn('name', ['TipoAlergia', 'ColombianAllergyType', 'AllergyIntoleranceCategory']);
         })->where('active', true)
           ->orderBy('display')
           ->get(['code', 'display'])
@@ -270,7 +271,7 @@ class CatalogController extends Controller
     public function getParentescos(): JsonResponse
     {
         $items = Hl7CatalogItem::whereHas('catalog', function ($query) {
-            $query->whereIn('name', ['ColombianFamilyMemberRelationship', 'FamilyMemberRelationship']);
+            $query->whereIn('name', ['ParentescoAntecedente', 'ColombianFamilyMemberRelationship', 'FamilyMemberRelationship']);
         })->where('active', true)
           ->orderBy('display')
           ->get(['code', 'display'])
@@ -319,6 +320,41 @@ class CatalogController extends Controller
         }
 
         return response()->json($items);
+    }
+
+    /**
+     * Endpoint dinámico genérico para consultar cualquier catálogo HL7 por nombre.
+     * Usa el modelo Hl7Catalog y su relación items() para resolver los conceptos.
+     *
+     * Ejemplo: GET /api/hl7/catalogs/dynamic/TipoAlergia
+     * Respuesta: { "success": true, "data": [{ "value": "01", "label": "Medicamento" }, ...] }
+     *
+     * @param string $name Nombre del catálogo (ej. 'TipoAlergia', 'ParentescoAntecedente')
+     */
+    public function getByName(string $name): JsonResponse
+    {
+        $catalog = Hl7Catalog::where('name', $name)->first();
+
+        if (!$catalog) {
+            return response()->json([
+                'success' => false,
+                'message' => "Catálogo '{$name}' no encontrado en la base de datos."
+            ], 404);
+        }
+
+        $items = $catalog->items()
+            ->where('active', true)
+            ->orderBy('code', 'asc')
+            ->get()
+            ->map(fn ($item) => [
+                'value' => $item->code,
+                'label' => $item->display,
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $items,
+        ]);
     }
 }
 

@@ -77,6 +77,9 @@ Route::prefix('hl7/catalogs')->middleware('auth:api')->group(function () {
     // Búsquedas dinámicas para autocompletado (?q=término, mínimo 2 caracteres)
     Route::get('/search/diagnosticos',  [CatalogController::class, 'searchDiagnosticos']);
     Route::get('/search/medicamentos',  [CatalogController::class, 'searchMedicamentos']);
+
+    // Endpoint genérico dinámico por nombre de catálogo
+    Route::get('/dynamic/{name}', [CatalogController::class, 'getByName']);
 });
 
 /*
