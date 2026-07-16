@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 200" fill="none">
+    <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00E1D9" />
+            <stop offset="100%" stop-color="#007BCA" />
+        </linearGradient>
+        <linearGradient id="grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#13B2D7" />
+            <stop offset="100%" stop-color="#095D77" />
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#001828" flood-opacity="0.3"/>
+        </filter>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#00E1D9" flood-opacity="0.5"/>
+        </filter>
+    </defs>
+
+    <!-- LOGO MARK -->
+    <g transform="translate(10, 10) scale(0.35)">
+        <path d="M 256 76 L 256 256 L 109 360 M 256 256 L 403 360" stroke="url(#grad1)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.4" />
+        <circle cx="256" cy="256" r="180" stroke="url(#grad2)" stroke-width="40" fill="none" filter="url(#shadow)"/>
+        <circle cx="256" cy="76" r="32" fill="url(#grad1)" filter="url(#glow)"/>
+        <circle cx="109" cy="360" r="32" fill="url(#grad1)" filter="url(#glow)"/>
+        <circle cx="403" cy="360" r="32" fill="url(#grad1)" filter="url(#glow)"/>
+        <g filter="url(#shadow)">
+            <path d="M 205 205 L 256 160 L 256 360" stroke="url(#grad1)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M 195 360 L 317 360" stroke="url(#grad1)" stroke-width="48" stroke-linecap="round" fill="none"/>
+        </g>
+    </g>
+
+    <!-- TEXT "ONE SOLUTION" (Dark Gray for Light Theme) -->
+    <text x="210" y="125" font-family="'Inter', 'Segoe UI', 'Roboto', sans-serif" font-size="80" font-weight="800" fill="#1E293B" letter-spacing="2">ONE</text>
+    <text x="390" y="125" font-family="'Inter', 'Segoe UI', 'Roboto', sans-serif" font-size="80" font-weight="300" fill="url(#grad1)" letter-spacing="4">SOLUTION</text>
+</svg>
