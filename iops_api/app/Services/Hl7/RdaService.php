@@ -105,35 +105,35 @@ abstract class RdaService
     }
 
     /**
-     * Obtiene los datos de la empresa (Organización) configurada.
+     * Obtiene los datos de la organización (IPS) configurada.
      *
-     * @param string $empresaId El ID de la empresa a consultar, por defecto '01' según requerimiento.
+     * @param string $organizationId El ID de la organización a consultar, por defecto '01' según requerimiento.
      * @return array
      * @throws \Exception
      */
-    protected function getOrganizationData(string $empresaId = '01'): array
+    protected function getOrganizationData(string $organizationId = '01'): array
     {
-        $empresa = \App\Models\Empresa::find($empresaId);
+        $organization = \App\Models\Organization::find($organizationId);
 
-        if (!$empresa) {
-            throw new \Exception("Empresa con ID {$empresaId} no encontrada");
+        if (!$organization) {
+            throw new \Exception("Organización con ID {$organizationId} no encontrada");
         }
 
         // Mapear datos a un array estructurado
         $organizationData = [
-            'empresa_id' => $empresa->empresa_id,
-            'razon_social' => $empresa->razon_social,
-            'tipo_id_tercero' => $empresa->tipo_id_tercero,
-            'id' => $empresa->id,
-            'dv' => $empresa->digito_verificacion,
-            'codigo_habilitacion' => $empresa->codigo_sgsss_ips ?? $empresa->codigo_sgsss, // Usar codigo_sgsss_ips si existe, sino el general
-            'direccion' => $empresa->direccion,
-            'telefono' => $empresa->telefonos,
-            'email' => $empresa->email,
-            'municipio_id' => $empresa->tipo_mpio_id,
-            'departamento_id' => $empresa->tipo_dpto_id,
-            'pais_id' => $empresa->tipo_pais_id,
-            'codigo_sgsss_ips' => $empresa->codigo_sgsss_ips,
+            'empresa_id' => $organization->empresa_id,
+            'razon_social' => $organization->razon_social,
+            'tipo_id_tercero' => $organization->tipo_id_tercero,
+            'id' => $organization->id,
+            'dv' => $organization->digito_verificacion,
+            'codigo_habilitacion' => $organization->codigo_sgsss_ips ?? $organization->codigo_sgsss, // Usar codigo_sgsss_ips si existe, sino el general
+            'direccion' => $organization->direccion,
+            'telefono' => $organization->telefonos,
+            'email' => $organization->email,
+            'municipio_id' => $organization->tipo_mpio_id,
+            'departamento_id' => $organization->tipo_dpto_id,
+            'pais_id' => $organization->tipo_pais_id,
+            'codigo_sgsss_ips' => $organization->codigo_sgsss_ips,
         ];
 
         Log::info("Datos Organization obtenidos", $organizationData);

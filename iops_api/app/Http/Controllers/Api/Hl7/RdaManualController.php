@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Hl7;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Hl7\StoreRdaPacienteRequest;
 use App\Models\RdaDocument;
+use App\Services\Fhir\RdaPacienteBuilder;
 use Illuminate\Http\JsonResponse;
 
 class RdaManualController extends Controller
@@ -46,12 +47,13 @@ class RdaManualController extends Controller
             'status' => 'DRAFT'
         ]);
 
+        // Generar el Bundle FHIR utilizando el Builder
+        $builder = new RdaPacienteBuilder();
+        $fhirBundle = $builder->build($payload);
+
         return response()->json([
             'success' => true,
-            'message' => 'RDA de Paciente guardado en borrador exitosamente.',
-            'data' => [
-                'document_id' => $document->id
-            ]
-        ], 201);
+            'fhir_bundle' => $fhirBundle
+        ], 201, [], JSON_UNESCAPED_SLASHES);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Organization;
 use App\User;
 
-class EmpresaUserSeeder extends Seeder
+class OrganizationUserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
