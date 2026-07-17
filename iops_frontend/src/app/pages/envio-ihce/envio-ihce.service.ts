@@ -127,14 +127,16 @@ export class EnvioIhceService {
     }
 
     /**
-     * Búsqueda de medicamentos (CUM / INN) por autocompletado.
+     * Búsqueda de medicamentos DCI (Denominación Común Internacional) por autocompletado.
      * @param query Término de búsqueda (mínimo 2 caracteres).
      */
-    searchMedicamentos(query: string): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/catalogs/search/medicamentos`, {
+    searchMedicamentosDci(query: string): Observable<any[]> {
+        return this.http.get<any>(`${this.apiUrl}/catalogs/search/medicamentos-dci`, {
             headers: this.getAuthHeaders().set('X-Skip-Loading', 'true'),
             params: { q: query }
-        });
+        }).pipe(
+            map(res => res.data || [])
+        );
     }
 
     /** Retorna las Unidades de Medida (UMM) */

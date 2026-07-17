@@ -153,6 +153,30 @@ class RdaPacienteBuilder
         $generoBio = $paciente['genero_biologico'] ?? '01'; // 01=Hombre, 02=Mujer
         $codMpio   = empty($paciente['codigo_municipio']) ? '76001' : $paciente['codigo_municipio'];
 
+        // Variables demográficas dinámicas
+        $etnia        = $paciente['etnia'] ?? '6';
+        $discapacidad = $paciente['discapacidad'] ?? '08';
+        $identidad    = $paciente['identidad_genero'] ?? '04';
+
+        // Mapeo de displays
+        $etniaMap = [
+            '1' => 'Indígena', '2' => 'ROM (Gitano)', '3' => 'Raizal',
+            '4' => 'Palenquero de San Basilio', '5' => 'Negro(a), Mulato(a), Afrocolombiano(a)', '6' => 'Otras etnias'
+        ];
+        $discapacidadMap = [
+            '01' => 'Discapacidad física',
+            '02' => 'Discapacidad visual',
+            '03' => 'Discapacidad auditiva',
+            '04' => 'Discapacidad intelectual',
+            '05' => 'Discapacidad sicosocial',
+            '06' => 'Sordoceguera',
+            '07' => 'Discapacidad múltiple',
+            '08' => 'Sin discapacidad'
+        ];
+        $identidadMap = [
+            '01' => 'Masculino', '02' => 'Femenino', '03' => 'Transgénero', '04' => 'Neutro'
+        ];
+
         // Mapeo de género biológico colombiano → FHIR gender
         $genderMap = ['01' => 'male', '02' => 'female', '03' => 'other'];
         $gender = $genderMap[$generoBio] ?? 'unknown';
@@ -190,24 +214,24 @@ class RdaPacienteBuilder
                     'url' => 'https://fhir.minsalud.gov.co/rda/StructureDefinition/ExtensionPatientEthnicity',
                     'valueCoding' => [
                         'system'  => self::SYS_ETHNIC,
-                        'code'    => '6',
-                        'display' => 'Otras etnias',
+                        'code'    => $etnia,
+                        'display' => $etniaMap[$etnia],
                     ],
                 ],
                 [
                     'url' => 'https://fhir.minsalud.gov.co/rda/StructureDefinition/ExtensionPatientDisability',
                     'valueCoding' => [
                         'system'  => self::SYS_DISABILITY,
-                        'code'    => '08',
-                        'display' => 'Sin discapacidad',
+                        'code'    => $discapacidad,
+                        'display' => $discapacidadMap[$discapacidad],
                     ],
                 ],
                 [
                     'url' => 'https://fhir.minsalud.gov.co/rda/StructureDefinition/ExtensionPatientGenderIdentity',
                     'valueCoding' => [
                         'system'  => self::SYS_GENDER_ID,
-                        'code'    => $generoBio === '02' ? '02' : '01',
-                        'display' => $generoBio === '02' ? 'Femenino' : 'Masculino',
+                        'code'    => $identidad,
+                        'display' => $identidadMap[$identidad],
                     ],
                 ],
             ],

@@ -191,6 +191,41 @@ class CatalogController extends Controller
     }
 
     /**
+     * Búsqueda exclusiva de medicamentos DCI (Denominación Común Internacional) bajo el sistema MipresINN.
+     * Requerido por el validador del Ministerio de Salud para MedicationStatement.
+     * Fuente: tabla ihce.mipres_inn
+     *
+     * GET /api/hl7/catalogs/search/medicamentos-dci?q=aldesleukina
+     */
+    public function buscarMedicamentosDci(Request $request): JsonResponse
+    {
+        $termino = trim($request->query('q', ''));
+
+        if (strlen($termino) < 2) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $patron = '%' . $termino . '%';
+
+        // Buscar exclusivamente en la tabla de DCI (Principios Activos INN)
+        $items = \Illuminate\Support\Facades\DB::table('ihce.mipres_inn')
+            ->where('active', true)
+            ->where(function ($query) use ($patron) {
+                $query->where('code', 'ILIKE', $patron)
+                      ->orWhere('display', 'ILIKE', $patron);
+            })
+            ->orderBy('display')
+            ->limit(20)
+            ->get(['code as value', 'display as label'])
+            ->map(fn ($row) => [
+                'label' => $row->label . ' [DCI: ' . $row->value . ']',
+                'value' => $row->value,
+            ]);
+
+        return response()->json(['success' => true, 'data' => $items]);
+    }
+
+    /**
      * Retorna las Unidades de Medida de Medicamentos (UMM).
      * Fuente: tabla ihce.fhir_umm — columnas: code, display.
      *

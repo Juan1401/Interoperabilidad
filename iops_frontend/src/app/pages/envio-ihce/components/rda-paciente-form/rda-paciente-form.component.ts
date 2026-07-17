@@ -29,24 +29,29 @@ export class RdaPacienteFormComponent implements OnInit {
   enviando = false;
 
   // Catálogos — se poblan desde Laravel en ngOnInit()
-  tiposDocumento: any[]    = [];
+  tiposDocumento: any[] = [];
   generosBiologicos: any[] = [];
-  zonasResidencia: any[]   = [];
-  municipios: any[]        = [];
-  unidadesMedida: any[]    = [];
+  zonasResidencia: any[] = [];
+  municipios: any[] = [];
+  unidadesMedida: any[] = [];
   viasAdministracion: any[] = [];
-  tiposAlergia: any[]      = [];
-  parentescos: any[]       = [];
+  tiposAlergia: any[] = [];
+  parentescos: any[] = [];
   severidadesAlergia: any[] = [];
+  etnias: any[] = [];
+  discapacidades: any[] = [];
+  identidadesGenero: any[] = [];
+  estadosClinicos: any[] = [];
+  estadosVerificacion: any[] = [];
   unidadesTiempo = [
-    {label: 'Horas (h)', value: 'h'}, 
-    {label: 'Días (d)', value: 'd'}, 
-    {label: 'Semanas (wk)', value: 'wk'}, 
-    {label: 'Meses (mo)', value: 'mo'}
+    { label: 'Horas (h)', value: 'h' },
+    { label: 'Días (d)', value: 'd' },
+    { label: 'Semanas (wk)', value: 'wk' },
+    { label: 'Meses (mo)', value: 'mo' }
   ];
   // País fijo Colombia; EAPB opcional (sin catálogo de API por ahora)
   paises: any[] = [{ label: 'Colombia (170)', value: '170' }];
-  eapb:   any[] = [];
+  eapb: any[] = [];
 
   items: MenuItem[] = [
     { label: 'Datos Demográficos' },
@@ -69,6 +74,9 @@ export class RdaPacienteFormComponent implements OnInit {
         zona_residencia: ['', Validators.required],
         codigo_pais: ['170', Validators.required],
         codigo_municipio: ['', Validators.required],
+        etnia: ['', Validators.required],
+        discapacidad: ['', Validators.required],
+        identidad_genero: ['', Validators.required],
         eapb_codigo: ['']
       })
     }),
@@ -99,26 +107,29 @@ export class RdaPacienteFormComponent implements OnInit {
 
   /** Ciclo de vida: carga todos los catálogos en paralelo al montar el componente */
   ngOnInit(): void {
+    // Catálogos que no requieren API (datos oficiales fijos del Minsalud)
+    this.cargarCatalogosEstaticos();
+
     forkJoin({
-      tiposDocumento:   this.envioService.getCatalogoTiposDocumento(),
-      generos:          this.envioService.getCatalogoGeneros(),
-      zonas:            this.envioService.getCatalogoZonas(),
-      municipios:       this.envioService.getCatalogoMunicipios(),
-      unidadesMedida:   this.envioService.getUnidadesMedida(),
-      viasAdmin:        this.envioService.getViasAdministracion(),
-      tiposAlergia:     this.envioService.getTiposAlergia(),
-      parentescos:      this.envioService.getParentescos(),
-      severidades:      this.envioService.getSeveridades()
+      tiposDocumento: this.envioService.getCatalogoTiposDocumento(),
+      generos: this.envioService.getCatalogoGeneros(),
+      zonas: this.envioService.getCatalogoZonas(),
+      municipios: this.envioService.getCatalogoMunicipios(),
+      unidadesMedida: this.envioService.getUnidadesMedida(),
+      viasAdmin: this.envioService.getViasAdministracion(),
+      tiposAlergia: this.envioService.getTiposAlergia(),
+      parentescos: this.envioService.getParentescos(),
+      severidades: this.envioService.getSeveridades()
     }).subscribe({
       next: (data) => {
-        this.tiposDocumento     = data.tiposDocumento;
-        this.generosBiologicos  = data.generos;
-        this.zonasResidencia    = data.zonas;
-        this.municipios         = data.municipios;
-        this.unidadesMedida     = data.unidadesMedida;
+        this.tiposDocumento = data.tiposDocumento;
+        this.generosBiologicos = data.generos;
+        this.zonasResidencia = data.zonas;
+        this.municipios = data.municipios;
+        this.unidadesMedida = data.unidadesMedida;
         this.viasAdministracion = data.viasAdmin;
-        this.tiposAlergia       = data.tiposAlergia;
-        this.parentescos        = data.parentescos;
+        this.tiposAlergia = data.tiposAlergia;
+        this.parentescos = data.parentescos;
         this.severidadesAlergia = data.severidades;
       },
       error: (err) => {
@@ -145,20 +156,20 @@ export class RdaPacienteFormComponent implements OnInit {
       return;
     }
     this.envioService.searchDiagnosticos(event.query).subscribe({
-      next:  (resultados) => { this.sugerenciasDiagnosticos = resultados; },
-      error: ()           => { this.sugerenciasDiagnosticos = []; }
+      next: (resultados) => { this.sugerenciasDiagnosticos = resultados; },
+      error: () => { this.sugerenciasDiagnosticos = []; }
     });
   }
 
-  /** Delega la búsqueda de medicamentos (CUM/INN) al CatalogController de Laravel */
+  /** Delega la búsqueda de medicamentos DCI al CatalogController de Laravel */
   buscarMedicamento(event: any): void {
     if (!event.query || event.query.trim().length < 2) {
       this.sugerenciasMedicamentos = [];
       return;
     }
-    this.envioService.searchMedicamentos(event.query).subscribe({
-      next:  (resultados) => { this.sugerenciasMedicamentos = resultados; },
-      error: ()           => { this.sugerenciasMedicamentos = []; }
+    this.envioService.searchMedicamentosDci(event.query).subscribe({
+      next: (resultados) => { this.sugerenciasMedicamentos = resultados; },
+      error: () => { this.sugerenciasMedicamentos = []; }
     });
   }
 
@@ -234,7 +245,32 @@ export class RdaPacienteFormComponent implements OnInit {
       return;
     }
 
-    const payload = this.rdaPacienteForm.getRawValue();
+    let payload = this.rdaPacienteForm.getRawValue();
+
+    // 🚀 Limpieza del Payload: Extraemos solo el string (value) de los autocompletados
+    // para cumplir estrictamente con las reglas required|string del backend.
+    
+    if (payload.caja_antecedentes?.patologicos) {
+      payload.caja_antecedentes.patologicos = payload.caja_antecedentes.patologicos.map((p: any) => ({
+        ...p,
+        codigo_cie10: (p.codigo_cie10 && typeof p.codigo_cie10 === 'object') ? p.codigo_cie10.value : p.codigo_cie10
+      }));
+    }
+
+    if (payload.caja_antecedentes?.farmacologicos) {
+      payload.caja_antecedentes.farmacologicos = payload.caja_antecedentes.farmacologicos.map((f: any) => ({
+        ...f,
+        medicamento: (f.medicamento && typeof f.medicamento === 'object') ? f.medicamento.value : f.medicamento
+      }));
+    }
+
+    if (payload.caja_antecedentes?.familiares) {
+      payload.caja_antecedentes.familiares = payload.caja_antecedentes.familiares.map((fam: any) => ({
+        ...fam,
+        codigo_cie10: (fam.codigo_cie10 && typeof fam.codigo_cie10 === 'object') ? fam.codigo_cie10.value : fam.codigo_cie10
+      }));
+    }
+
     console.log('📋 Payload RDA Paciente listo para enviar:', JSON.stringify(payload, null, 2));
 
     this.enviando = true;
@@ -297,6 +333,67 @@ export class RdaPacienteFormComponent implements OnInit {
   get municipioFormateado(): string {
     const val = this.rdaPacienteForm.get('caja_1_demograficos.paciente.codigo_municipio')?.value;
     return this.municipios.find(m => m.value === val)?.label || val || '—';
+  }
+
+  /** Devuelve la etiqueta de la etnia seleccionada */
+  get etniaFormateada(): string {
+    const val = this.rdaPacienteForm.get('caja_1_demograficos.paciente.etnia')?.value;
+    return this.etnias.find(e => e.value === val)?.label || '—';
+  }
+
+  /** Devuelve la etiqueta de la discapacidad seleccionada */
+  get discapacidadFormateada(): string {
+    const val = this.rdaPacienteForm.get('caja_1_demograficos.paciente.discapacidad')?.value;
+    return this.discapacidades.find(d => d.value === val)?.label || '—';
+  }
+
+  /** Devuelve la etiqueta de la identidad de género seleccionada */
+  get identidadGeneroFormateada(): string {
+    const val = this.rdaPacienteForm.get('caja_1_demograficos.paciente.identidad_genero')?.value;
+    return this.identidadesGenero.find(i => i.value === val)?.label || '—';
+  }
+
+  /**
+   * Pobla los arreglos de catálogos que son fijos del Minsalud y no requieren consulta a la API.
+   * Se llama una sola vez desde ngOnInit().
+   */
+  private cargarCatalogosEstaticos(): void {
+    this.etnias = [
+      { label: 'Indígena', value: '1' },
+      { label: 'ROM (Gitano)', value: '2' },
+      { label: 'Raizal', value: '3' },
+      { label: 'Palenquero de San Basilio', value: '4' },
+      { label: 'Negro(a), Mulato(a), Afrocolombiano(a)', value: '5' },
+      { label: 'Otras etnias', value: '6' }
+    ];
+    this.discapacidades = [
+      { label: 'Discapacidad física', value: '01' },
+      { label: 'Discapacidad visual', value: '02' },
+      { label: 'Discapacidad auditiva', value: '03' },
+      { label: 'Discapacidad intelectual', value: '04' },
+      { label: 'Discapacidad sicosocial', value: '05' },
+      { label: 'Sordoceguera', value: '06' },
+      { label: 'Discapacidad múltiple', value: '07' },
+      { label: 'Sin discapacidad', value: '08' }
+    ];
+    this.identidadesGenero = [
+      { label: 'Masculino', value: '01' },
+      { label: 'Femenino', value: '02' },
+      { label: 'Transgénero', value: '03' },
+      { label: 'Ninguno de los anteriores', value: '04' }
+    ];
+    this.estadosClinicos = [
+      { label: 'Activo', value: 'active' },
+      { label: 'Recurrencia', value: 'recurrence' },
+      { label: 'Inactivo', value: 'inactive' },
+      { label: 'Resuelto', value: 'resolved' }
+    ];
+    this.estadosVerificacion = [
+      { label: 'No confirmado', value: 'unconfirmed' },
+      { label: 'Provisional', value: 'provisional' },
+      { label: 'Confirmado', value: 'confirmed' },
+      { label: 'Refutado', value: 'refuted' }
+    ];
   }
 }
 

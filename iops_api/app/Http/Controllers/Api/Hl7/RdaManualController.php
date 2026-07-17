@@ -64,6 +64,33 @@ class RdaManualController extends Controller
             }
         }
 
+        // Hidratar descripciones reales de medicamentos para evitar el fallback a PARACETAMOL
+        if (!empty($payload['caja_antecedentes']['farmacologicos'])) {
+            foreach ($payload['caja_antecedentes']['farmacologicos'] as &$farmaco) {
+                if (!empty($farmaco['medicamento'])) {
+                    $medCode = $farmaco['medicamento'];
+                    // Si llega como array (por ejemplo del p-autoComplete)
+                    if (is_array($medCode)) {
+                        $medCode = $medCode['value'] ?? '';
+                    }
+
+                    // Buscar primero en fhir_cums (CUM)
+                    $cum = \Illuminate\Support\Facades\DB::table('ihce.fhir_cums')
+                        ->where('code', $medCode)->first();
+                    if ($cum) {
+                        $farmaco['medicamento_nombre'] = $cum->display;
+                    } else {
+                        // Buscar en mipres_inn (INN)
+                        $inn = \Illuminate\Support\Facades\DB::table('ihce.mipres_inn')
+                            ->where('code', $medCode)->first();
+                        if ($inn) {
+                            $farmaco['medicamento_nombre'] = $inn->display;
+                        }
+                    }
+                }
+            }
+        }
+
         // 4. Guardar en la Base de Datos
         $document = RdaDocument::create([
             'user_id' => $user->id,
