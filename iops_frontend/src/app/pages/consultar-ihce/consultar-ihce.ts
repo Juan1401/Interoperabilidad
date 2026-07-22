@@ -152,8 +152,12 @@ export class ConsultarIhce implements OnInit {
     }
 
     asignarValoresSesion() {
-        const data = this.sessionData();
+        const data = this.sessionData() || this.sessionService.getStoredData();
         console.log('data::', data);
+
+        if (data && !this.sessionData()) {
+            this.sessionService.setSessionData(data);
+        }
 
         /*
         // Validación de credenciales del usuario logueado
@@ -516,12 +520,15 @@ export class ConsultarIhce implements OnInit {
      */
     private dispararAuditoriaRda(fila: any, tipoRdaId: number): void {
         try {
-            const session = this.sessionData();
+            const session = this.sessionData() || this.sessionService.getStoredData();
 
-            // console.log('Session:', session);
+            // Extraer user_id desde la sesión (normalizada en SessionService)
+            const userId: number = Number(session?.id ?? session?.usuario_id ?? session?.user_id ?? session?.US ?? 0);
 
-            // Extraer user_id desde la sesión
-            const userId: number = session?.usuario_id ?? session?.user_id ?? session?.id ?? session?.US ?? 0;
+            if (!userId || userId < 1) {
+                console.warn('[Auditoría RDA] Omitiendo auditoría: No se encontró un user_id válido en la sesión active.');
+                return;
+            }
 
             // Extraer el ID del Composition desde la entrada del Bundle FHIR
             // Estructura: fila.resource.id (si ya es el recurso) o buscar en fila.entry[]
