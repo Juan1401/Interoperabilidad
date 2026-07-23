@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { Observable, tap, catchError, throwError, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoginCredentials, LoginResponse, UsuarioInfo } from '../models/auth.models';
+import { SessionService } from './session.service';
 
 /**
  * Interface para la solicitud de auditoría de acceso
@@ -30,6 +31,7 @@ export interface OAuthTokenResponse {
 })
 export class AuthService {
     private http = inject(HttpClient);
+    private sessionService = inject(SessionService);
 
     // Clave usada para persistir el token en sessionStorage
     private readonly TOKEN_KEY = 'HL7_OAUTH_TOKEN';
@@ -45,12 +47,13 @@ export class AuthService {
     private router = inject(Router);
 
     /**
-     * Recupera el usuario guardado del sessionStorage
+     * Recupera el usuario guardado del localStorage o sessionStorage
      */
     private getStoredUser(): UsuarioInfo | null {
-        const stored = sessionStorage.getItem('HL7_USER_INFO');
+        const stored = localStorage.getItem('HL7_USER_INFO') || sessionStorage.getItem('HL7_USER_INFO');
         return stored ? JSON.parse(stored) : null;
     }
+
 
     /**
      * Ejecuta la petición POST a Laravel para obtener el Crendetial Token.
@@ -80,9 +83,10 @@ export class AuthService {
     }
 
     /**
-     * Guarda el Token en la sesión actual
+     * Guarda el Token en la sesión actual (localStorage + sessionStorage)
      */
     private setSessionToken(token: string): void {
+        localStorage.setItem(this.TOKEN_KEY, token);
         sessionStorage.setItem(this.TOKEN_KEY, token);
     }
 
@@ -90,14 +94,40 @@ export class AuthService {
      * Retorna el token almacenado si la aplicación lo requiere en otro servicio (ej: Interceptors)
      */
     public getSessionToken(): string | null {
-        return sessionStorage.getItem(this.TOKEN_KEY);
+        return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
     }
 
     /**
      * Elimina el token de la sesión al cerrar la app o caducar
      */
     public clearSessionToken(): void {
+        localStorage.removeItem(this.TOKEN_KEY);
         sessionStorage.removeItem(this.TOKEN_KEY);
+    }
+
+
+    /**
+     * Obtiene la dirección IP real del cliente consultando al backend.
+     * Laravel detecta la IP respetando cabeceras de proxy inverso (Nginx).
+     * Requiere que el token OAuth (client_credentials) ya esté almacenado.
+     */
+    public getClientIp(): Observable<{ ip: string }> {
+        const token = this.getSessionToken();
+        const headers = new HttpHeaders({
+            Authorization: `Bearer ${token ?? ''}`
+        });
+        return this.http.get<{ ip: string }>(
+            `${environment.apiAuth.url}/api/client-ip`,
+            { headers }
+        );
+    }
+
+    /**
+     * Retorna la IP del cliente ya almacenada en localStorage o sessionStorage.
+     * Devuelve '0.0.0.0' si aún no ha sido capturada.
+     */
+    public getStoredClientIp(): string {
+        return localStorage.getItem('CLIENT_IP') ?? sessionStorage.getItem('CLIENT_IP') ?? '0.0.0.0';
     }
 
     /**
@@ -159,9 +189,16 @@ export class AuthService {
         return this.http.post<LoginResponse>(url, credentials, { headers }).pipe(
             tap((response) => {
                 if (response && response.access_token) {
+                    // Almacenar el token de usuario (reemplaza el token client_credentials)
                     this.setSessionToken(response.access_token);
-                    sessionStorage.setItem('HL7_USER_INFO', JSON.stringify(response.user));
+                    // Persistir datos del usuario en localStorage y sessionStorage
+                    const userStr = JSON.stringify(response.user);
+                    localStorage.setItem('HL7_USER_INFO', userStr);
+                    sessionStorage.setItem('HL7_USER_INFO', userStr);
+                    // Actualizar Signal del usuario actual
                     this._currentUser.set(response.user);
+                    // Alimentar el SessionService para que todos los módulos tengan acceso reactivo
+                    this.sessionService.setSessionData(response.user);
                 }
             }),
             catchError((error: any) => {
@@ -176,8 +213,14 @@ export class AuthService {
      */
     public logout(): void {
         this.clearSessionToken();
+        localStorage.removeItem('HL7_USER_INFO');
+        localStorage.removeItem('CLIENT_IP');
         sessionStorage.removeItem('HL7_USER_INFO');
+        sessionStorage.removeItem('CLIENT_IP');
         this._currentUser.set(null);
+        // Limpiar también la sesión del SessionService (Signal + storage)
+        this.sessionService.clearSession();
         this.router.navigate(['/auth/login']);
     }
+
 }

@@ -38,11 +38,9 @@ export class AppMenu implements OnInit {
     updateMenu(sessionData: any) {
         const dashboardItems: MenuItem[] = [
             { label: 'Inicio', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-            { label: 'Crear RDA Paciente', icon: 'pi pi-fw pi-user-plus', routerLink: ['/rda-paciente'] },
-            { label: 'Consultar IHCE', icon: 'pi pi-fw pi-search', routerLink: ['/consultar-ihce'] }
-            // { label: 'Envío IHCE', icon: 'pi pi-fw pi-send', routerLink: ['/send-ihce'] },
-            // { label: 'Consultar IHCE', icon: 'pi pi-fw pi-search', routerLink: ['/consultar-ihce'] }
+            { label: 'Crear RDA Paciente', icon: 'pi pi-fw pi-user-plus', routerLink: ['/rda-paciente'] }
         ];
+
         // console.log('sessionData::', sessionData);
         if (sessionData) {
             if (sessionData.PERMISSION) {

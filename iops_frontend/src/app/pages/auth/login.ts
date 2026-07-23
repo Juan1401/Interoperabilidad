@@ -10,7 +10,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
+import { SessionService } from '../../services/session.service';
+import { IpService } from '../../services/ip.service';
 import { AuthState } from '../../models/auth.models';
+
 
 @Component({
     selector: 'app-login',
@@ -60,27 +63,42 @@ import { AuthState } from '../../models/auth.models';
     `
 })
 export class Login implements OnInit {
-    private fb = inject(FormBuilder);
-    private authService = inject(AuthService);
-    private router = inject(Router);
+    private fb            = inject(FormBuilder);
+    private authService   = inject(AuthService);
+    private router        = inject(Router);
     private messageService = inject(MessageService);
 
     public loginForm = this.fb.group({
-        usuario: ['', [Validators.required]],
+        usuario:  ['', [Validators.required]],
         password: ['', [Validators.required]]
     });
 
-    public authState = signal<AuthState>('idle');
+    public authState    = signal<AuthState>('idle');
     public errorMessage = signal<string>('');
 
     public isLoading = computed(() => this.authState() === 'loading');
 
     async ngOnInit() {
         try {
+            // 1. Obtener el token OAuth (client_credentials) para consumir la API
             await firstValueFrom(this.authService.fetchAndStoreToken());
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Aplicacion en linea y lista para procesar solicitudes' });
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Sistema en línea',
+                detail: 'Aplicación lista para procesar solicitudes'
+            });
+
+            // 2. Capturar y almacenar la IP real del cliente en sessionStorage.
+            //    Se hace aquí (con el token ya disponible) para tenerla lista
+            //    cuando se requiera en la auditoría de acceso post-login.
+            this.capturarIpCliente();
+
         } catch (error) {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo obtener el token de acceso' });
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error de conexión',
+                detail: 'No se pudo establecer conexión con el servidor'
+            });
         }
     }
 
@@ -98,11 +116,38 @@ export class Login implements OnInit {
             await firstValueFrom(this.authService.login(credentials));
 
             this.authState.set('success');
-            // Login exitoso, vamos a la raíz que está protegida por el authGuard
+            // Login exitoso → navegar a la raíz (protegida por AuthGuard)
             await this.router.navigate(['/']);
         } catch (error: any) {
             this.authState.set('error');
             this.errorMessage.set(error.message || 'Error al conectar con el servidor.');
         }
     }
+
+    private ipService      = inject(IpService);
+    private sessionService = inject(SessionService);
+
+    /**
+     * Detecta la IP real de la máquina cliente (red LAN física e.g. 192.168.4.127) mediante IpService.
+     * Persiste la IP en sessionStorage, localStorage y actualiza la Signal de sesión activa.
+     */
+    private async capturarIpCliente(): Promise<void> {
+        try {
+            const ip = await this.ipService.detectLocalIp();
+            sessionStorage.setItem('CLIENT_IP', ip);
+            localStorage.setItem('CLIENT_IP', ip);
+
+            // Si ya hay sesión cargada en SessionService, actualizar la IP en la Signal
+            const currentSession = this.sessionService.sessionData();
+            if (currentSession) {
+                currentSession.IP = ip;
+                this.sessionService.setSessionData(currentSession);
+            }
+        } catch (e) {
+            console.warn('[Login] No se pudo obtener la IP de la máquina local:', e);
+            sessionStorage.setItem('CLIENT_IP', '127.0.0.1');
+            localStorage.setItem('CLIENT_IP', '127.0.0.1');
+        }
+    }
 }
+

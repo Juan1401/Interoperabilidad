@@ -9,6 +9,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { forkJoin, of, from } from 'rxjs';
 import { catchError, finalize, concatMap, toArray } from 'rxjs/operators';
 import { EnvioIhceService } from './envio-ihce.service';
+import { SessionService } from '../../services/session.service';
+
 import { LayoutService } from '../../layout/service/layout.service';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -85,6 +87,7 @@ const documentPairValidator: ValidatorFn = (control: AbstractControl): Validatio
 export class EnvioIhce implements OnInit {
     private fb = inject(NonNullableFormBuilder);
     private envioIhceService = inject(EnvioIhceService);
+    private sessionService = inject(SessionService);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     private layoutService = inject(LayoutService);
@@ -344,10 +347,8 @@ export class EnvioIhce implements OnInit {
                     styleClass: 'backdrop-blur-lg rounded-2xl'
                 });
 
-                // Obtener usuario de sesión actual
-                const decryptedSessionStr = sessionStorage.getItem('decryptedSession');
-                const decryptedSession = decryptedSessionStr ? JSON.parse(decryptedSessionStr) : null;
-                const usuarioId = decryptedSession?.US || '';
+                // Obtener el ID del usuario desde la Signal reactiva de sesión
+                const usuarioId = this.sessionService.sessionData()?.id ?? 0;
 
                 // Un solo flujo secuencial: concatMap + tap para progreso + toArray para resumen final
                 from(seleccionados)
@@ -355,7 +356,7 @@ export class EnvioIhce implements OnInit {
                         concatMap((ingreso: any) => {
                             const payload = {
                                 ingreso: ingreso.ingreso,
-                                usuario_id: usuarioId
+                                usuario_id: String(usuarioId)
                             };
 
                             return this.envioIhceService.enviarRdaPaciente(payload).pipe(
@@ -408,14 +409,13 @@ export class EnvioIhce implements OnInit {
             acceptButtonStyleClass: 'p-button-primary',
             rejectButtonStyleClass: 'p-button-secondary p-button-outlined',
             accept: () => {
-                // Obtener y parsear a objeto el string de la sesión
-                const decryptedSessionStr = sessionStorage.getItem('decryptedSession');
-                const decryptedSession = decryptedSessionStr ? JSON.parse(decryptedSessionStr) : null;
+                // Obtener el ID del usuario desde la Signal reactiva de sesión
+                const usuarioId = this.sessionService.sessionData()?.id ?? 0;
 
                 // json que contiene la informacion a enviar para el endpoint RDA
                 const payload = {
                     ingreso: ingreso.ingreso,
-                    usuario_id: decryptedSession?.US || ''
+                    usuario_id: String(usuarioId)
                 };
 
                 // console.log('Enviando Payload RDA (Objeto):', payload);

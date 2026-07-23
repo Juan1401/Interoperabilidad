@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -27,10 +27,12 @@ import { MessageService } from 'primeng/api';
 
         <!-- IP Central -->
         <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-lg pointer-events-none" style="color: var(--text-color);">
-            @if (sessionData()?.IP) {
-                <span>IP: {{ sessionData()?.IP }}</span>
+            @if (userIp()) {
+                <span>IP: {{ userIp() }}</span>
             }
         </div>
+
+
 
         <div class="layout-topbar-actions gap-2">
             <div class="layout-config-menu flex gap-2">
@@ -98,6 +100,8 @@ export class AppTopbar implements OnInit, OnDestroy {
     router = inject(Router);
 
     sessionData = this.sessionService.sessionData;
+    userIp = computed(() => (this.sessionData() as any)?.IP || '');
+
 
     currentDate = signal<string>('');
     currentTime = signal<string>('');

@@ -22,6 +22,9 @@ use App\Http\Controllers\Api\Hl7\CatalogController;
 // Ruta por defecto de Passport para obtener información del usuario autenticado.
 Route::get('/user', [AuthController::class, 'user']);
 
+// Retorna la IP real del cliente (usada en auditoría de acceso del login).
+Route::get('/client-ip', [AuthController::class, 'getClientIp'])->middleware('client');
+
 // Endpoint para que los usuarios inicien sesión.
 Route::post('/login', [AuthController::class, 'login'])->middleware('client');
 
