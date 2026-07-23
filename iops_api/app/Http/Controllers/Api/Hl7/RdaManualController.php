@@ -91,20 +91,32 @@ class RdaManualController extends Controller
             }
         }
 
-        // 4. Guardar en la Base de Datos
+        // 4. Guardar el payload del formulario en la Base de Datos como borrador inicial
         $document = RdaDocument::create([
-            'user_id' => $user->id,
+            'user_id'       => $user->id,
             'document_type' => 'RDA_PACIENTE',
-            'form_payload' => $payload,
-            'status' => 'DRAFT'
+            'form_payload'  => $payload,
+            'status'        => 'DRAFT'
         ]);
 
-        // Generar el Bundle FHIR utilizando el Builder
-        $builder = new RdaPacienteBuilder();
-        $fhirBundle = $builder->build($payload);
+        // 5. Generar el Bundle FHIR utilizando el Builder
+        $builder     = new RdaPacienteBuilder();
+        $fhirBundle  = $builder->build($payload);
+
+        // 6. Persistir el Bundle FHIR generado y marcar el documento como listo
+        //    Esto permite auditoría, reintentos de envío y trazabilidad completa.
+        $document->update([
+            'fhir_bundle_generated' => $fhirBundle,
+            'status'                => 'READY'
+        ]);
 
         return response()->json([
-            'success' => true,
+            'success'    => true,
+            'message'    => 'Bundle FHIR generado y almacenado correctamente.',
+            'data'       => [
+                'document_id' => $document->id,
+                'status'      => $document->status,
+            ],
             'fhir_bundle' => $fhirBundle
         ], 201, [], JSON_UNESCAPED_SLASHES);
     }
