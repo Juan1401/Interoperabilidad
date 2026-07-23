@@ -35,6 +35,9 @@ export class RdaPacienteFormComponent implements OnInit {
   // Estado del documento para feedback visual en el Paso 3
   statusDocumento: 'idle' | 'DRAFT' | 'READY' | 'ACCEPTED' | 'REJECTED' | 'ERROR_AUTH' | 'ERROR_SERVER' | 'ERROR' = 'idle';
 
+  // Errores específicos devueltos por el Ministerio
+  erroresMinisterio: string[] = [];
+
   // Catálogos — se poblan desde Laravel en ngOnInit()
   tiposDocumento: any[] = [];
   generosBiologicos: any[] = [];
@@ -279,6 +282,8 @@ export class RdaPacienteFormComponent implements OnInit {
     // ── FASE 1: Guardar en BD y generar Bundle FHIR ─────────────────────────
     this.enviando = true;
     this.statusDocumento = 'DRAFT';
+    this.erroresMinisterio = []; // Limpiamos errores previos
+
     this.envioService.postRdaPaciente(payload).subscribe({
       next: (response) => {
         this.enviando = false;
@@ -340,8 +345,14 @@ export class RdaPacienteFormComponent implements OnInit {
         });
 
         // Log de errores FHIR del Ministerio para depuración
-        if (!response?.success && response?.data?.errors) {
+        if (!response?.success && response?.data?.errors?.issue) {
           console.warn('❌ Errores FHIR del Ministerio:', response.data.errors);
+          // Extraer el texto de los errores
+          this.erroresMinisterio = response.data.errors.issue.map((i: any) => 
+            i.details?.text || i.diagnostics || 'Error de validación desconocido'
+          );
+        } else {
+          this.erroresMinisterio = [];
         }
       },
       error: (httpError) => {

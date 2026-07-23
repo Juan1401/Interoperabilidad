@@ -494,6 +494,17 @@
               }
               @if (statusDocumento === 'REJECTED') {
                 <p class="text-sm text-red-700 dark:text-red-400">El Ministerio rechazó el documento por errores de validación.</p>
+                
+                @if (erroresMinisterio.length > 0) {
+                  <div class="mt-3 p-3 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-800 rounded-md">
+                    <span class="font-semibold text-red-800 dark:text-red-300 mb-2 block text-sm">Se encontraron los siguientes problemas:</span>
+                    <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-400 space-y-1">
+                      @for (err of erroresMinisterio; track $index) {
+                        <li>{{ err }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
               }
             </div>
 
