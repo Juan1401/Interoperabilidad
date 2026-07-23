@@ -179,5 +179,18 @@ export class EnvioIhceService {
             subscriber.complete();
         });
     }
+
+    /**
+     * Envía al Ministerio el Bundle FHIR ya almacenado en la tabla rda_documents.
+     * @param documentId UUID del RdaDocument en estado READY.
+     * @returns Observable con { success, severity, message, data }
+     */
+    sendRdaAlMinisterio(documentId: string): Observable<any> {
+        return this.http.post<any>(
+            `${this.apiUrl}/rda/paciente/manual/${documentId}/enviar`,
+            {},
+            { headers: this.getAuthHeaders().set('Content-Type', 'application/json') }
+        );
+    }
 }
 

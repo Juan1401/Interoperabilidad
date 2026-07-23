@@ -57,6 +57,9 @@ Route::post('/hl7/rda/hospitalizacion', [RdaController::class, 'getRdaHospitaliz
 // Ruta para guardar el formulario manual de RDA Paciente
 Route::post('/hl7/rda/paciente/manual', [RdaManualController::class, 'storePaciente'])->middleware('auth:api');
 
+// Ruta para enviar al Ministerio el Bundle FHIR ya almacenado en un RdaDocument
+Route::post('/hl7/rda/paciente/manual/{document_id}/enviar', [RdaManualController::class, 'sendPaciente'])->middleware('auth:api');
+
 /*
 |--------------------------------------------------------------------------
 | Catálogos HL7 — Listas desplegables y autocompletados para el formulario RDA

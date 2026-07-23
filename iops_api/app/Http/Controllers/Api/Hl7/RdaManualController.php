@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Hl7\StoreRdaPacienteRequest;
 use App\Models\RdaDocument;
 use App\Services\Fhir\RdaPacienteBuilder;
+use App\Services\Hl7\RdaPacienteService;
+use App\Services\OAuthTokenService;
 use Illuminate\Http\JsonResponse;
 
 class RdaManualController extends Controller
@@ -119,5 +121,113 @@ class RdaManualController extends Controller
             ],
             'fhir_bundle' => $fhirBundle
         ], 201, [], JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Envía al Ministerio IHCE el Bundle FHIR ya almacenado en rda_documents.
+     *
+     * Flujo:
+     *  1. Carga el documento por su UUID (valida que pertenezca al usuario autenticado).
+     *  2. Verifica que el bundle FHIR exista y el documento esté en estado READY.
+     *  3. Obtiene el token OAuth y llama al endpoint del Ministerio.
+     *  4. Persiste la respuesta en minsalud_response y actualiza el status.
+     *  5. Retorna un mensaje estructurado con warnings/errores para el frontend.
+     *
+     * POST /api/hl7/rda/paciente/manual/{document_id}/enviar
+     */
+    public function sendPaciente(string $documentId): JsonResponse
+    {
+        // 1. Obtener el documento validando que pertenezca al usuario autenticado
+        /** @var \App\User $user */
+        $user     = auth()->user();
+        $document = RdaDocument::where('id', $documentId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$document) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Documento no encontrado o no tienes permisos para enviarlo.',
+            ], 404);
+        }
+
+        // 2. Validar que el bundle FHIR esté generado
+        if (empty($document->fhir_bundle_generated)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El documento no tiene un Bundle FHIR generado. Regenere el formulario antes de enviar.',
+            ], 422);
+        }
+
+        // 3. Prevenir reenvíos de documentos ya aceptados
+        if ($document->status === 'ACCEPTED') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este documento ya fue aceptado por el Ministerio. No se puede reenviar.',
+                'data'    => ['document_id' => $document->id, 'status' => $document->status],
+            ], 409);
+        }
+
+        // 4. Obtener token OAuth y enviar al Ministerio
+        try {
+            $oauthService = app(OAuthTokenService::class);
+            $token        = $oauthService->getToken();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo obtener el token de autenticación con el Ministerio.',
+                'error'   => $e->getMessage(),
+            ], 503);
+        }
+
+        $rdaService = app(RdaPacienteService::class);
+        $result     = $rdaService->sendRdaPaciente($document->fhir_bundle_generated, $token);
+
+        // 5. Determinar el nuevo estado del documento según la respuesta del Ministerio
+        $nuevoStatus = match(true) {
+            $result['success']                     => 'ACCEPTED',
+            $result['status_code'] === 400         => 'REJECTED',
+            $result['status_code'] === 401         => 'ERROR_AUTH',
+            $result['status_code'] === 422         => 'REJECTED',
+            $result['status_code'] >= 500          => 'ERROR_SERVER',
+            default                                => 'ERROR'
+        };
+
+        // 6. Persistir la respuesta del Ministerio y el nuevo estado
+        $document->update([
+            'minsalud_response' => $result['response'],
+            'status'            => $nuevoStatus,
+        ]);
+
+        // 7. Construir la respuesta para el frontend con el nivel de severidad adecuado
+        if ($result['success']) {
+            return response()->json([
+                'success'  => true,
+                'severity' => 'success',
+                'message'  => 'RDA enviado y aceptado exitosamente por el Ministerio.',
+                'data'     => [
+                    'document_id' => $document->id,
+                    'status'      => $nuevoStatus,
+                    'http_code'   => $result['status_code'],
+                    'response'    => $result['response'],
+                ],
+            ], 200, [], JSON_UNESCAPED_SLASHES);
+        }
+
+        // Respuesta con warnings o errores
+        $esWarning = in_array($result['status_code'], [400, 422]);
+        return response()->json([
+            'success'  => false,
+            'severity' => $esWarning ? 'warn' : 'error',
+            'message'  => $esWarning
+                ? 'El Ministerio rechazó el RDA. Revise los errores de validación.'
+                : 'Error de comunicación con el Ministerio. Intente de nuevo.',
+            'data'     => [
+                'document_id' => $document->id,
+                'status'      => $nuevoStatus,
+                'http_code'   => $result['status_code'],
+                'errors'      => $result['response'],
+            ],
+        ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 }

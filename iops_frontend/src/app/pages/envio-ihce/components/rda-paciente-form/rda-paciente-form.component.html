@@ -457,10 +457,57 @@
               </div>
             </p-fieldset>
 
-            <!-- Botón de envío a ancho completo -->
-            <p-button label="Generar RDA y Enviar" icon="pi pi-send" iconPos="right" severity="success" size="large"
-              styleClass="w-full" [loading]="enviando" (onClick)="enviarRda()">
-            </p-button>
+            <!-- Indicador de Estado del Documento -->
+            <div class="p-4 border rounded-md" [ngClass]="{
+              'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700': statusDocumento === 'idle',
+              'bg-blue-50 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800': statusDocumento === 'DRAFT' || statusDocumento === 'READY',
+              'bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-800': statusDocumento === 'ACCEPTED',
+              'bg-red-50 dark:bg-red-900/40 border-red-200 dark:border-red-800': statusDocumento === 'ERROR' || statusDocumento === 'REJECTED' || statusDocumento === 'ERROR_AUTH' || statusDocumento === 'ERROR_SERVER'
+            }">
+              <div class="flex items-center gap-2 mb-2">
+                <i class="pi" [ngClass]="{
+                  'pi-file text-gray-600 dark:text-gray-400': statusDocumento === 'idle',
+                  'pi-spin pi-spinner text-blue-600 dark:text-blue-400': enviando || enviandoAlMinisterio,
+                  'pi-file-check text-blue-600 dark:text-blue-400': statusDocumento === 'READY' && !enviando && !enviandoAlMinisterio,
+                  'pi-check-circle text-green-600 dark:text-green-400': statusDocumento === 'ACCEPTED',
+                  'pi-times-circle text-red-600 dark:text-red-400': statusDocumento === 'ERROR' || statusDocumento === 'REJECTED' || statusDocumento === 'ERROR_AUTH' || statusDocumento === 'ERROR_SERVER'
+                }"></i>
+                <span class="font-semibold text-gray-800 dark:text-gray-200">Estado del RDA:</span>
+                <span class="font-bold uppercase" [ngClass]="{
+                  'text-gray-600 dark:text-gray-400': statusDocumento === 'idle',
+                  'text-blue-600 dark:text-blue-400': statusDocumento === 'DRAFT' || statusDocumento === 'READY',
+                  'text-green-600 dark:text-green-400': statusDocumento === 'ACCEPTED',
+                  'text-red-600 dark:text-red-400': statusDocumento === 'ERROR' || statusDocumento === 'REJECTED' || statusDocumento === 'ERROR_AUTH' || statusDocumento === 'ERROR_SERVER'
+                }">
+                  {{ statusDocumento === 'idle' ? 'No generado' : statusDocumento }}
+                </span>
+              </div>
+              
+              @if (statusDocumento === 'idle') {
+                <p class="text-sm text-gray-600 dark:text-gray-400">Debe generar el Bundle FHIR primero.</p>
+              }
+              @if (statusDocumento === 'READY') {
+                <p class="text-sm text-gray-600 dark:text-gray-400">El Bundle FHIR está listo. Proceda a enviarlo al Ministerio.</p>
+              }
+              @if (statusDocumento === 'ACCEPTED') {
+                <p class="text-sm text-green-700 dark:text-green-400">El documento fue aceptado exitosamente por el Ministerio.</p>
+              }
+              @if (statusDocumento === 'REJECTED') {
+                <p class="text-sm text-red-700 dark:text-red-400">El Ministerio rechazó el documento por errores de validación.</p>
+              }
+            </div>
+
+            <!-- Botones de Acción (Fase 1 y Fase 2) -->
+            <div class="flex flex-col gap-3">
+              <p-button label="1. Generar Bundle FHIR" icon="pi pi-cog" severity="info" size="large"
+                styleClass="w-full" [loading]="enviando" (onClick)="enviarRda()">
+              </p-button>
+
+              <p-button label="2. Enviar al Ministerio" icon="pi pi-send" iconPos="right" severity="success" size="large"
+                styleClass="w-full" [loading]="enviandoAlMinisterio" (onClick)="enviarAlMinisterio()"
+                [disabled]="!documentIdGenerado || statusDocumento === 'ACCEPTED'">
+              </p-button>
+            </div>
 
           </div>
         </div>

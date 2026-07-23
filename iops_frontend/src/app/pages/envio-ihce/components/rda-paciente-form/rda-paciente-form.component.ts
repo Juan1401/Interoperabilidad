@@ -27,6 +27,13 @@ export class RdaPacienteFormComponent implements OnInit {
   private messageService = inject(MessageService);
 
   enviando = false;
+  enviandoAlMinisterio = false;
+
+  // UUID del documento generado en Fase 1, necesario para la Fase 2
+  documentIdGenerado: string | null = null;
+
+  // Estado del documento para feedback visual en el Paso 3
+  statusDocumento: 'idle' | 'DRAFT' | 'READY' | 'ACCEPTED' | 'REJECTED' | 'ERROR_AUTH' | 'ERROR_SERVER' | 'ERROR' = 'idle';
 
   // Catálogos — se poblan desde Laravel en ngOnInit()
   tiposDocumento: any[] = [];
@@ -248,8 +255,6 @@ export class RdaPacienteFormComponent implements OnInit {
     let payload = this.rdaPacienteForm.getRawValue();
 
     // 🚀 Limpieza del Payload: Extraemos solo el string (value) de los autocompletados
-    // para cumplir estrictamente con las reglas required|string del backend.
-    
     if (payload.caja_antecedentes?.patologicos) {
       payload.caja_antecedentes.patologicos = payload.caja_antecedentes.patologicos.map((p: any) => ({
         ...p,
@@ -271,26 +276,83 @@ export class RdaPacienteFormComponent implements OnInit {
       }));
     }
 
-    console.log('📋 Payload RDA Paciente listo para enviar:', JSON.stringify(payload, null, 2));
-
+    // ── FASE 1: Guardar en BD y generar Bundle FHIR ─────────────────────────
     this.enviando = true;
+    this.statusDocumento = 'DRAFT';
     this.envioService.postRdaPaciente(payload).subscribe({
       next: (response) => {
         this.enviando = false;
+        this.documentIdGenerado = response?.data?.document_id ?? null;
+        this.statusDocumento = 'READY';
+
         this.messageService.add({
-          severity: 'success',
-          summary: 'RDA Enviado',
-          detail: response?.message || 'El Registro de Datos Asistenciales fue generado y enviado exitosamente.',
-          life: 8000
+          severity: 'info',
+          summary: 'Bundle FHIR generado',
+          detail: response?.message || 'El bundle FHIR fue generado correctamente. Presione "Enviar al Ministerio" para completar el proceso.',
+          life: 6000
         });
       },
       error: (error) => {
         this.enviando = false;
+        this.statusDocumento = 'ERROR';
         this.messageService.add({
           severity: 'error',
-          summary: 'Error en el envío',
-          detail: error?.error?.message || 'Ocurrió un error inesperado al enviar el RDA. Intente de nuevo.',
+          summary: 'Error al generar el Bundle FHIR',
+          detail: error?.error?.message || 'Ocurrió un error inesperado al guardar el formulario.',
           life: 8000
+        });
+      }
+    });
+  }
+
+  /** FASE 2: Envía al Ministerio el bundle FHIR ya almacenado */
+  enviarAlMinisterio() {
+    if (!this.documentIdGenerado) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción requerida',
+        detail: 'Primero debe generar el Bundle FHIR presionando "Generar RDA".',
+        life: 5000
+      });
+      return;
+    }
+
+    this.enviandoAlMinisterio = true;
+    this.envioService.sendRdaAlMinisterio(this.documentIdGenerado).subscribe({
+      next: (response) => {
+        this.enviandoAlMinisterio = false;
+        this.statusDocumento = response?.data?.status ?? 'ERROR';
+
+        // El backend retorna severity: 'success' | 'warn' | 'error'
+        const severity = response?.severity ?? (response?.success ? 'success' : 'error');
+        const summary = severity === 'success'
+          ? '✅ RDA Aceptado por el Ministerio'
+          : severity === 'warn'
+          ? '⚠️ RDA Rechazado — Revisar errores'
+          : '❌ Error de comunicación';
+
+        this.messageService.add({
+          severity,
+          summary,
+          detail: response?.message ?? 'Sin detalles disponibles.',
+          life: 10000,
+          sticky: severity !== 'success'
+        });
+
+        // Log de errores FHIR del Ministerio para depuración
+        if (!response?.success && response?.data?.errors) {
+          console.warn('❌ Errores FHIR del Ministerio:', response.data.errors);
+        }
+      },
+      error: (httpError) => {
+        this.enviandoAlMinisterio = false;
+        this.statusDocumento = 'ERROR';
+        this.messageService.add({
+          severity: 'error',
+          summary: '❌ Error de red',
+          detail: httpError?.error?.message || 'No se pudo conectar con el servidor. Verifique su conexión.',
+          life: 10000,
+          sticky: true
         });
       }
     });
